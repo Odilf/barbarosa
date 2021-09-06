@@ -546,22 +546,24 @@ The cost of a path is the number of moves to get to a node plus the heuristic fo
 If the tree is searched and exahusted given a certain threshold, then the tree is recomputed with the new threshold being the smallest cost that passed the threshold in the previous search. This is repeated until a solution is found. 
 """
 
-# ╔═╡ b0e10764-4df6-4822-b676-5d8af215cd5c
-begin
-	caca = 0
-	for i in 1:20
-		if i > 3
-			continue
-		end
-		caca = i
-	end
-	caca
-end
-
 # ╔═╡ 0bd91365-0c38-443c-b243-a73a2d11713a
 md"""
-Also a function to return a nice string with the solution would be useful, since moves are added to the begging of the solution array. 
+Also a function to return a nice string with the solution is implemented as a `pretty_print` keyword argument in the IDA* function. 
 """
+
+# ╔═╡ 788ef26c-a08c-418d-b580-ca5382e236c6
+function prettyprint(solution::Vector{<:Any}, delim=" ")
+	solution = name.(solution)
+	# Join move subarrays
+	solution = map(v -> if typeof(v) <: Array{<:Any} 
+			join(v, delim) 
+			else v 
+		end, solution)
+	join(solution, delim)
+end
+
+# ╔═╡ abbb92c5-400f-487a-85df-486a98d83f0e
+join(["R U", "R"], " ")
 
 # ╔═╡ 6e846e60-5274-4095-b7e8-b83f13adcab4
 md"""
@@ -582,34 +584,32 @@ md"""
 We will store the table using the HDF5 format and julia library
 """
 
-# ╔═╡ 8f075ce2-f0a2-407e-b737-7602278f2d07
-
-
 # ╔═╡ 56600142-c703-420f-9b9b-39d65cb6588c
-function heuristic(cube::Cube)
+function constant_heuristic(cube::Cube)
 	1
 end
 
 # ╔═╡ 18b8f949-3c34-4648-83ed-c21b6c9bad67
-function search(cube, g, threshold, solution, new_threshold)
+function search(cube, g, threshold, solution, new_threshold, heuristic = constant_heuristic)
 	
 	# Check if solved
 	if issolved(cube)
 		return solution, 69420
 	end
-
+	
 	# Check threshold
 	cost = g + heuristic(cube)
 	if cost > threshold
 		if cost < new_threshold
 			new_threshold = cost
 		end
+		# error("newthresh is $new_threshold, g is $g, cost is $cost, threshold is $threshold solution is $(name(solution))")
 		return nothing, new_threshold
 	end
 	
 	# Search deeper
 	for (current_move, path_cost) in getmoves(solution)
-		new_solution, new_theshold = search(
+		new_solution, new_threshold = search(
 			move(cube, current_move),
 			g + path_cost,
 			threshold,
@@ -618,45 +618,46 @@ function search(cube, g, threshold, solution, new_threshold)
 		)
 		
 		if new_solution ≠ nothing
-			return new_solution, new_threshold
+			return new_solution, 69420
 		end
 	end
-	return nothing, 69420
+	return nothing, new_threshold
 end
 
 # ╔═╡ b95875a3-912f-4993-b248-86f9432c8f91
-function IDAsolve(cube, limit = 10)
+function IDAsolve(cube; limit = 10, heuristic = constant_heuristic, pretty_print = true)
 	if !issolvable(cube)
 		error("Cube is unsolvable")
 	end
 
 	threshold = heuristic(cube)
-	new_threshold = threshold
 	
 	for i in 1:limit
-		solution, new_threshold = search(cube, 0, threshold, [], Inf)
+		solution, threshold = search(cube, 0, threshold, [], Inf, heuristic)
 		
 		if solution ≠ nothing
-			return solution.reverse()
+			solution = reverse(solution)
+			if pretty_print
+				solution = prettyprint(solution)
+			end
+			return solution
 		end
-		
-		threshold = new_threshold
 	end
 	
 	error("No solution found with iteration limit $limit")
 end
 
 # ╔═╡ da373699-225b-4ffe-b89b-635027c76f98
-begin
-	sexy_solution = IDAsolve(sexy_cube, 2)
-	name(sexy_solution)
-end
+sexy_solution = IDAsolve(sexy_cube)
 
 # ╔═╡ 4d99d8b7-814a-40be-b563-44f367321cdf
-prettyprint(sexy_solution)
+prettyprint(sexy_solution, ", ")
 
 # ╔═╡ a494d531-9f41-4430-b590-82754cdc6503
-prettyprint(IDAsolve(move(solved_cube, ["R", "L", "U", "D2", "F'", "U2"])))
+let
+	solution = IDAsolve(move(solved_cube, ["R", "L", "U", "D2", "F'", "U2"]), pretty_print = false)
+	prettyprint(solution)
+end
 
 # ╔═╡ c16bb000-c3f8-4b6f-9e36-4efb9166f3d8
 md"""
@@ -679,7 +680,6 @@ md"""
 
 # ╔═╡ 498a345d-9126-4cd2-8ee0-b9f7bad31f85
 md"""
-#### Corners
 There are $3$ ways to orient any corner and $8$ places to place them. Because of parity, we know the orientation of the last corner given the other seven, so we have $3^7$ possible corner orientations. 
 
 In a solved cube, the same happens with the positions. However we are not taking into account the edges, so any corner culd be in any position, which gives us $8!$ combinations for corners. 
@@ -979,7 +979,7 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╠═fda5ad80-b79f-4464-b35d-fe6a29bca77d
 # ╠═3b9ffb15-86ec-4ca2-9e04-0c8eadc61c54
 # ╠═7cbcc253-69d3-40b9-a559-311a8bf98a12
-# ╠═3f5b9fc4-abfa-4d14-b846-1becb0a9bbbb
+# ╟─3f5b9fc4-abfa-4d14-b846-1becb0a9bbbb
 # ╟─410ac675-a7e8-484a-93fb-bf6bbb3115e6
 # ╠═638a1ca2-850b-429d-9d76-4823a0f7b0bd
 # ╟─b4a3bf53-de29-4890-a6f2-3746a6022265
@@ -1023,14 +1023,14 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╠═b95875a3-912f-4993-b248-86f9432c8f91
 # ╠═18b8f949-3c34-4648-83ed-c21b6c9bad67
 # ╠═da373699-225b-4ffe-b89b-635027c76f98
-# ╠═b0e10764-4df6-4822-b676-5d8af215cd5c
 # ╟─0bd91365-0c38-443c-b243-a73a2d11713a
+# ╠═788ef26c-a08c-418d-b580-ca5382e236c6
+# ╠═abbb92c5-400f-487a-85df-486a98d83f0e
 # ╠═4d99d8b7-814a-40be-b563-44f367321cdf
 # ╠═a494d531-9f41-4430-b590-82754cdc6503
 # ╟─6e846e60-5274-4095-b7e8-b83f13adcab4
 # ╟─cbce1f2e-6869-4918-b5bc-bfd4ad275e86
 # ╠═01e2e5fc-3f22-494b-8f51-43db0f788041
-# ╠═8f075ce2-f0a2-407e-b737-7602278f2d07
 # ╠═56600142-c703-420f-9b9b-39d65cb6588c
 # ╟─c16bb000-c3f8-4b6f-9e36-4efb9166f3d8
 # ╟─e64bd260-babe-4b06-94cb-e8d18b2035ad
