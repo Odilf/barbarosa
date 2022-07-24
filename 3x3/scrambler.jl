@@ -1,7 +1,5 @@
 include("3x3.jl")
 
-function randomcube()
+function scramble()
 	return cube()
 end
-
-randomcube()

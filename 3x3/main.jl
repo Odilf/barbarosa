@@ -7,7 +7,7 @@ end
 
 module Scrambler
 
-export randomcube
+export scramble
 
 include("scrambler.jl")
 

@@ -6,21 +6,21 @@ Vector3 = SVector{3, <:Int}
 
 rotation_matrices_dict = Dict(
 	X => θ -> [
-		1 0 0
-		0 cos(θ) sin(θ)
+		1   0       0
+		0 cos(θ)  sin(θ)
 		0 -sin(θ) cos(θ) 
 	],
 
 	Y => θ -> [
-		cos(θ) 0 sin(θ)
-		0 1 0
-		-sin(θ) 0 cos(θ)
+		cos(θ)  0 -sin(θ)
+		   0    1   0
+		sin(θ) 0 cos(θ)
 	],
 
 	Z => θ -> [
-		cos(θ) -sin(θ) 0
-		sin(θ) cos(θ) 0
-		0 0 1
+		cos(θ)   sin(θ) 0
+		-sin(θ)  cos(θ) 0
+		   0       0    1
 	]
 )
 

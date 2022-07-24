@@ -2,13 +2,10 @@ include("../3x3/3x3.jl")
 
 using Test
 
-using .Cube3x3: rotate, X, Y, Z, parsemove
-using StaticArrays
-
 # Check position rotation
-@test Cube3x3.rotate(SVector(1, 0, 1), X, 2π/2) == [1, 0, -1] # R2
-@test rotate(SVector(3, 2, 1), Y, 2π/4) == [1, 2, -3] # Random
-@test rotate(SVector(1, 1, 1), Z, 2π/4) == [-1, 1, 1] # F
+@test rotate(SVector(1, 0, 1), X, 2π/2) == [1, 0, -1] # R2
+@test rotate(SVector(3, 2, 1), Y, 2π/4) == [-1, 2, 3] # Random
+@test rotate(SVector(1, 1, 1), Z, 2π/4) == [1, -1, 1] # F
 @test rotate(SVector(1, 1, 1), X, 2π/4) == [1, 1, -1] # R
 
 # Check move parsing
@@ -25,11 +22,12 @@ using StaticArrays
 @test movedata(parsemove("B2")) == (-2π/2, Z)
 
 # Check moving pieces
-@test move(SVector(1, 1, 0), "R") == [1, 0, -1]
-@test move(SVector(1, 0, 1), "R2") == [1, 0, -1]
-@test move(SVector(1, 1, 1), "F") == [-1, 1, 1]
-@test move(SVector(1, 0, 0), "L") == [1, 0, 0]
-@test move(SVector(-1, 1, 0), "L") == [-1, 0, 1]
+@test move(SVector(1, 1, 0), parsemove("R")) == [1, 0, -1]
+@test move(SVector(1, 0, 1), parsemove("R2")) == [1, 0, -1]
+@test move(SVector(1, 1, 1), parsemove("F")) == [1, -1, 1]
+@test move(SVector(1, 0, 0), parsemove("L")) == [1, 0, 0]
+@test move(SVector(-1, 1, 0), parsemove("L")) == [-1, 0, 1]
+@test move(SVector(1, 1, 1), parsemove("U")) == [-1, 1, 1]
 
 # Check piece generation
 @test length(edges()) == 12
@@ -44,12 +42,13 @@ using StaticArrays
 @test isinrange(SVector(0, 1, 0), SVector(-1, 0, 1)) == false
 
 # Check movement
-include("../3x3/3x3.jl")
+include("../3x3/algs.jl")
 
-@test move(cube(), "R2 R2") == cube()
-@test move(cube(), "R R'") == cube()
-@test move(cube(), "R U R' U' " ^ 6) == cube()
+@test move(cube(), "R2 R2") |> issolved
+@test move(cube(), "R R'") |> issolved
+@test move(cube(), "R U R' U' " ^ 6) |> issolved
 @test move(cube(), "R2 L2") == move(cube(), "L2 R2") == move(cube(), "L R L2 R L'")
-@test move(cube(), repeat(Algs.U * " ", 3)) == cube()
+@test move(cube(), repeat(Algs.U * " ", 3)) |> issolved
+@test move(cube(), repeat(Algs.T * " ", 2)) |> issolved
 positionset(cube::Cube) = Set(map(x -> x.position, values(cube)))
 @test positionset(cube()) == positionset(move(cube(), "R U R' U' D F L2 B4 R'"))

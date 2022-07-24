@@ -55,13 +55,13 @@ end
 function move(cube::Cube, input::Move)::Cube
 	moved = []
 	for (pos, piece) in cube
-		p = if isinrange(pos, face_planes_dict[input.face])
-			move(piece, input)
+		pair = if isinrange(pos, face_planes_dict[input.face])
+			move(pos, input) => Piece(piece.position, move(piece.normal, input))
 		else
-			piece
+			pos => piece
 		end
 
-		moved = [moved..., move(pos, input) => Piece(piece.position, move(piece.normal, input))]
+		moved = [moved..., pair]
 	end
 
 	Dict(moved)
