@@ -102,7 +102,7 @@ name(SVector{3}([1, 1, 1]))
 
 Base.show(io::IO, piece::Piece) = print(io, "Piece $(name(piece.position)) with normal $(piece.normal)")
 
-Base.show(io::IO, cube::Cube) = print(io, "3x3 cube" * (cube == solved_cube ? " (solved)" : " (scrambled)"))
+Base.show(io::IO, cube::Cube) = print(io, "3x3 cube" * (issolved(cube) ? " (solved)" : " (scrambled)"))
 function Base.show(io::IO, ::MIME"text/plain", cube::Cube)
 	print(io, cube)
 	print(io, ": ")
@@ -113,4 +113,4 @@ function Base.show(io::IO, ::MIME"text/plain", cube::Cube)
 	end
 end
 
-cube()
+issolved(cube::Cube) = cube == solved_cube

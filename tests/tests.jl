@@ -1,9 +1,12 @@
-include("3x3.jl")
+include("../3x3/3x3.jl")
 
 using Test
 
+using .Cube3x3: rotate, X, Y, Z, parsemove
+using StaticArrays
+
 # Check position rotation
-@test rotate(SVector(1, 0, 1), X, 2π/2) == [1, 0, -1] # R2
+@test Cube3x3.rotate(SVector(1, 0, 1), X, 2π/2) == [1, 0, -1] # R2
 @test rotate(SVector(3, 2, 1), Y, 2π/4) == [1, 2, -3] # Random
 @test rotate(SVector(1, 1, 1), Z, 2π/4) == [-1, 1, 1] # F
 @test rotate(SVector(1, 1, 1), X, 2π/4) == [1, 1, -1] # R
@@ -41,7 +44,7 @@ using Test
 @test isinrange(SVector(0, 1, 0), SVector(-1, 0, 1)) == false
 
 # Check movement
-include("algs.jl")
+include("../3x3/3x3.jl")
 
 @test move(cube(), "R2 R2") == cube()
 @test move(cube(), "R R'") == cube()
