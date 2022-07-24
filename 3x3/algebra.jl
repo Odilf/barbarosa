@@ -1,6 +1,6 @@
 using StaticArrays
 
-Vector3 = SVector{3, Int}
+Vector3 = SVector{3, <:Int}
 
 @enum Axis X Y Z
 
@@ -36,7 +36,7 @@ struct Move
 	amount::Integer
 end
 
-move_dict = Dict(
+const face_letters_dict = Dict(
 	'R' => R,
 	'U' => U,
 	'F' => F,
@@ -45,9 +45,20 @@ move_dict = Dict(
 	'B' => B,
 )
 
-function parsemove(input::String)
-	input[1] ∉ keys(move_dict) && error("Unknown face letter ($(input[1]))")
-	face = move_dict[input[1]]
+const face_planes_dict = Dict{Face, Vector3}(
+	R => [1, 0, 0],
+	L => [-1, 0, 0],
+	U => [0, 1, 0],
+	D => [0, -1, 0],
+	F => [0, 0, 1],
+	B => [0, 0, -1],
+)
+
+face_letters_dict['R']
+
+function parsemove(input::AbstractString)::Move
+	input[1] ∉ keys(face_letters_dict) && error("Unknown face letter ($(input[1]))")
+	face = face_letters_dict[input[1]]
 	amount = if length(input) == 1
 		1
 	elseif input[2] == '\''
@@ -57,6 +68,10 @@ function parsemove(input::String)
 	end
 
 	Move(face, amount)
+end
+
+function parsealg(input::AbstractString)::Vector{Move}
+	[parsemove(i) for i in split(rstrip(input), ' ')]
 end
 
 function movedata(move::Move)
@@ -73,12 +88,7 @@ function movedata(move::Move)
 	(angle, axis)
 end
 
-function move(position::Vector3, move::Move)
-	angle, axis = movedata(move)
-	rotate(position, axis, angle)
-end
-
-function move(position::Vector3, move::String)
-	angle, axis = movedata(parsemove(move))
+function move(position::Vector3, input::Move)
+	angle, axis = movedata(input)
 	rotate(position, axis, angle)
 end
