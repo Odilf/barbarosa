@@ -17,7 +17,7 @@ function edges()
 		elseif pos[1] == -1
 			[-1, 0, 0]
 		else
-			[0, 0, pos[3]]
+			[0, pos[2], 0]
 		end
 		Piece(pos, normal)
 	end
