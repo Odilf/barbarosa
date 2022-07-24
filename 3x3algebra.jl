@@ -2,17 +2,6 @@ using StaticArrays
 
 Vector3 = SVector{3, Int}
 
-const edge_positions = [
-	[0, 1, 1], [0, -1, 1], [0, -1, -1], [0, 1, -1],
-	[1, 0, 1], [-1, 0, 1], [-1, 0, -1], [1, 0, -1],
-	[1, 1, 0], [-1, 1, 0], [-1, -1, 0], [1, -1, 0],
-]
-
-const corner_positions = [
-	[1, 1, 1], [1, 1, -1], [1, -1, 1], [1, -1, -1],
-	[-1, 1, 1], [-1, 1, -1], [-1, -1, 1], [-1, -1, -1],
-]
-
 @enum Axis X Y Z
 
 rotation_matrices_dict = Dict(
