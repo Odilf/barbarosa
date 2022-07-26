@@ -1,5 +1,3 @@
-include("3x3.jl")
-
 using Random
 
 isedge(piece::Piece) = sum(abs.(piece.position)) == 2
@@ -24,16 +22,16 @@ function orientation(position::Vector3, normal::Vector3)
 	if findfirst(i -> abs(i) == 1, n) |> isnothing
 		error("What $position, $normal")
 	end
-	index = findfirst(i -> abs(i) == 1, normal) - 1
+	index = findfirst(i -> abs(i) == 1, n) - 1
 	
 	# Mod it and apply parity
 	n = length(p)
 	mod((n - index) * parity, n)
 end
 
-scramble() |> orientation
+orientation(pair::Pair{Vector3, Piece}) = orientation(pair.first, pair.second.normal)
 
-function orientation(cube::Cube)
+function orientation(cube::Vector{Pair{Vector3, Piece}})
 	edges = 0
 	corners = 0
 
@@ -62,14 +60,16 @@ function randomorientation(piece::Piece, position::Vector3)
 	Piece(piece.position, n)
 end
 
-function randomize(input::Cube)::Cube
-	pieces = shuffle(input |> values |> collect)
-	pairs = map(zip(keys(input), pieces)) do (pos, piece)
+function randomize(input::Vector{Pair{Vector3, Piece}})::Vector{Pair{Vector3, Piece}}
+	pieces = shuffle([piece for (pos, piece) in input])
+
+	map(zip(input, pieces)) do ((pos, _), piece)
 		pos => randomorientation(piece, pos)
 	end
 
-	Dict(pairs)
 end
+
+scramble()
 
 function twist(normal::Vector3, position::Vector3, n::Integer = 1)::Vector3
 	n -= 1
@@ -82,10 +82,8 @@ function twist(normal::Vector3, position::Vector3, n::Integer = 1)::Vector3
 			normal = [0, 0, 0]
 			normal[i] = position[i]
 
-			
-
 			return if n > 0
-				twist(SVector(normal...), position, n)
+				twist(v(normal...), position, n)
 			else
 				normal
 			end
@@ -95,10 +93,7 @@ function twist(normal::Vector3, position::Vector3, n::Integer = 1)::Vector3
 	error("Unreachable, in theory")
 end
 
-
-twist(SVector(0, 1, 0), SVector(1, 1, 0))
-
-function scramble()
+function scramble()::Cube
 	e = randomize(cube() |> edges)
 	c = randomize(cube() |> corners)
 	(eo, _) = orientation(e)
@@ -106,18 +101,18 @@ function scramble()
 
 	# Flip edge if orientation is incorrect
 	if eo % 2 != 0
-		pos = [1, 1, 0]
-		p = e[pos]
-		e[pos] = Piece(p.position, twist(p.normal, SVector(pos...)))
+		i = 1
+		(pos, piece) = e[i]
+		e[i] = pos => Piece(piece.position, twist(piece.normal, v(pos...)))
 	end
 
 	# Twist corner if orientation is incorrect
 	dif = co % 3
 	if dif != 0
-		pos = [1, 1, 1]
-		p = c[pos]
-		c[pos] = Piece(p.position, twist(p.normal, SVector(pos...), dif))
+		i = 1
+		(pos, piece) = c[i]
+		c[i] = pos => Piece(piece.position, twist(piece.normal, v(pos...), dif))
 	end
 
-	Dict(e..., c...)
+	SVector(e..., c...)
 end

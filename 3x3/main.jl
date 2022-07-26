@@ -1,14 +1,7 @@
 module Cube3x3
 
 include("3x3.jl")
-export cube, move, issolved
-
-end
-
-module Scrambler
-
-export scramble
-
 include("scrambler.jl")
+export Piece, Cube, cube, Move, move, issolved, Vector3, scramble, issolved, neighbours
 
 end

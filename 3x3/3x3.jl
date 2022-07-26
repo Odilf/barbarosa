@@ -1,9 +1,11 @@
 include("algebra.jl")
 
-struct Piece
+mutable struct Piece
 	position::Vector3
 	normal::Vector3
 end
+
+Base.:(==)(p1::Piece, p2::Piece) = p1.position == p2.position && p1.normal == p2.normal
 
 function edges()
 	positions = []
@@ -36,16 +38,19 @@ function corners()
 	pieces
 end
 
-Cube = Dict{Vector3, Piece}
+Cube = SVector{20, Pair{Vector3, Piece}}
 
-function cube()::Cube
-	Dict(
-		[edge.position => edge for edge in edges()]...,
-		[corner.position => corner for corner in corners()]...,
-	)
+const solved_cube = let
+	c = corners()
+	e = edges()
+	p = [piece.position => piece for piece in [c..., e...]]
+	SVector{20}(p)
 end
 
-const solved_cube = cube()
+Base.copy(piece::Piece) = Piece(piece.position, piece.normal)
+Base.copy(cube::Cube) = SVector{20}([copy(pos) => copy(piece) for (pos, piece) in cube])
+
+cube()::Cube = solved_cube::Cube
 
 function isinrange(position::Vector3, plane::Vector3)::Bool
 	i = findfirst(x -> x != 0, plane)
@@ -53,18 +58,13 @@ function isinrange(position::Vector3, plane::Vector3)::Bool
 end
 
 function move(cube::Cube, input::Move)::Cube
-	moved = []
-	for (pos, piece) in cube
-		pair = if isinrange(pos, face_planes_dict[input.face])
+	map(cube) do (pos, piece)
+		if isinrange(pos, face_planes_dict[input.face])
 			move(pos, input) => Piece(piece.position, move(piece.normal, input))
 		else
 			pos => piece
 		end
-
-		moved = [moved..., pair]
 	end
-
-	Dict(moved)
 end
 
 function move(cube::Cube, alg::String)::Cube
@@ -72,6 +72,30 @@ function move(cube::Cube, alg::String)::Cube
 		cube = move(cube, input)
 	end
 	cube
+end
+
+issolved(cube::Cube) = cube == solved_cube
+isreallysolved(cube::Cube) = Set(cube) == Set(solved_cube)
+
+const possible_moves = let
+	m::Vector{Move} = []
+	for face in instances(Face)
+		for i in [-1, 1, 2]
+			m = [m..., Move(face, i)]
+		end
+	end
+	SVector{18}(m)
+end
+
+neighbours(cube::Cube)::SVector{18, Cube} = map(m -> move(cube, m), possible_moves)
+
+# Pretty printing
+function name(face::Face)
+	for (letter, f) in face_letters_dict
+		if f == face 
+			return letter
+		end
+	end
 end
 
 function name(position::Vector3)
@@ -82,23 +106,24 @@ function name(position::Vector3)
 		end
 	end
 
-	output = ""
-	for (letter, face) in face_letters_dict
-		if face ∈ faces
-			output *= letter
-		end
-	end
-
+	output = join([name(face) for face in faces])
 	length(output) == 2 && (output *= ' ')
-
 	output
 end
 
+function name(move::Move)
+	f = name(move.face)
 
+	a = if move.amount == 1
+		""
+	elseif move.amount == -1
+		'\''
+	else
+		string(move.amount)
+	end
 
-
-
-name(SVector{3}([1, 1, 1]))
+	f * a
+end
 
 Base.show(io::IO, piece::Piece) = print(io, "Piece $(name(piece.position)) with normal $(piece.normal)")
 
@@ -113,4 +138,6 @@ function Base.show(io::IO, ::MIME"text/plain", cube::Cube)
 	end
 end
 
-issolved(cube::Cube) = cube == solved_cube
+Base.show(io::IO, move::Move) = print(io, name(move))
+Base.show(io::IO, alg::Vector{Move}) = print(io, join(name.(alg), " "))
+Base.show(io::IO, ::MIME"text/plain", alg::Vector{Move}) = print(io, join(name.(alg), " "))

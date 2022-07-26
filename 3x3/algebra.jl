@@ -1,6 +1,8 @@
 using StaticArrays
+using Memoize
 
-Vector3 = SVector{3, <:Int}
+Vector3 = SVector{3, Int8}
+v(x, y, z) = SVector(Int8(x), Int8(y), Int8(z))
 
 @enum Axis X Y Z
 
@@ -85,10 +87,11 @@ function movedata(move::Move)
 
 	angle = move.amount * π/2 * ((move.face ∈ [R, U, F]) ? 1 : -1)
 
-	(angle, axis)
+		(angle, axis)
 end
 
-function move(position::Vector3, input::Move)
+# Uses one 32 byte allocation
+@memoize IdDict function move(position::Vector3, input::Move)::Vector3
 	angle, axis = movedata(input)
 	rotate(position, axis, angle)
 end
