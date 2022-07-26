@@ -2,9 +2,9 @@ using Random
 
 isedge(piece::Piece) = sum(abs.(piece.position)) == 2
 
-# Kinda ugly
-edges(cube::Cube) = cube[9:20]
-corners(cube::Cube) = cube[1:8]
+# Kinda dangerous
+corners(cube::Cube)::SVector{8, Pair{Vector3, Piece}} = cube[1:8]
+edges(cube::Cube)::SVector{12, Pair{Vector3, Piece}} = cube[9:20]
 
 filter(pair -> pair.first == 2, cube())
 
