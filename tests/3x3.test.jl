@@ -35,8 +35,6 @@ using Test
 @test length(cube()) == 20
 @test cube()[1].second.normal == [1, 0, 0]
 
-
-
 # Check getting pieces of plane
 @test isinrange(v(1, 0, 0), v(1, 0, -1)) == true
 @test isinrange(v(0, -1, 0), v(0, -1, 2)) == true
