@@ -3,8 +3,8 @@ using Random
 isedge(piece::Piece) = sum(abs.(piece.position)) == 2
 
 # Kinda ugly
-edges(cube::Cube) = filter(pair -> sum(abs.(pair.first)) == 2, cube)
-corners(cube::Cube) = filter(pair -> sum(abs.(pair.first)) == 3, cube)
+edges(cube::Cube) = cube()[9:20]
+corners(cube::Cube) = cube()[1:8]
 
 filter(pair -> pair.first == 2, cube())
 
@@ -68,8 +68,6 @@ function randomize(input::Vector{Pair{Vector3, Piece}})::Vector{Pair{Vector3, Pi
 	end
 
 end
-
-scramble()
 
 function twist(normal::Vector3, position::Vector3, n::Integer = 1)::Vector3
 	n -= 1
