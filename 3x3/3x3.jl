@@ -67,12 +67,14 @@ function move(cube::Cube, input::Move)::Cube
 	end
 end
 
-function move(cube::Cube, alg::String)::Cube
-	for input in parsealg(alg)
+function move(cube::Cube, alg::Vector{Move})::Cube
+	for input in alg
 		cube = move(cube, input)
 	end
 	cube
 end
+
+move(cube::Cube, alg::String)::Cube = move(cube, parsealg(alg))
 
 issolved(cube::Cube) = cube == solved_cube
 isreallysolved(cube::Cube) = Set(cube) == Set(solved_cube)
@@ -80,7 +82,7 @@ isreallysolved(cube::Cube) = Set(cube) == Set(solved_cube)
 const possible_moves = let
 	m::Vector{Move} = []
 	for face in instances(Face)
-		for i in [-1, 1, 2]
+		for i in [2, -1, 1]
 			m = [m..., Move(face, i)]
 		end
 	end
