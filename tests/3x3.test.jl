@@ -30,8 +30,8 @@ using Test
 @test move(v(1, 1, 1), parsemove("U")) == [-1, 1, 1]
 
 # Check piece generation
-@test length(edges()) == 12
-@test length(corners()) == 8
+@test length(makeedges()) == 12
+@test length(makecorners()) == 8
 @test length(cube()) == 20
 @test cube()[1].second.normal == [1, 0, 0]
 

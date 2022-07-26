@@ -7,13 +7,13 @@ end
 
 Base.:(==)(p1::Piece, p2::Piece) = p1.position == p2.position && p1.normal == p2.normal
 
-function edges()
+function makeedges()
 	positions = []
 	for (i, j) in [(1, 1), (1, -1), (-1, -1), (-1, 1)]
 		positions = [positions..., [i, j, 0], [i, 0, j], [0, i, j]]
 	end
 	
-	edges = map(positions) do pos
+	map(positions) do pos
 		normal = if pos[1] == 1
 			[1, 0, 0]
 		elseif pos[1] == -1
@@ -25,13 +25,12 @@ function edges()
 	end
 end
 
-function corners()
+function makecorners()
 	pieces = []
 	for i in [1, -1]
 		for j in [1, -1]
 			for k in [1, -1]
-				pieces = [pieces..., 
-				Piece([i, j, k], [i, 0, 0])]
+				push!(pieces, Piece([i, j, k], [i, 0, 0]))
 			end
 		end
 	end
@@ -41,8 +40,8 @@ end
 Cube = SVector{20, Pair{Vector3, Piece}}
 
 const solved_cube = let
-	c = corners()
-	e = edges()
+	c = makecorners()
+	e = makeedges()
 	p = [piece.position => piece for piece in [c..., e...]]
 	SVector{20}(p)
 end

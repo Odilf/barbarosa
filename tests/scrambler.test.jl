@@ -2,8 +2,8 @@ using Test
 
 include("../3x3/scrambler.jl")
 
-@test filter(pair -> sum(abs.(pair.first)) == 3, cube()) == cube()[1:8]
-@test filter(pair -> sum(abs.(pair.first)) == 2, cube()) == cube()[9:20]
+@test filter(pair -> sum(abs.(pair.first)) == 3, cube()) == cube()[1:8] == cube() |> corners
+@test filter(pair -> sum(abs.(pair.first)) == 2, cube()) == cube()[9:20] == cube() |> edges
 
 # Check orientation (I hope this is thorough)
 @test orientation(v(1, 0, 1), v(1, 0, 0)) == 0

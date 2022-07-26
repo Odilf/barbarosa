@@ -3,8 +3,8 @@ using Random
 isedge(piece::Piece) = sum(abs.(piece.position)) == 2
 
 # Kinda ugly
-edges(cube::Cube) = cube()[9:20]
-corners(cube::Cube) = cube()[1:8]
+edges(cube::Cube) = cube[9:20]
+corners(cube::Cube) = cube[1:8]
 
 filter(pair -> pair.first == 2, cube())
 
@@ -46,6 +46,8 @@ function orientation(cube::Vector{Pair{Vector3, Piece}})
 
 	(edges = edges, corners = corners)
 end
+
+orientation(cube::Cube) = orientation(Vector(cube))
 
 function isoriented(cube::Cube)
 	(e, c) = orientation(cube)
