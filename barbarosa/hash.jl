@@ -18,7 +18,7 @@ function Base.hash(cube::SVector{8, Pair{Vector3, Piece}})
 	end
 
 	# Stuff to get the number
-	permutations_hash(SVector{8}(piece_hash)) + sum(orientations) * factorial(8)
+	permutations_hash(SVector{8}(piece_hash), max=8) + sum(orientations) * factorial(8)
 end
 
 # Edge hash
@@ -38,7 +38,7 @@ function Base.hash(cube::SVector{12, Pair{Vector3, Piece}})
 		end
 
 		# Stuff to get the number
-		permutations_hash(SVector{6}(piece_hash), min=6) * 2^6 + sum(orientations)
+		permutations_hash(SVector{6}(piece_hash), max=12) * 2^6 + sum(orientations)
 	end
 end
 
@@ -46,12 +46,11 @@ function Base.hash(cube::Cube)
 	[hash(cube |> corners), hash(cube |> edges)...]
 end
 
-function permutations_hash(vector::SVector{N, <:Integer} where N; min = 0)
-	l = length(vector)
+function permutations_hash(vector::SVector{N, <:Integer} where N; max::Integer)
+	fmax = factorial(max)
 	map(enumerate(vector)) do (i, n)
-		i = i
-		n -= min
-		n -= sum(vector[i + 1:end] .< n)
-		(n - 1) * factorial(i - 1)
+		i = i - 1
+		n = n - sum(vector[1:i] .< n) - 1
+		n * fmax ÷ factorial(max - i)
 	end |> sum
 end
