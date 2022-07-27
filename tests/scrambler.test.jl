@@ -1,5 +1,8 @@
+module TestScrambler
+
 using Test
 
+include("../3x3/3x3.jl")
 include("../3x3/scrambler.jl")
 
 @test filter(pair -> sum(abs.(pair.first)) == 3, cube()) == cube()[1:8] == cube() |> corners
@@ -19,3 +22,5 @@ include("../3x3/scrambler.jl")
 
 # Check scrambler 
 @test all([isoriented(scramble()) for _ in 1:1000])
+
+end

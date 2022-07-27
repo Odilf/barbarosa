@@ -1,3 +1,5 @@
+module TestIDA*
+
 using Test
 
 include("../3x3/main.jl")
@@ -17,14 +19,14 @@ function testheuristic(heuristic; samples = 100)
 end
 
 using Plots
-let 
+function plot_heuristics()
 	plot(testheuristic(manhattan); ylims=(0,4), label="manhattan")
 	plot!(testheuristic(euclidean); label="euclidean")
 	plot!(1:20, x -> x; label="\$ x = y \$")
 end
 
 
-@benchmark IDAstar(move(cube(), "R2 L2 D2 F2"), manhattan; iterations=100, silent=true)
-@benchmark IDAstarNotVisited(move(cube(), "R2 L2 D2 F2"), manhattan; iterations=100, silent=true)
+# @benchmark IDAstar(move(cube(), "R2 L2 D2 F2"), manhattan; iterations=100, silent=true)
+# @benchmark IDAstarNotVisited(move(cube(), "R2 L2 D2 F2"), manhattan; iterations=100, silent=true)
 
-IDAstar(move(cube(), "R2 L2 D2 F2"), manhattan; iterations=100, silent=false)
+end

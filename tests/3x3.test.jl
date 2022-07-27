@@ -1,3 +1,5 @@
+module Test3x3
+
 include("../3x3/3x3.jl")
 
 using Test
@@ -57,3 +59,5 @@ positionset(cube::Cube) = Set(map(p -> p.second.position, cube))
 @test (@allocated Piece(v(1, 2, 3), v(4, 5, 6))) == 0
 @test (@allocated cube()) == 0
 @test (@allocated move(cube(), "R2")) < 3000
+
+end
