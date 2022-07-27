@@ -93,9 +93,14 @@ function twist(normal::Vector3, position::Vector3, n::Integer = 1)::Vector3
 	error("Unreachable, in theory")
 end
 
+function twist(pair::Pair{Vector3, Piece}, n::Integer = 1) 
+	(pos, piece) = pair
+	pos => Piece(piece.position, twist(piece.normal, pos, n))
+end
+
 function scramble()::Cube
-	e = randomize(cube() |> edges)
-	c = randomize(cube() |> corners)
+	e = randomize(Vector(cube() |> edges))
+	c = randomize(Vector(cube() |> corners))
 	(eo, _) = orientation(e)
 	(_, co) = orientation(c)
 
@@ -114,5 +119,5 @@ function scramble()::Cube
 		c[i] = pos => Piece(piece.position, twist(piece.normal, v(pos...), dif))
 	end
 
-	SVector(e..., c...)
+	SVector(c..., e...)
 end
