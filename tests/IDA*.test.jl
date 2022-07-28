@@ -25,8 +25,7 @@ function plot_heuristics()
 	plot!(1:20, x -> x; label="\$ x = y \$")
 end
 
-
-# @benchmark IDAstar(move(cube(), "R2 L2 D2 F2"), manhattan; iterations=100, silent=true)
-# @benchmark IDAstarNotVisited(move(cube(), "R2 L2 D2 F2"), manhattan; iterations=100, silent=true)
+@test IDAstar(move(cube(), "R2 L2 D2 F2"), manhattan; iterations=100, silent=true) |> reconstruct_solution == Cube3x3.parsealg("F2 D2 R2 L2")
+@test IDAstar(move(cube(), "R U R' U'"), manhattan; iterations=100, silent=true) |> reconstruct_solution == Cube3x3.parsealg("U R U' R'")
 
 end
