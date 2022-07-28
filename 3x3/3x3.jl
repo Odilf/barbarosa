@@ -39,6 +39,12 @@ end
 
 Cube = SVector{20, Pair{Vector3, Piece}}
 
+# For hashing and stuff
+Corners = SVector{8, Pair{Vector3, Piece}}
+Edges = SVector{12, Pair{Vector3, Piece}}
+HalfEdges = SVector{6, Pair{Vector3, Piece}}
+HashSet = Union{Cube, Corners, HalfEdges, Edges}
+
 const solved_cube = let
 	c = makecorners()
 	e = makeedges()
@@ -56,7 +62,7 @@ function isinrange(position::Vector3, plane::Vector3)::Bool
 	position[i] == plane[i]
 end
 
-function move(cube::Cube, input::Move)::Cube
+function move(cube::T, input::Move)::T where {T <: HashSet}
 	map(cube) do (pos, piece)
 		if isinrange(pos, face_planes_dict[input.face])
 			move(pos, input) => Piece(piece.position, move(piece.normal, input))
@@ -66,17 +72,23 @@ function move(cube::Cube, input::Move)::Cube
 	end
 end
 
-function move(cube::Cube, alg::Vector{Move})::Cube
+function move(cube::T, alg::Vector{Move})::T where {T <: HashSet}
 	for input in alg
 		cube = move(cube, input)
 	end
 	cube
 end
 
-move(cube::Cube, alg::String)::Cube = move(cube, parsealg(alg))
+function move(cube::T, alg::String)::T where {T <: HashSet}
+	move(cube, parsealg(alg))
+end
 
 issolved(cube::Cube) = cube == solved_cube
-isreallysolved(cube::Cube) = Set(cube) == Set(solved_cube)
+issolved(c::Corners) = c == corners(solved_cube)
+issolved(e::Edges) = e == edges(solved_cube)
+issolved(e::HalfEdges) = e ⊆ edges(solved_cube)
+
+# isreallysolved(cube::Cube) = Set(cube) == Set(solved_cube)
 
 const possible_moves = let
 	m::Vector{Move} = []
@@ -88,7 +100,9 @@ const possible_moves = let
 	SVector{18}(m)
 end
 
-neighbours(cube::Cube)::SVector{18, Cube} = map(m -> move(cube, m), possible_moves)
+function neighbours(cube::T)::SVector{18, T} where {T <: HashSet} 
+	map(m -> move(cube, m), possible_moves)
+end
 
 # Pretty printing
 function name(face::Face)
