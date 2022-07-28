@@ -1,5 +1,6 @@
 using .Cube3x3
 using .Cube3x3: possible_moves
+using Base.Threads
 
 # function IDAstar(state::Cube, heuristic; iterations = 100, silent = false)::Vector{Cube}
 # 	h = heuristic(state)
@@ -53,7 +54,7 @@ using .Cube3x3: possible_moves
 # 	error("Couldn't find solution after $iterations iterations")
 # end
 
-function reconstruct_solution(nodes::Vector{Cube})
+function reconstruct_solution(nodes::Vector{<:HashSet})
 	solution = []
 	for (i, node) in enumerate(nodes[2:end])
 		for m in possible_moves
@@ -67,16 +68,14 @@ function reconstruct_solution(nodes::Vector{Cube})
 end
 
 
-
-
-function IDAstar(state::Cube, heuristic; iterations = 100, silent = false)::Vector{Cube}
+function IDAstar(state::T, heuristic; iterations = 100, silent = false)::Vector{T} where {T <: HashSet}
 	h = heuristic(state)
 	threshold = h
 	next_threshold = Inf
 
-	function search(node::Cube, g)::Vector{Cube}
+	function search(node::T, g)::Vector{T}
 		if issolved(node)
-			return [node::Cube]
+			return [node::T]
 		end
 	
 		cost = heuristic(node) + g
