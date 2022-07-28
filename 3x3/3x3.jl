@@ -1,6 +1,6 @@
 include("algebra.jl")
 
-mutable struct Piece
+struct Piece
 	position::Vector3
 	normal::Vector3
 end
