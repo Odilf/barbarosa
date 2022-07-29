@@ -1,4 +1,3 @@
-using .Cube3x3
 using StaticArrays
 
 const edge_permutations = factorial(12) ÷ factorial(6) * 2^6
@@ -6,9 +5,8 @@ const corner_permutations = factorial(8) * 3^7
 
 # Corner hash
 function Base.hash(corners::Corners)
-	piece_hash = map(enumerate(corners)) do (i, (pos, piece))
-		i = i - 1 # 0 indexing, makes my life easier
-		index = findfirst(pair -> pair.first == piece.position, corners)
+	piece_hash = map(corners) do (pos, _)
+		findfirst(pair -> pair.second.position == pos, corners)
 	end
 
 	orientations = map(enumerate(corners[1:end-1])) do (i, (pos, piece))
@@ -54,3 +52,42 @@ function permutations_hash(vector::SVector{N, <:Integer} where N; max::Integer)
 		n * fmax ÷ factorial(max - i)
 	end |> sum
 end
+
+function generate_corners(hash::Integer)
+	hash -= 1
+	permutations_hash = hash % factorial(8)
+	orientation_hash = hash ÷ factorial(8)
+
+	orientations = map(1:8) do i
+		(orientation_hash % 3^i) ÷ 3^(i - 1)
+	end
+
+	permutations = map(0:7) do i
+		(permutations_hash % (factorial(8) ÷ factorial(8 - i - 1))) ÷ (factorial(8) ÷ factorial(8 - i)) + 1
+	end
+
+	permutations = let
+		# permutations = [permutations; 1]
+		result = []
+		options = collect(1:8)
+		for decision in permutations
+			push!(result, options[decision])
+			deleteat!(options, decision)
+		end
+		result
+	end
+
+	c = cube() |> corners
+	map(zip(permutations, orientations, c)) do (p, o, (_, piece))
+		pair = c[p].first => piece
+		Cube3x3.twist(pair, o)
+	end
+end
+
+# let 
+# 	c =  move(cube(), "F") |> corners
+# 	h = c |> hash
+# 	f = h |> generate_corners
+
+# 	f
+# end

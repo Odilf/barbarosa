@@ -10,7 +10,7 @@ const extension = ".barbarosa"
 @enum PieceType edge corner
 
 function getpath(type::PieceType)
-	folder = "MUS_cache"
+	folder = "src/MUS"
 	folder * (type == corner ? "/corners" : "/edges") * extension
 end
 
@@ -60,16 +60,9 @@ function generate_cache(state::Cube, moves::UInt8, threshold::Integer)::Nothing
 	return
 end
 
-# @time generate_cache(cube(), UInt8(0), 5)
+function generate_corner_cache(corner_cache::Vector{UInt8}; range = 1:100)
+	
 
-# generate_cache(cube(), UInt8(0), 4)
-
-# resetcache()
-# savecache()
-# assigncache()
-# cacheprogress()
-
-# corner_cache, edge_cache = getcache()
-
-# filter(p -> p != 0, corner_cache)
-
+	for i in range
+	end
+end

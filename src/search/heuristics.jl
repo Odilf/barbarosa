@@ -1,5 +1,3 @@
-using .Cube3x3
-
 function apply(f, cube::HashSet)
 	value = 0
 	for (pos, piece) in cube

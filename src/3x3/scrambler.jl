@@ -72,28 +72,29 @@ function randomize(input::Vector{Pair{Vector3, Piece}})::Vector{Pair{Vector3, Pi
 end
 
 function twist(normal::Vector3, position::Vector3, n::Integer = 1)::Vector3
-	n -= 1
+	if n <= 0
+		return normal
+	end
+
+	parity = reduce(*, filter(v -> v != 0, normal))
+	# parity = 1
 	i = findfirst(x -> abs(x) == 1, normal)
 
-	for _ in 1:length(normal)
-		i = i % 3 + 1
+	for _ in 1:3
+		i = i % 3 + 1 * parity
 
 		if (position[i] != 0)
 			normal = [0, 0, 0]
 			normal[i] = position[i]
 
-			return if n > 0
-				twist(v(normal...), position, n)
-			else
-				normal
-			end
+			return twist(v(normal...), position, n - 1)
 		end
 	end
 
 	error("Unreachable, in theory")
 end
 
-function twist(pair::Pair{Vector3, Piece}, n::Integer = 1) 
+function twist(pair::Pair{Vector3, Piece}, n::Integer = 1)::Pair{Vector3, Piece}
 	(pos, piece) = pair
 	pos => Piece(piece.position, twist(piece.normal, pos, n))
 end
@@ -120,4 +121,10 @@ function scramble()::Cube
 	end
 
 	SVector(c..., e...)
+end
+
+let
+	c = scramble()
+	o = orientation(c)
+	isoriented(c), orientation(c)
 end

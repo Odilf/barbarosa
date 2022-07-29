@@ -1,6 +1,5 @@
-using .Cube3x3
-using .Cube3x3: possible_moves
-using Base.Threads
+# using .Cube3x3: possible_moves
+# using Base.Threads
 
 # function IDAstar(state::Cube, heuristic; iterations = 100, silent = false)::Vector{Cube}
 # 	h = heuristic(state)
@@ -57,7 +56,7 @@ using Base.Threads
 function reconstruct_solution(nodes::Vector{<:HashSet})
 	solution = []
 	for (i, node) in enumerate(nodes[2:end])
-		for m in possible_moves
+		for m in Cube3x3.possible_moves
 			if move(node, m) == nodes[i]
 				solution = [m, solution...]
 				break
