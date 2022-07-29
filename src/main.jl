@@ -7,6 +7,8 @@ module Cube3x3
 end
 
 module Search
+	export IDAstar, manhattan, reconstruct_solution
+
 	using ..Cube3x3
 
 	include("search/heuristics.jl")
@@ -14,6 +16,8 @@ module Search
 end
 
 module MUS
+	export edge_permutations, corner_permutations, hash
+
 	using ..Cube3x3
 	using ..Search
 
