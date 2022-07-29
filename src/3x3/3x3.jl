@@ -1,5 +1,6 @@
 using StaticArrays
 using Memoize
+using Bijections
 
 Vector3 = SVector{3, Int8}
 v(x, y, z) = SVector(Int8(x), Int8(y), Int8(z))
@@ -38,25 +39,23 @@ struct Move
 	amount::Integer
 end
 
-const face_letters_dict = Dict(
+const face_letters_dict = Bijection(Dict(
 	'R' => R,
 	'U' => U,
 	'F' => F,
 	'L' => L,
 	'D' => D,
 	'B' => B,
-)
+))
 
-const face_planes_dict = Dict{Face, Vector3}(
+const face_planes_dict = Bijection(Dict{Face, Vector3}(
 	R => [1, 0, 0],
 	L => [-1, 0, 0],
 	U => [0, 1, 0],
 	D => [0, -1, 0],
 	F => [0, 0, 1],
 	B => [0, 0, -1],
-)
-
-face_letters_dict['R']
+))
 
 function parsemove(input::AbstractString)::Move
 	input[1] ∉ keys(face_letters_dict) && error("Unknown face letter ($(input[1]))")
@@ -100,8 +99,6 @@ struct Piece
 	position::Vector3
 	normal::Vector3
 end
-
-Base.:(==)(p1::Piece, p2::Piece) = p1.position == p2.position && p1.normal == p2.normal
 
 function makeedges()
 	positions = []
@@ -147,9 +144,6 @@ const solved_cube = let
 	p = [piece.position => piece for piece in [c..., e...]]
 	SVector{20}(p)
 end
-
-Base.copy(piece::Piece) = Piece(piece.position, piece.normal)
-Base.copy(cube::Cube) = SVector{20}([copy(pos) => copy(piece) for (pos, piece) in cube])
 
 cube()::Cube = solved_cube::Cube
 
@@ -202,15 +196,12 @@ end
 
 # Pretty printing
 function name(face::Face)
-	for (letter, f) in face_letters_dict
-		if f == face 
-			return letter
-		end
-	end
+	face_letters_dict(face)
 end
 
 function name(position::Vector3)
 	faces = []
+
 	for (face, plane) in face_planes_dict
 		if isinrange(position, plane)
 			faces = [faces..., face]
