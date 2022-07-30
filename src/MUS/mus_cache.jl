@@ -17,7 +17,21 @@ end
 resetcache() = savecache(zeros(UInt8, corner_permutations), zeros(UInt8, edge_permutations))
 
 function getcache()::Tuple{Cache, Cache}
-	read(getpath(corner)), read(getpath(edge))
+	c = if isfile(getpath(corner))
+		read(getpath(corner))
+	else
+		write(getpath(corner), zeros(UInt8, corner_permutations))
+		Vector(corner_permutations)
+	end
+
+	e = if isfile(getpath(edge))
+		read(getpath(edge))
+	else
+		write(getpath(edge), zeros(UInt8, edge_permutations))
+		Vector(zeros, edge_permutations)
+	end
+
+	c, e
 end
 
 corner_cache, edge_cache = getcache()
