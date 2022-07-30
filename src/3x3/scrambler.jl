@@ -31,7 +31,7 @@ end
 
 orientation(pair::Pair{Vector3, Piece}) = orientation(pair.first, pair.second.normal)
 
-function orientation(cube::Vector{Pair{Vector3, Piece}})
+function orientation(cube::HashSet)
 	edges = 0
 	corners = 0
 
@@ -47,7 +47,7 @@ function orientation(cube::Vector{Pair{Vector3, Piece}})
 	(edges = edges, corners = corners)
 end
 
-orientation(cube::Cube) = orientation(Vector(cube))
+orientation(cube::Vector{Pair{Vector3, Piece}}) = orientation(SVector(cube...))
 
 function isoriented(cube::Cube)
 	(e, c) = orientation(cube)
@@ -62,13 +62,12 @@ function randomorientation(piece::Piece, position::Vector3)
 	Piece(piece.position, n)
 end
 
-function randomize(input::Vector{Pair{Vector3, Piece}})::Vector{Pair{Vector3, Piece}}
-	pieces = shuffle([piece for (pos, piece) in input])
+function randomize(input::T)::T where {T <: HashSet}
+	positions = shuffle([pos for (pos, _) in input])
 
-	map(zip(input, pieces)) do ((pos, _), piece)
+	map(zip(positions, input)) do (pos, (_, piece))
 		pos => randomorientation(piece, pos)
-	end
-
+	end |> SVector
 end
 
 function twist(normal::Vector3, position::Vector3, n::Integer = 1)::Vector3
@@ -76,12 +75,11 @@ function twist(normal::Vector3, position::Vector3, n::Integer = 1)::Vector3
 		return normal
 	end
 
-	parity = reduce(*, filter(v -> v != 0, normal))
-	# parity = 1
+	parity = reduce(*, filter(v -> v != 0, position))
 	i = findfirst(x -> abs(x) == 1, normal)
 
 	for _ in 1:3
-		i = i % 3 + 1 * parity
+		i = mod(i - 1 + parity, 3) + 1
 
 		if (position[i] != 0)
 			normal = [0, 0, 0]
@@ -99,9 +97,26 @@ function twist(pair::Pair{Vector3, Piece}, n::Integer = 1)::Pair{Vector3, Piece}
 	pos => Piece(piece.position, twist(piece.normal, pos, n))
 end
 
+# Ew
+function swaps(v::Vector{<:Integer})
+	v = copy(v)
+	total = 0
+	for i in eachindex(v)
+		n = v[i]
+		j = findfirst(n -> n == i, v)
+
+		if j != i
+			total += 1
+			v[j], v[i] = v[i], v[j]
+		end
+	end
+
+	return total
+end
+
 function scramble()::Cube
-	e = randomize(Vector(cube() |> edges))
-	c = randomize(Vector(cube() |> corners))
+	e = randomize(cube() |> edges) |> Vector
+	c = randomize(cube() |> corners) |> Vector
 	(eo, _) = orientation(e)
 	(_, co) = orientation(c)
 
@@ -119,12 +134,29 @@ function scramble()::Cube
 		(pos, piece) = c[i]
 		c[i] = pos => Piece(piece.position, twist(piece.normal, v(pos...), dif))
 	end
+	
+	# Swap if swap parity is incorrect
+	if swaps(permutations(c)) % 2 != swaps(permutations(e)) % 2
+		e[1], e[2] = e[2].first => e[1].second, e[1].first => e[2].second
+	end
 
 	SVector(c..., e...)
 end
 
+function permutations(cube::Vector{Pair{Vector3, Piece}})
+	map(cube) do (pos, _)
+		findfirst(pair -> pair.second.position == pos, cube)
+	end
+end
+
+
 let
 	c = scramble()
-	o = orientation(c)
-	isoriented(c), orientation(c)
+	co = permutations(c |> corners |> Vector) |> swaps
+	e = permutations(c |> edges |> Vector) |> swaps
+	(
+		co, 
+		e, 
+		co % 2 == e % 2
+	)
 end
