@@ -21,7 +21,7 @@ include("../src/main.jl")
 		using StaticArrays
 		using .Cube3x3
 		using .MUS
-		using .MUS: permutations_hash
+		using .MUS: permutations_hash, generate_corners
 
 		include("MUS.test.jl")
 	end
