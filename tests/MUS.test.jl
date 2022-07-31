@@ -13,11 +13,16 @@ end
 
 	@test map(1:1000) do _
 		c = scramble() |> corners
-		c |> hash |> dehash_corners == c
+		c |> hash |> MUS.dehash_corners == c
 	end |> all
 
 	@test map(1:1000) do _
 		c = scramble() |> edges
-		c |> hash |> dehash_edges == c
+		MUS.dehash_edges(hash(c)...)  == c
+	end |> all
+
+	@test map(1:1000) do _
+		c = scramble()
+		dehash(hash(c)...) == c
 	end |> all
 end
