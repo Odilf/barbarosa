@@ -16,12 +16,13 @@ module Search
 end
 
 module MUS
-	export edge_permutations, corner_permutations, hash
+	export edge_permutations, corner_permutations, hash, dehash_corners, dehash_edges
 
 	using ..Cube3x3
 	using ..Search
 
 	include("MUS/hash.jl")
+	include("MUS/dehash.jl")
 	include("MUS/mus_cache.jl")
 end
 

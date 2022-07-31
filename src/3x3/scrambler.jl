@@ -98,8 +98,8 @@ function twist(pair::Pair{Vector3, Piece}, n::Integer = 1)::Pair{Vector3, Piece}
 end
 
 # Ew
-function swaps(v::Vector{<:Integer})
-	v = copy(v)
+function swaps(v::SVector{N, <:Integer}) where N
+	v = MVector(v)
 	total = 0
 	for i in eachindex(v)
 		n = v[i]
@@ -137,26 +137,16 @@ function scramble()::Cube
 	
 	# Swap if swap parity is incorrect
 	if swaps(permutations(c)) % 2 != swaps(permutations(e)) % 2
-		e[1], e[2] = e[2].first => e[1].second, e[1].first => e[2].second
+		e[1], e[2] = e[2].first => Piece(e[1].second.position, e[2].second.normal), e[1].first => Piece(e[2].second.position, e[1].second.normal)
 	end
 
 	SVector(c..., e...)
 end
 
-function permutations(cube::Vector{Pair{Vector3, Piece}})
+function permutations(cube::SVector{N, Pair{Vector3, Piece}}, search_pool=cube)::SVector{N, <:Integer} where N
 	map(cube) do (pos, _)
-		findfirst(pair -> pair.second.position == pos, cube)
+		findfirst(pair -> pair.second.position == pos, search_pool)
 	end
 end
 
-
-let
-	c = scramble()
-	co = permutations(c |> corners |> Vector) |> swaps
-	e = permutations(c |> edges |> Vector) |> swaps
-	(
-		co, 
-		e, 
-		co % 2 == e % 2
-	)
-end
+permutations(cube::Vector{Pair{Vector3, Piece}}) = permutations(SVector(cube...))
