@@ -35,7 +35,7 @@ function Base.hash(edges::Edges)
 
 		# Stuff to get the number (1 indexed)
 		hash_permutations(SVector{6}(perms), max=12) * 2^6 + sum(orientations) + 1
-	end |> Tuple
+	end
 end
 
 function Base.hash(cube::Cube)

@@ -34,8 +34,8 @@ function dehash_corners(hash::Integer)
 	end
 end
 
-function dehash_edges(hashes::NTuple{2, <:Integer})
-	zips = map(hashes) do hash
+function dehash_edges(h1::Integer, h2::Integer)::Edges
+	zips = map([h1, h2]) do hash
 		hash -= 1
 		permutations_hash = hash ÷ 2^6
 		orientation_hash = hash % 2^6 
@@ -66,4 +66,10 @@ function dehash_edges(hashes::NTuple{2, <:Integer})
 		pair = pos => piece
 		Cube3x3.twist(pair, orientation % 2)
 	end
+end
+
+function dehash(corner_hash::Integer, edge_hash_1::Integer, edge_hash_2::Integer)::Cube
+	c = dehash_corners(corner_hash)
+	e = dehash_edges(edge_hash_1, edge_hash_2)
+	return SVector{20}([c; e])
 end
