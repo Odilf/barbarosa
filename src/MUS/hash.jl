@@ -6,42 +6,6 @@ const corner_permutations = factorial(8) * 3^7
 
 Cube3x3.permutations(elements::Integer, choose::Integer) = reduce(*, (elements - choose + 1):elements)
 
-# Corner hash
-function Base.hash(corners::Corners)
-	perms = permutations(corners)
-
-	orientations = map(enumerate(corners[1:end-1])) do (i, (pos, piece))
-		i = i - 1
-		index = orientation(pos, piece.normal)
-		index * 3^i
-	end
-
-	# Stuff to get the number (1 indexed)
-	hash_permutations(perms, max=8) + sum(orientations) * factorial(8) + 1
-end
-
-# Edge hash
-function Base.hash(edges::Edges)
-	halves = [SVector{6}(edges[1:6]), SVector{6}(edges[7:12])]
-
-	map(halves) do half
-		perms = permutations(half, edges)
-
-		orientations = map(enumerate(half)) do (i, (pos, piece))
-			i = i - 1
-			index = orientation(pos, piece.normal)
-			index * 2^i
-		end
-
-		# Stuff to get the number (1 indexed)
-		hash_permutations(SVector{6}(perms), max=12) * 2^6 + sum(orientations) + 1
-	end
-end
-
-function Base.hash(cube::Cube)
-	[hash(cube |> corners), hash(cube |> edges)...]
-end
-
 function hash_permutations(vector::SVector{N, <:Integer}; max::Integer=N)::Integer where N
 	map(enumerate(vector)) do (i, n)
 		i = i - 1 # 0-indexing
@@ -51,4 +15,41 @@ function hash_permutations(vector::SVector{N, <:Integer}; max::Integer=N)::Integ
 
 		n * permutations(max, i) # Encode decision
 	end |> sum
+end
+
+function hash_orientations(orientations::SVector{N, <:Integer}, modulus::Integer)::Integer where N
+	map(enumerate(orientations)) do (i, orientation)
+		orientation * modulus^(i - 1)
+	end |> sum
+end
+
+hash_orientations(o::Vector{<:Integer}, m::Integer) = hash_orientations(SVector(o...), m)
+
+# Corner hash
+function Base.hash(corners::Corners)
+	permutation_hash = hash_permutations(permutations(corners); max=8)
+	orientation_hash = hash_orientations(orientation.(corners[1:end-1]), 3)
+
+	# Stuff to get the number (1 indexed)
+	permutation_hash + orientation_hash * factorial(8) + 1
+end
+
+[[1, 1], [3, 3]] .* -1
+
+# Edge hash
+function Base.hash(edges::Edges)
+	halves = [SVector{6}(edges[1:6]), SVector{6}([pos .* - Int8(1) => piece for (pos, piece) in edges[7:12]])]
+	pools = [edges, [edges[7:12]; edges[1:6]]]
+
+	map(zip(halves, pools)) do (half, pool)
+		permutation_hash = hash_permutations(permutations(half, pool=edges); max=12)
+		orientation_hash = hash_orientations(orientation.(half), 2)
+
+		# Stuff to get the number (1 indexed)
+		permutation_hash * 2^6 + orientation_hash + 1
+	end
+end
+
+function Base.hash(cube::Cube)
+	[hash(cube |> corners), hash(cube |> edges)...]
 end
