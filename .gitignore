@@ -1,4 +1,4 @@
 .vscode
+.DS_Store
 src/MUS/corners.barbarosa
 src/MUS/edges.barbarosa
-.DS_Store
