@@ -23,7 +23,7 @@ module MUS
 
 	include("MUS/hash.jl")
 	include("MUS/dehash.jl")
-	include("MUS/mus_cache.jl")
+	include("MUS/cache.jl")
 end
 
 module Barbarosa
