@@ -1,13 +1,14 @@
 using StaticArrays
+using .Cube3x3: v, permutations
 
 const edge_permutations = factorial(12) ÷ factorial(6) * 2^6
 const corner_permutations = factorial(8) * 3^7
 
+Cube3x3.permutations(elements::Integer, choose::Integer) = reduce(*, (elements - choose + 1):elements)
+
 # Corner hash
 function Base.hash(corners::Corners)
-	piece_hash = map(corners) do (pos, _)
-		findfirst(pair -> pair.second.position == pos, corners)
-	end
+	perms = permutations(corners)
 
 	orientations = map(enumerate(corners[1:end-1])) do (i, (pos, piece))
 		i = i - 1
@@ -16,7 +17,7 @@ function Base.hash(corners::Corners)
 	end
 
 	# Stuff to get the number (1 indexed)
-	permutations_hash(SVector{8}(piece_hash), max=8) + sum(orientations) * factorial(8) + 1
+	hash_permutations(perms, max=8) + sum(orientations) * factorial(8) + 1
 end
 
 # Edge hash
@@ -24,10 +25,7 @@ function Base.hash(edges::Edges)
 	halves = [SVector{6}(edges[1:6]), SVector{6}(edges[7:12])]
 
 	map(halves) do half
-		piece_hash = map(enumerate(half)) do (i, (pos, piece))
-			i = i - 1 # 0 indexing, makes my life easier
-			index = findfirst(pair -> pair.first == piece.position, edges)
-		end
+		perms = permutations(half, edges)
 
 		orientations = map(enumerate(half)) do (i, (pos, piece))
 			i = i - 1
@@ -36,58 +34,21 @@ function Base.hash(edges::Edges)
 		end
 
 		# Stuff to get the number (1 indexed)
-		permutations_hash(SVector{6}(piece_hash), max=12) * 2^6 + sum(orientations) + 1
-	end
+		hash_permutations(SVector{6}(perms), max=12) * 2^6 + sum(orientations) + 1
+	end |> Tuple
 end
 
 function Base.hash(cube::Cube)
-	[hash(cube |> corners); hash(cube |> edges)]
+	[hash(cube |> corners), hash(cube |> edges)...]
 end
 
-function permutations_hash(vector::SVector{N, <:Integer} where N; max::Integer)
-	fmax = factorial(max)
+function hash_permutations(vector::SVector{N, <:Integer}; max::Integer=N)::Integer where N
 	map(enumerate(vector)) do (i, n)
-		i = i - 1
+		i = i - 1 # 0-indexing
+
+		# Decision (Eg.: if we have selected 1 and 3, 4 is the second decision)
 		n = n - sum(vector[1:i] .< n) - 1
-		n * fmax ÷ factorial(max - i)
+
+		n * permutations(max, i) # Encode decision
 	end |> sum
 end
-
-function generate_corners(hash::Integer)
-	hash -= 1
-	permutations_hash = hash % factorial(8)
-	orientation_hash = hash ÷ factorial(8)
-
-	orientations = map(1:8) do i
-		(orientation_hash % 3^i) ÷ 3^(i - 1)
-	end
-
-	permutations = map(0:7) do i
-		(permutations_hash % (factorial(8) ÷ factorial(8 - i - 1))) ÷ (factorial(8) ÷ factorial(8 - i)) + 1
-	end
-
-	permutations = let
-		# permutations = [permutations; 1]
-		result = []
-		options = collect(1:8)
-		for decision in permutations
-			push!(result, options[decision])
-			deleteat!(options, decision)
-		end
-		result
-	end
-
-	c = cube() |> corners
-	map(zip(permutations, orientations, c)) do (p, o, (_, piece))
-		pair = c[p].first => piece
-		Cube3x3.twist(pair, o)
-	end
-end
-
-# let 
-# 	c =  move(cube(), "F") |> corners
-# 	h = c |> hash
-# 	f = h |> generate_corners
-
-# 	f
-# end
