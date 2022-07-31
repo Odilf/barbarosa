@@ -4,7 +4,7 @@
 	@test hash_permutations(@SVector[1, 2, 3, 4, 5, 6, 7, 8], max=8) == 0
 	@test hash_permutations(@SVector[2, 1, 3, 4, 5, 6, 7, 8], max=8) == 1
 	@test hash_permutations(@SVector[3, 1, 2, 4, 5, 6, 7, 8], max=8) == 2
-	@test hash(cube())[1:2] == [1, 1]
+	@test hash(cube()) == [1, 1, 1]
 end
 
 @testset "Dehashing" begin
@@ -13,16 +13,11 @@ end
 
 	@test map(1:1000) do _
 		c = scramble() |> corners
-		c |> hash |> MUS.dehash_corners == c
+		dehash_corners(hash(c)) == c
 	end |> all
 
 	@test map(1:1000) do _
 		c = scramble() |> edges
-		MUS.dehash_edges(hash(c)...)  == c
-	end |> all
-
-	@test map(1:1000) do _
-		c = scramble()
-		dehash(hash(c)...) == c
+		dehash_edges(hash(c)[1])  == c[1:6]
 	end |> all
 end
