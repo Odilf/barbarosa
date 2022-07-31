@@ -143,9 +143,9 @@ function scramble()::Cube
 	SVector(c..., e...)
 end
 
-function permutations(cube::SVector{N, Pair{Vector3, Piece}}, search_pool=cube)::SVector{N, <:Integer} where N
+function permutations(cube::SVector{N, Pair{Vector3, Piece}}; pool::SVector{M, Pair{Vector3, Piece}}=cube)::SVector{N, <:Integer} where { N, M }
 	map(cube) do (pos, _)
-		findfirst(pair -> pair.second.position == pos, search_pool)
+		findfirst(pair -> pair.second.position == pos, pool)
 	end
 end
 
