@@ -25,13 +25,11 @@ function dehash_corners(hash::Integer)::Corners
 
 	permutations = dehash_permutations(permutations_hash; length=8)
 
-	cube_corners = cube() |> corners
-
-	map(zip(permutations, orientations, cube_corners)) do (index, orientation, (_, piece))
-		normal = v(cube_corners[index].first[1], 0, 0)
-		pair = cube_corners[index].first => Piece(piece.position, normal)
-		Cube3x3.twist(pair, (3 - orientation) % 3)
-	end
+	corners = Corners().pieces
+	map(zip(permutations, orientations, corners)) do (index, orientation, piece)
+		position = corners[index].position
+		Piece(piece.id, position, orientation)
+	end |> Corners
 end
 
 function dehash_edges(hash::Integer)::HalfEdges
@@ -45,21 +43,10 @@ function dehash_edges(hash::Integer)::HalfEdges
 
 	permutations = dehash_permutations(permutations_hash; length=6, max=12)
 
-	cube_edges = edges(cube())
+	edges = Edges().pieces
 
-	map(zip(permutations, orientations, cube_edges[1:6])) do (index, orientation, (_, piece))
-		
-		pos = cube_edges[index].first
-
-		normal = if abs(pos[1]) == 1
-			v(cube_edges[index].first[1], 0, 0)
-		else
-			v(0, cube_edges[index].first[2], 0)
-		end
-
-		piece = Piece(piece.position, normal)
-
-		pair = pos => piece
-		Cube3x3.twist(pair, orientation % 2)
-	end
+	map(zip(permutations, orientations, edges[1:6])) do (index, orientation, piece)
+		position = edges[index].position
+		Piece(piece.id, position, orientation)
+	end |> HalfEdges
 end

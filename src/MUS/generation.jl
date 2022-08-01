@@ -1,4 +1,4 @@
-function cache_by_depth(cache::Vector{UInt8}, cube::HashSet, threshold::Integer, moves::Integer = 0)::Vector{UInt8}
+function cache_by_depth(cache::Vector{UInt8}, cube::Cube{N where N}, threshold::Integer, moves::Integer = 0)::Vector{UInt8} 
 	if moves > threshold
 		return []
 	end
@@ -7,7 +7,7 @@ function cache_by_depth(cache::Vector{UInt8}, cube::HashSet, threshold::Integer,
 		cache_by_depth(cache, neighbour, threshold, moves + 1)
 	end
 
-	i = if cube isa Edges
+	i = if N == 12
 		hash(cube)[1]
 	else
 		hash(cube)
@@ -19,13 +19,13 @@ end
 
 function cache_corners_by_depth(depth::Integer)
 	cache = getcache()
-	cache.corners = cache_by_depth(cache.corners, cube() |> corners, depth)
+	cache.corners = cache_by_depth(cache.corners, Corners(), depth)
 	savecache(cache)
 end
 
 function cache_edges_by_depth(depth::Integer)
 	cache = getcache()
-	cache.edges = cache_by_depth(cache.edges, edges(cube()), depth)
+	cache.edges = cache_by_depth(cache.edges, HalfEdges(), depth)
 	savecache(cache)
 end
 
@@ -66,9 +66,6 @@ function cache_corners(cache::Cache, range::AbstractRange; kwargs...)
 
 	cache
 end
-
-
-
 
 function mus_edge_heuristic(cache::Vector{UInt8}, fallback=manhattan)
 	if length(cache) != edge_permutations

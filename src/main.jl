@@ -1,5 +1,5 @@
 module Cube3x3
-	export Vector3, Piece, Cube, cube, Move, move, issolved, scramble, neighbours, corners, edges, halfedges, orientation, Corners, Edges, HalfEdges, HashSet, Algs
+	export Vector3, Piece, Cube, move, issolved, scramble, neighbours, orientation, Corners, Edges, HalfEdges, Algs
 
 	include("3x3/3x3.jl")
 	include("3x3/scrambler.jl")

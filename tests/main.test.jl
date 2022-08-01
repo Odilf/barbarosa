@@ -7,7 +7,7 @@ using Test
 @testset "Global" begin
 	@testset "3x3" begin
 		using ..Cube3x3
-		using ..Cube3x3: v, isinrange, makecorners, makeedges, parsemove, movedata, X, Y, Z, R, U, L, D, F, B, rotate, twist, isoriented
+		using ..Cube3x3: v, Move, isinrange, makecorners, makeedges, movedata, X, Y, Z, R, U, L, D, F, B, rotate, issolvable
 
 		include("3x3.test.jl")
 	end

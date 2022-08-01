@@ -53,7 +53,7 @@
 # 	error("Couldn't find solution after $iterations iterations")
 # end
 
-function reconstruct_solution(nodes::Vector{<:HashSet})
+function reconstruct_solution(nodes::Vector{<:Cube})
 	solution = []
 	for (i, node) in enumerate(nodes[2:end])
 		for m in Cube3x3.possible_moves
@@ -67,14 +67,14 @@ function reconstruct_solution(nodes::Vector{<:HashSet})
 end
 
 
-function IDAstar(state::T, heuristic; iterations = 100, silent = false)::Vector{T} where {T <: HashSet}
+function IDAstar(state::Cube{N}, heuristic; iterations = 100, silent = false)::Vector{Cube{N}} where N
 	h = heuristic(state)
 	threshold = h
 	next_threshold = Inf
 
-	function search(node::T, g)::Vector{T}
+	function search(node::Cube{N}, g)::Vector{Cube{N}}
 		if issolved(node)
-			return [node::T]
+			return [node::Cube{N}]
 		end
 	
 		cost = heuristic(node) + g

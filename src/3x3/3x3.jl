@@ -2,8 +2,22 @@ using StaticArrays
 using Memoize
 using Bijections
 
-Vector3 = SVector{3, Int8}
-v(x, y, z) = SVector(Int8(x), Int8(y), Int8(z))
+Vector3{T} = SVector{3, T} where T <: Integer
+v(x, y, z) = SVector(x, y, z)
+
+function name(vec3::Vector3)
+	output = ""
+	vec3[1] == 1 && (output *= "R")
+	vec3[1] == -1 && (output *= "L")
+	vec3[2] == 1 && (output *= "U")
+	vec3[2] == -1 && (output *= "D")
+	vec3[3] == 1 && (output *= "F")
+	vec3[3] == -1 && (output *= "B")
+	return output
+end
+
+Base.show(io::IO, vec3::Vector3) = print(io, "[$(vec3[1]), $(vec3[2]), $(vec3[3])] ($(name(vec3)))")
+Base.show(io::IO, ::MIME"text/plain", vec3::Vector3) = print(io, vec3)
 
 @enum Axis X Y Z
 
@@ -34,11 +48,6 @@ end
 
 @enum Face R U F L D B
 
-struct Move
-	face::Face
-	amount::Integer
-end
-
 const face_letters_dict = Bijection(Dict(
 	'R' => R,
 	'U' => U,
@@ -47,6 +56,28 @@ const face_letters_dict = Bijection(Dict(
 	'D' => D,
 	'B' => B,
 ))
+
+function name(face::Face)::Char
+	face_letters_dict(face)
+end
+
+struct Move
+	face::Face
+	amount::Integer
+end
+
+function name(move::Move)
+	face = name(move.face)
+	amount = abs(move.amount)
+	reverse = move.amount < 0 ? "\'" : ""
+	if amount == 1
+		amount = ""
+	end
+
+	"$face$amount$reverse"
+end
+
+Base.show(io::IO, move::Move) = print(io, name(move))
 
 const face_planes_dict = Bijection(Dict{Face, Vector3}(
 	R => [1, 0, 0],
@@ -57,23 +88,29 @@ const face_planes_dict = Bijection(Dict{Face, Vector3}(
 	B => [0, 0, -1],
 ))
 
-function parsemove(input::AbstractString)::Move
-	input[1] ∉ keys(face_letters_dict) && error("Unknown face letter ($(input[1]))")
-	face = face_letters_dict[input[1]]
-	amount = if length(input) == 1
-		1
-	elseif input[2] == '\''
-		-1
-	else
-		parse(Int, input[2:end])
+
+function Move(input::AbstractString)
+	regex = r"([RUFLDB]{1})(\d*)('?)"
+	m = match(regex, input)
+	if m === nothing
+		error("Invalid input for move")
 	end
 
-	Move(face, amount)
+	face, amount, reverse = m.captures
+	
+	face = face_letters_dict[face[1]]
+	amount = length(amount) == 0 ? 1 : parse(Int, amount)
+	reverse = length(reverse) == 0 ? 1 : -1
+
+	Move(face, amount * reverse)
 end
 
 function parsealg(input::AbstractString)::Vector{Move}
-	[parsemove(i) for i in split(rstrip(input), ' ')]
+	[Move(i) for i in split(rstrip(input), ' ')]
 end
+
+Base.show(io::IO, alg::Vector{Move}) = print(io, join(name.(alg), " "))
+Base.show(io::IO, ::MIME"text/plain", alg::Vector{Move}) = print(io, join(name.(alg), " "))
 
 function movedata(move::Move)
 	axis = if move.face ∈ [R, L]
@@ -86,7 +123,7 @@ function movedata(move::Move)
 
 	angle = move.amount * π/2 * ((move.face ∈ [R, U, F]) ? 1 : -1)
 
-		(angle, axis)
+	(angle, axis)
 end
 
 # Uses one 32 byte allocation
@@ -96,8 +133,38 @@ end
 end
 
 struct Piece
+	id::Vector3
 	position::Vector3
 	normal::Vector3
+end
+
+function Base.show(io::IO, piece::Piece)
+	p = piece.position == piece.id ? "solved" : "at $(piece.position)"
+	print(io, "Piece $(piece.id) $p with normal $(piece.normal)")
+end
+
+function Piece(id::Vector3, position::Vector3)::Piece
+	i = findfirst(n -> abs(n) == 1, position)
+	normal = [0, 0, 0]
+	normal[i] = position[i]
+	Piece(id, position, normal)
+end
+
+Piece(id::Vector3)::Piece = Piece(id, id)
+
+Piece(x::Integer, y::Integer, z::Integer)::Piece = Piece(@SVector[x, y, z])
+
+function Piece(id::Vector3, position::Vector3, orientation::Integer)
+	mask = position .!= 0
+	modulus = count(mask)
+	parity = reduce(*, position[mask])
+	orientation = mod(orientation * parity, modulus) + 1
+	
+	i = collect(1:3)[mask][orientation]
+	normal = [0, 0, 0]
+	normal[i] = position[mask][orientation]
+
+	Piece(id, position, normal)
 end
 
 function makeedges()
@@ -107,14 +174,7 @@ function makeedges()
 	end
 	
 	map(positions) do pos
-		normal = if pos[1] == 1
-			[1, 0, 0]
-		elseif pos[1] == -1
-			[-1, 0, 0]
-		else
-			[0, pos[2], 0]
-		end
-		Piece(pos, normal)
+		Piece(pos...)
 	end
 end
 
@@ -123,62 +183,83 @@ function makecorners()
 	for i in [1, -1]
 		for j in [1, -1]
 			for k in [1, -1]
-				push!(pieces, Piece([i, j, k], [i, 0, 0]))
+				push!(pieces, Piece(i, j, k))
 			end
 		end
 	end
 	pieces
 end
 
-Cube = SVector{20, Pair{Vector3, Piece}}
+struct Cube{N}
+	pieces::SVector{N, Piece}
+end
 
-# For hashing and stuff
-Corners = SVector{8, Pair{Vector3, Piece}}
-Edges = SVector{12, Pair{Vector3, Piece}}
-HalfEdges = SVector{6, Pair{Vector3, Piece}}
-HashSet = Union{Cube, Corners, HalfEdges, Edges}
+FullCube = Cube{20}
+Edges = Cube{12}
+HalfEdges = Cube{6}
+Corners = Cube{8}
 
 const solved_cube = let
 	c = makecorners()
 	e = makeedges()
-	p = [piece.position => piece for piece in [c..., e...]]
-	SVector{20}(p)
+	Cube{20}([c; e])
 end
 
-cube()::Cube = solved_cube::Cube
+Cube() = solved_cube
+Cube{20}() = solved_cube
+Cube{12}(cube::FullCube = solved_cube) = Edges(cube.pieces[9:20])
+Cube{6}(cube::FullCube = solved_cube) = HalfEdges(cube.pieces[9:14])
+Cube{8}(cube::FullCube = solved_cube) = Corners(cube.pieces[1:8])
+
+Base.:(==)(a::Cube, b::Cube) = a.pieces == b.pieces
+
+Base.show(io::IO, cube::Cube) = print(io, "$(length(cube.pieces)) length cube")
+function Base.show(io::IO, ::MIME"text/plain", cube::Cube)
+	print(io, cube)
+	print(io, ":\n")
+
+	for piece in cube.pieces
+		print(io, "   ")
+		println(io, piece)
+	end
+end
 
 function isinrange(position::Vector3, plane::Vector3)::Bool
 	i = findfirst(x -> x != 0, plane)
 	position[i] == plane[i]
 end
 
-function move(cube::T, input::Move)::T where {T <: HashSet}
-	map(cube) do (pos, piece)
-		if isinrange(pos, face_planes_dict[input.face])
-			move(pos, input) => Piece(piece.position, move(piece.normal, input))
+function move(cube::Cube{N}, input::Move)::Cube{N} where N
+	map(cube.pieces) do piece
+		if isinrange(piece.position, face_planes_dict[input.face])
+			Piece(piece.id, move(piece.position, input), move(piece.normal, input))	
 		else
-			pos => piece
+			piece
 		end
-	end
+	end |> Cube
 end
 
-function move(cube::T, alg::Vector{Move})::T where {T <: HashSet}
+function move(cube::Cube{N}, alg::Vector{Move})::Cube{N} where N
 	for input in alg
 		cube = move(cube, input)
 	end
 	cube
 end
 
-function move(cube::T, alg::String)::T where {T <: HashSet}
+function move(cube::Cube{N}, alg::String)::Cube{N} where N
 	move(cube, parsealg(alg))
 end
 
-issolved(cube::Cube) = cube == solved_cube
-issolved(c::Corners) = c == corners(solved_cube)
-issolved(e::Edges) = e == edges(solved_cube)
-issolved(e::HalfEdges) = e ⊆ edges(solved_cube)
+function issolved(cube::Cube{N}) where N
+	cube == Cube{N}()
+end
 
-# isreallysolved(cube::Cube) = Set(cube) == Set(solved_cube)
+function issolved_thorough(cube::Cube{N}) where N
+	map(cube.pieces) do piece
+		piece.id == piece.position &&
+		findfirst(n -> n != 0, piece.normal) == findfirst(n -> n != 0, piece.position)
+	end |> all
+end
 
 const possible_moves = let
 	m::Vector{Move} = []
@@ -190,56 +271,6 @@ const possible_moves = let
 	SVector{18}(m)
 end
 
-function neighbours(cube::T)::SVector{18, T} where {T <: HashSet} 
+function neighbours(cube::Cube{N})::SVector{18, Cube{N}} where N
 	map(m -> move(cube, m), possible_moves)
 end
-
-# Pretty printing
-function name(face::Face)
-	face_letters_dict(face)
-end
-
-function name(position::Vector3)
-	faces = []
-
-	for (face, plane) in face_planes_dict
-		if isinrange(position, plane)
-			faces = [faces..., face]
-		end
-	end
-
-	output = join([name(face) for face in faces])
-	length(output) == 2 && (output *= ' ')
-	output
-end
-
-function name(move::Move)
-	f = name(move.face)
-
-	a = if move.amount == 1
-		""
-	elseif move.amount == -1
-		'\''
-	else
-		string(move.amount)
-	end
-
-	f * a
-end
-
-Base.show(io::IO, piece::Piece) = print(io, "Piece $(name(piece.position)) with normal $(piece.normal)")
-
-Base.show(io::IO, cube::Cube) = print(io, "3x3 cube" * (issolved(cube) ? " (solved)" : " (scrambled)"))
-function Base.show(io::IO, ::MIME"text/plain", cube::Cube)
-	print(io, cube)
-	print(io, ": ")
-	for (pos, piece) in cube
-		print(io, "\n  ")
-		print(io, piece)
-		print(io, " at $(name(pos))")
-	end
-end
-
-Base.show(io::IO, move::Move) = print(io, name(move))
-Base.show(io::IO, alg::Vector{Move}) = print(io, join(name.(alg), " "))
-Base.show(io::IO, ::MIME"text/plain", alg::Vector{Move}) = print(io, join(name.(alg), " "))

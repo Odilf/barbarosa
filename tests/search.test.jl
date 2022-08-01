@@ -1,2 +1,2 @@
-@test IDAstar(move(cube(), "R2 D2 F2"), manhattan; iterations=100, silent=true) |> reconstruct_solution == Cube3x3.parsealg("F2 D2 R2")
-@test IDAstar(move(cube(), "R U R' U'"), manhattan; iterations=100, silent=true) |> reconstruct_solution == Cube3x3.parsealg("U R U' R'")
+@test IDAstar(move(Cube(), "R2 D2 F2"), manhattan; iterations=100, silent=true) |> reconstruct_solution == Cube3x3.parsealg("F2 D2 R2")
+@test IDAstar(move(Cube(), "R U R' U'"), manhattan; iterations=100, silent=true) |> reconstruct_solution == Cube3x3.parsealg("U R U' R'")
