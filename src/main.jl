@@ -1,5 +1,5 @@
 module Cube3x3
-	export Vector3, Piece, Cube, cube, Move, move, issolved, scramble, neighbours, corners, edges, orientation, Corners, Edges, HalfEdges, HashSet, Algs
+	export Vector3, Piece, Cube, cube, Move, move, issolved, scramble, neighbours, corners, edges, halfedges, orientation, Corners, Edges, HalfEdges, HashSet, Algs
 
 	include("3x3/3x3.jl")
 	include("3x3/scrambler.jl")
@@ -24,6 +24,7 @@ module MUS
 	include("MUS/hash.jl")
 	include("MUS/dehash.jl")
 	include("MUS/cache.jl")
+	include("MUS/generation.jl")
 end
 
 module Barbarosa
