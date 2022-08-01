@@ -12,7 +12,7 @@ function dehash_permutations(hash::Integer; length::Integer, max::Integer=length
 	end
 end
 
-function dehash_corners(hash::Integer)
+function dehash_corners(hash::Integer)::Corners
 	hash -= 1
 	permutations_hash = hash % factorial(8)
 	orientation_hash = hash ÷ factorial(8)
