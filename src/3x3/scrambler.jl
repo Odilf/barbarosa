@@ -5,6 +5,7 @@ isedge(piece::Piece) = sum(abs.(piece.position)) == 2
 # Kinda dangerous
 corners(cube::Cube)::SVector{8, Pair{Vector3, Piece}} = cube[1:8]
 edges(cube::Cube)::SVector{12, Pair{Vector3, Piece}} = cube[9:20]
+halfedges(cube::Cube)::SVector{6, Pair{Vector3, Piece}} = cube[9:14]
 
 filter(pair -> pair.first == 2, cube())
 
