@@ -21,29 +21,34 @@ Base.show(io::IO, ::MIME"text/plain", vec3::Vector3) = print(io, vec3)
 
 @enum Axis X Y Z
 
-rotation_matrices_dict = Dict(
-	X => θ -> [
-		1   0       0
-		0 cos(θ)  sin(θ)
-		0 -sin(θ) cos(θ) 
-	],
+function rotate_90(p::Vector3, axis::Axis)
+	if axis == X
+		@SVector[p[1], p[3], -p[2]]
+	elseif axis == Y
+		@SVector[-p[3], p[2], p[1]]
+	else
+		@SVector[p[2], -p[1], p[3]]
+	end
+end
 
-	Y => θ -> [
-		cos(θ)  0 -sin(θ)
-		   0    1   0
-		sin(θ) 0 cos(θ)
-	],
+function rotate_270(p::Vector3, axis::Axis)
+	if axis == X
+		@SVector[p[1], -p[3], p[2]]
+	elseif axis == Y
+		@SVector[p[3], p[2], -p[1]]
+	else
+		@SVector[-p[2], p[1], p[3]]
+	end
+end
 
-	Z => θ -> [
-		cos(θ)   sin(θ) 0
-		-sin(θ)  cos(θ) 0
-		   0       0    1
-	]
-)
-
-function rotate(position::Vector3, axis::Axis, θ::Real)::Vector3	
-	m = rotation_matrices_dict[axis](θ)
-	round.(Int, m * position)
+function rotate_180(p::Vector3, axis::Axis)
+	if axis == X
+		@SVector[p[1], -p[2], -p[3]]
+	elseif axis == Y
+		@SVector[-p[1], p[2],-p[3]]
+	else
+		@SVector[-p[1], -p[2], p[3]]
+	end
 end
 
 @enum Face R U F L D B
@@ -113,23 +118,33 @@ Base.show(io::IO, alg::Vector{Move}) = print(io, join(name.(alg), " "))
 Base.show(io::IO, ::MIME"text/plain", alg::Vector{Move}) = print(io, join(name.(alg), " "))
 
 function movedata(move::Move)
-	axis = if move.face ∈ [R, L]
-		X
-	elseif move.face ∈ [U, D]
-		Y
-	else
-		Z
-	end
+	
 
 	angle = move.amount * π/2 * ((move.face ∈ [R, U, F]) ? 1 : -1)
 
 	(angle, axis)
 end
 
-# Uses one 32 byte allocation
-@memoize IdDict function move(position::Vector3, input::Move)::Vector3
-	angle, axis = movedata(input)
-	rotate(position, axis, angle)
+function move(vector::Vector3, input::Move)::Vector3
+	axis = input.face == R || input.face == L ? X : 
+		   input.face == U || input.face == D ? Y : Z
+
+	direction = input.face == R || input.face == U || input.face == F ? 1 : -1
+	amount = input.amount * direction
+
+	if amount == 1
+		rotate_90(vector, axis)
+	elseif amount == 2
+		rotate_180(vector, axis)
+	elseif amount == -1
+		rotate_270(vector, axis)
+	else
+		f = amount > 0 ? rotate_90 : rotate_270
+		for _ in 1:abs(amount)
+			vector = f(vector, axis)
+		end
+		vector
+	end
 end
 
 struct Piece
@@ -210,8 +225,6 @@ Cube{20}() = solved_cube
 Cube{12}(cube::FullCube = solved_cube) = Edges(cube.pieces[9:20])
 Cube{6}(cube::FullCube = solved_cube) = HalfEdges(cube.pieces[9:14])
 Cube{8}(cube::FullCube = solved_cube) = Corners(cube.pieces[1:8])
-
-Base.:(==)(a::Cube, b::Cube) = a.pieces == b.pieces
 
 Base.show(io::IO, cube::Cube) = print(io, "$(length(cube.pieces)) length cube")
 function Base.show(io::IO, ::MIME"text/plain", cube::Cube)

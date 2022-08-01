@@ -1,8 +1,8 @@
 @testset "Vector rotation" begin
-	@test rotate(v(1, 0, 1), X, 2π/2) == [1, 0, -1] # R2
-	@test rotate(v(3, 2, 1), Y, 2π/4) == [-1, 2, 3] # Random
-	@test rotate(v(1, 1, 1), Z, 2π/4) == [1, -1, 1] # F
-	@test rotate(v(1, 1, 1), X, 2π/4) == [1, 1, -1] # R
+	@test Cube3x3.rotate_180(v(1, 0, 1), X) == [1, 0, -1] # R2
+	@test Cube3x3.rotate_90(v(3, 2, 1), Y) == [-1, 2, 3] # Random
+	@test Cube3x3.rotate_90(v(1, 1, 1), Z) == [1, -1, 1] # F
+	@test Cube3x3.rotate_90(v(1, 1, 1), X) == [1, 1, -1] # R
 end
 
 @testset "Move parsing" begin
@@ -11,13 +11,6 @@ end
 	@test Move("F") == Move(F, 1)
 	@test Move("L42'") == Move(L, -42)
 	@test_throws ErrorException Move("X2")
-end
-
-@testset "Retrieve move data" begin
-	@test movedata(Move("R2")) == (2π/2, X)
-	@test movedata(Move("L'")) == (2π/4, X)
-	@test movedata(Move("D4")) == (-2π, Y)
-	@test movedata(Move("B2")) == (-2π/2, Z)
 end
 
 @testset "Piece movement" begin
@@ -82,5 +75,3 @@ end
 		@test all([issolvable(scramble()) for _ in 1:1000])
 	end
 end
-
-orientation(move(Cube(), "U R U'"))
