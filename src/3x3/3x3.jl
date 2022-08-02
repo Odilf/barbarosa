@@ -2,7 +2,7 @@ using StaticArrays
 using Memoize
 using Bijections
 
-Vector3{T} = SVector{3, T} where T <: Integer
+Vector3 = SVector{3, Int}
 v(x, y, z) = SVector(x, y, z)
 
 function name(vec3::Vector3)
@@ -263,9 +263,8 @@ function move(cube::Cube{N}, alg::String)::Cube{N} where N
 	move(cube, parsealg(alg))
 end
 
-function issolved(cube::Cube{N}) where N
-	cube == Cube{N}()
-end
+issolved(cube::Cube{N}) where N = cube == Cube{N}()
+issolved(cube::FullCube) = cube.pieces == solved_cube.pieces
 
 function issolved_thorough(cube::Cube{N}) where N
 	map(cube.pieces) do piece

@@ -1,15 +1,15 @@
 # using .Cube3x3: possible_moves
 # using Base.Threads
 
-# function IDAstar(state::Cube, heuristic; iterations = 100, silent = false)::Vector{Cube}
+# function IDAstar(state::Cube{N}ube, heuristic; iterations = 100, silent = false)::Vector{Cube}
 # 	h = heuristic(state)
 # 	threshold = h
 # 	next_threshold = Inf
 # 	visited = Set()
 
-# 	function search(node::Cube, g)::Vector{Cube}
+# 	function search(node::Cube{N}ube, g)::Vector{Cube}
 # 		if issolved(node)
-# 			return [node::Cube]
+# 			return [node::Cube{N}ube]
 # 		end
 	
 # 		cost = heuristic(node) + g
