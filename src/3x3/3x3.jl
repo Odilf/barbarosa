@@ -259,6 +259,8 @@ function move(cube::Cube{N}, alg::Vector{Move})::Cube{N} where N
 	cube
 end
 
+move(cube::Cube{N}, input::Nothing) where N = cube
+
 function move(cube::Cube{N}, alg::String)::Cube{N} where N
 	move(cube, parsealg(alg))
 end
@@ -273,7 +275,7 @@ function issolved_thorough(cube::Cube{N}) where N
 	end |> all
 end
 
-const possible_moves = let
+const all_possible_moves = let
 	m::Vector{Move} = []
 	for face in instances(Face)
 		for i in [2, -1, 1]
@@ -283,6 +285,40 @@ const possible_moves = let
 	SVector{18}(m)
 end
 
-function neighbours(cube::Cube{N})::SVector{18, Cube{N}} where N
-	map(m -> move(cube, m), possible_moves)
+struct Connection{T<:Integer}
+	moves::Vector{Move}
+	cost::T
+end
+
+function movecombinations(a::Face, b::Face)
+	m = Vector{Connection}(undef, 15)
+	m = []
+
+	# Singles
+	for face in [a, b]
+		for i in [2, -1, 1]
+			push!(m, Connection([Move(face, i)], 1))
+		end
+	end
+
+	# Doubles
+	for i in [2, -1, 1]
+		for j in [2, -1, 1]
+			push!(m, Connection([Move(a, i), Move(b, j)], 2))
+		end
+	end
+
+	SVector{15}(m)
+end
+
+const neighbouring_moves = let
+	SVector{45}(
+		movecombinations(R, L)...,
+		movecombinations(U, D)...,
+		movecombinations(F, B)...,
+	)
+end
+
+function neighbours(cube::Cube{N})::SVector{18, Neighbour{N, Int}} where N
+	map(m -> move(cube, m), all_possible_moves)
 end

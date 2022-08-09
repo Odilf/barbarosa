@@ -3,8 +3,8 @@ function cache_by_depth(cache::Vector{UInt8}, cube::Cube{N}, threshold::Integer,
 		return cache
 	end
 
-	for neighbour in neighbours(cube)
-		cache = cache_by_depth(cache, neighbour, threshold, moves + 1)
+	for connection in connections
+		cache = cache_by_depth(cache, move(cube, connection.moves), threshold, moves + connection.cost)
 	end
 
 	i = N == 12 ? hash(cube)[1] : hash(cube)
@@ -121,7 +121,3 @@ end
 # 	i = hash(move(Corners(), "R2 F"))
 # 	cache[i]
 # end
-
-@time cache_corners_by_depth(5)
-
-getcache()

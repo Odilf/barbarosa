@@ -56,7 +56,7 @@
 function reconstruct_solution(nodes::Vector{<:Cube})
 	solution = []
 	for (i, node) in enumerate(nodes[2:end])
-		for m in Cube3x3.possible_moves
+		for m in Cube3x3.all_possible_moves
 			if move(node, m) == nodes[i]
 				solution = [m, solution...]
 				break
@@ -67,8 +67,8 @@ function reconstruct_solution(nodes::Vector{<:Cube})
 end
 
 
-function IDAstar(state::Cube{N}, heuristic; iterations = 100, silent = false)::Vector{Cube{N}} where N
-	h = heuristic(state)
+function IDAstar(cube::Cube{N}, heuristic; iterations = 100, silent = false)::Vector{Cube{N}} where N
+	h = heuristic(cube)
 	threshold = h
 	next_threshold = Inf
 
@@ -86,8 +86,8 @@ function IDAstar(state::Cube{N}, heuristic; iterations = 100, silent = false)::V
 			return []
 		end
 	
-		for new_node in neighbours(node)
-			result = search(new_node, g + 1)
+		for connection in neighbouring_moves
+			result = search(move(node, connection.moves), g + connection.cost)
 			if length(result) != 0
 				return [result..., node]
 			end
@@ -99,7 +99,7 @@ function IDAstar(state::Cube{N}, heuristic; iterations = 100, silent = false)::V
 	for depth in 1:iterations
 		silent || println("Searching at depth $depth")
 
-		solution = search(state, 0)
+		solution = search(cube, 0)
 		if length(solution) != 0
 			return solution
 		end
