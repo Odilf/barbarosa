@@ -60,3 +60,6 @@ savecache(cache::Vector{UInt8}, ::Type{Edges}) = savecache(cache, edge_path)
 savecache(cache::Cache) = savecache(cache, corner_path, edge_path)
 
 resetcache(paths...) = savecache(Cache(), paths...)
+
+Base.max(cache::Vector{UInt8}, check_range=1:30) = max(check_range[[i ∈ cache for i ∈ check_range]]...)
+Base.max(cache::Cache, check_range=1:30) = (corners=max(cache.corners, check_range), edges=max(cache.edges, check_range))

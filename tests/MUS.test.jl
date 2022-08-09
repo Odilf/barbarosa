@@ -1,6 +1,6 @@
 @testset "Hashing" begin
-	@test all([scramble() |> Corners |> hash < corner_permutations for _ in 1:100])
-	@test all([all(scramble() |> HalfEdges |> hash < edge_permutations) for _ in 1:100])
+	@test all([scramble() |> Corners |> hash < corner_permutations for _ ∈ 1:100])
+	@test all([all(scramble() |> HalfEdges |> hash < edge_permutations) for _ ∈ 1:100])
 	@test hash_permutations(@SVector[1, 2, 3, 4, 5, 6, 7, 8], max=8) == 0
 	@test hash_permutations(@SVector[2, 1, 3, 4, 5, 6, 7, 8], max=8) == 1
 	@test hash_permutations(@SVector[3, 1, 2, 4, 5, 6, 7, 8], max=8) == 2

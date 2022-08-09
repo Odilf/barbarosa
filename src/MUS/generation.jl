@@ -1,5 +1,5 @@
 function cache_by_depth(cache::Vector{UInt8}, cube::Cube{N}, threshold::Integer, moves::Integer = 0) where N
-	for connection in neighbouring_moves
+	for connection ∈ neighbouring_moves
 		if moves < threshold
 			cache = cache_by_depth(cache, move(cube, connection.moves), threshold, moves + connection.cost)
 		end
@@ -18,7 +18,7 @@ CacheSet = Union{Type{Corners}, Type{Edges}}
 
 function cache_by_depth(depth::Integer, set::CacheSet)
 	cache = cache_by_depth(getcache(set), set == Edges ? HalfEdges() : set(), depth)
-	savecache(cache, Edges)
+	savecache(cache, set)
 end
 
 function mus_heuristic(set::Set, cache::Vector{UInt8}; fallback) where {Set <: CacheSet}
@@ -27,11 +27,11 @@ function mus_heuristic(set::Set, cache::Vector{UInt8}; fallback) where {Set <: C
 	end
 
 	function heuristic(set::Set)
-		cached = cache[hash(cube)]
+		cached = cache[hash(set)]
 		if cached != 0xff
 			return cached
 		else
-			return fallback(cube)
+			return fallback(set)
 		end
 	end
 end
@@ -39,7 +39,7 @@ end
 function cache_by_hash(set::Set, cache::Vector{UInt8}, range::AbstractRange; fallback, IDA_kwargs...)
 	heuristic = mus_heuristic(set, cache; fallback)
 
-	for i in range
+	for i ∈ range
 		if cache[i] != 0xff
 			println("Skipping caching hash $i because it is cached already ($(cache[i]))")
 		else

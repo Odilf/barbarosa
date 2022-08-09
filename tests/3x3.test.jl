@@ -72,6 +72,17 @@ end
 	end
 
 	@testset "Scrambles" begin
-		@test all([issolvable(scramble()) for _ in 1:1000])
+		@test all([issolvable(scramble()) for _ ∈ 1:1000])
 	end
 end
+
+# let 
+# 	c = Cube()
+# 	m = Move("R2")
+# 	@time move(c, m)
+# end
+
+# let
+# 	s = @SVector[1, 2, 3]
+# 	@time map(i -> i^2, s)
+# end

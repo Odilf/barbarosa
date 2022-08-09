@@ -40,12 +40,12 @@ function isoriented(cube::FullCube)
 end
 
 function randomize_positions(cube::Cube)::Vector{Vector3}
-	shuffle([piece.position for piece in cube.pieces])
+	shuffle([piece.position for piece ∈ cube.pieces])
 end
 
 function scramble(cube::Cube{N}, mod::Integer; normalize_orientations = true) where N
 	positions = randomize_positions(cube)
-	orientations = [rand(0:mod - 1) for _ in 1:N]
+	orientations = [rand(0:mod - 1) for _ ∈ 1:N]
 
 	if normalize_orientations
 		dif = mod - sum(orientations[2:end]) % mod
@@ -112,7 +112,7 @@ end
 function countswaps(v::SVector{N, <:Integer}) where N
 	v = MVector(v)
 	total = 0
-	for i in eachindex(v)
+	for i ∈ eachindex(v)
 		n = v[i]
 		j = findfirst(n -> n == i, v)
 

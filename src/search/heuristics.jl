@@ -1,7 +1,7 @@
-# apply(f, cube::Cube) = sum([f(piece) for piece in cube.pieces])
+# apply(f, cube::Cube) = sum([f(piece) for piece ∈ cube.pieces])
 function apply(f, cube::Cube)
 	total = 0
-	for piece in cube.pieces
+	for piece ∈ cube.pieces
 		total += f(piece)
 	end
 	total

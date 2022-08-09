@@ -111,7 +111,7 @@ function Move(input::AbstractString)
 end
 
 function parsealg(input::AbstractString)::Vector{Move}
-	[Move(i) for i in split(rstrip(input), ' ')]
+	[Move(i) for i ∈ split(rstrip(input), ' ')]
 end
 
 Base.show(io::IO, alg::Vector{Move}) = print(io, join(name.(alg), " "))
@@ -140,7 +140,7 @@ function move(vector::Vector3, input::Move)::Vector3
 		rotate_270(vector, axis)
 	else
 		f = amount > 0 ? rotate_90 : rotate_270
-		for _ in 1:abs(amount)
+		for _ ∈ 1:abs(amount)
 			vector = f(vector, axis)
 		end
 		vector
@@ -184,7 +184,7 @@ end
 
 function makeedges()
 	positions = []
-	for (i, j) in [(1, 1), (1, -1), (-1, -1), (-1, 1)]
+	for (i, j) ∈ [(1, 1), (1, -1), (-1, -1), (-1, 1)]
 		positions = [positions..., [i, j, 0], [i, 0, j], [0, i, j]]
 	end
 	
@@ -195,9 +195,9 @@ end
 
 function makecorners()
 	pieces = []
-	for i in [1, -1]
-		for j in [1, -1]
-			for k in [1, -1]
+	for i ∈ [1, -1]
+		for j ∈ [1, -1]
+			for k ∈ [1, -1]
 				push!(pieces, Piece(i, j, k))
 			end
 		end
@@ -231,7 +231,7 @@ function Base.show(io::IO, ::MIME"text/plain", cube::Cube)
 	print(io, cube)
 	print(io, ":\n")
 
-	for piece in cube.pieces
+	for piece ∈ cube.pieces
 		print(io, "   ")
 		println(io, piece)
 	end
@@ -253,13 +253,13 @@ function move(cube::Cube{N}, input::Move)::Cube{N} where N
 end
 
 function move(cube::Cube{N}, alg::Vector{Move})::Cube{N} where N
-	for input in alg
+	for input ∈ alg
 		cube = move(cube, input)
 	end
 	cube
 end
 
-move(cube::Cube{N}, input::Nothing) where N = cube
+move(cube::Cube{N}, ::Nothing) where N = cube
 
 function move(cube::Cube{N}, alg::String)::Cube{N} where N
 	move(cube, parsealg(alg))
@@ -277,8 +277,8 @@ end
 
 const all_possible_moves = let
 	m::Vector{Move} = []
-	for face in instances(Face)
-		for i in [2, -1, 1]
+	for face ∈ instances(Face)
+		for i ∈ [2, -1, 1]
 			m = [m..., Move(face, i)]
 		end
 	end
@@ -295,15 +295,15 @@ function movecombinations(a::Face, b::Face)
 	m = []
 
 	# Singles
-	for face in [a, b]
-		for i in [2, -1, 1]
+	for face ∈ [a, b]
+		for i ∈ [2, -1, 1]
 			push!(m, Connection([Move(face, i)], 1))
 		end
 	end
 
 	# Doubles
-	for i in [2, -1, 1]
-		for j in [2, -1, 1]
+	for i ∈ [2, -1, 1]
+		for j ∈ [2, -1, 1]
 			push!(m, Connection([Move(a, i), Move(b, j)], 2))
 		end
 	end
