@@ -25,6 +25,9 @@ function getcache()
 	Cache(caches...)
 end
 
+getcache(::Type{Corners}) = getcache().corners
+getcache(::Type{Edges}) = getcache().edges
+
 function cacheprogress(cache::Vector{UInt8})
 	total = length(cache)
 	cached = count(n -> n != 0xff, cache)

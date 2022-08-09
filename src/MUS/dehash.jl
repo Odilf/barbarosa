@@ -12,7 +12,7 @@ function dehash_permutations(hash::Integer; length::Integer, max::Integer=length
 	end
 end
 
-function dehash_corners(hash::Integer)::Corners
+function dehash(hash::Integer, ::Type{Corners})::Corners
 	hash -= 1
 	permutations_hash = hash % factorial(8)
 	orientation_hash = hash ÷ factorial(8)
@@ -32,7 +32,7 @@ function dehash_corners(hash::Integer)::Corners
 	end |> Corners
 end
 
-function dehash_edges(hash::Integer)::HalfEdges
+function dehash(hash::Integer, ::Union{Type{Edges}, Type{HalfEdges}})::HalfEdges
 	hash -= 1
 	permutations_hash = hash ÷ 2^6
 	orientation_hash = hash % 2^6 

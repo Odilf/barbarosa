@@ -16,7 +16,7 @@ module Search
 end
 
 module MUS
-	export edge_permutations, corner_permutations, hash, dehash_corners, dehash_edges, getcache
+	export edge_permutations, corner_permutations, hash, dehash, getcache
 
 	using ..Cube3x3
 	using ..Search
