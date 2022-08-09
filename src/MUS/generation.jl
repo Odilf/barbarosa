@@ -1,4 +1,4 @@
-function cache_by_depth(cache::Vector{UInt8}, cube::Cube{N where N}, threshold::Integer, moves::Integer = 0)::Vector{UInt8} 
+function cache_by_depth(cache::Vector{UInt8}, cube::Cube{N}, threshold::Integer, moves::Integer = 0)::Vector{UInt8} where N
 	if moves > threshold
 		return []
 	end
@@ -18,14 +18,16 @@ function cache_by_depth(cache::Vector{UInt8}, cube::Cube{N where N}, threshold::
 end
 
 function cache_corners_by_depth(depth::Integer)
+	corner_cache = cache_by_depth(cache.corners, Corners(), depth)
 	cache = getcache()
-	cache.corners = cache_by_depth(cache.corners, Corners(), depth)
+	cache.corners = corner_cache
 	savecache(cache)
 end
 
 function cache_edges_by_depth(depth::Integer)
+	edge_cache = cache_by_depth(cache.edges, HalfEdges(), depth)
 	cache = getcache()
-	cache.edges = cache_by_depth(cache.edges, HalfEdges(), depth)
+	cache.edges = edge_cache
 	savecache(cache)
 end
 
