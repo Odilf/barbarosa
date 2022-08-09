@@ -41,24 +41,19 @@ function Base.show(io::IO, cache::Cache)
 	print(io, "Cache \n Corners: $cc/$ct ($(cp * 100)%) \n Edges: $ec/$et ($(ep * 100)%)")
 end
 
+savecache(cache::Vector{UInt8}, path::AbstractString) = write(path, cache)
+
 function savecache(cache::Cache, corner_path::AbstractString, edge_path::AbstractString)
-	write(corner_path, cache.corners)
-	write(edge_path, cache.edges)
+	savecache(cache.corners, corner_path)
+	savecache(cache.edges, edge_path)
 
 	@info "Saved cache $cache"
 
 	return cache
 end
 
-savecache(cache::Cache) = savecache(cache, corner_path, edge_path )
+savecache(cache::Vector{UInt8}, ::Type{Corners}) = savecache(cache, corner_path)
+savecache(cache::Vector{UInt8}, ::Type{Edges}) = savecache(cache, edge_path)
+savecache(cache::Cache) = savecache(cache, corner_path, edge_path)
 
 resetcache(paths...) = savecache(Cache(), paths...)
-
-# function cache(cache::Vector{UInt8}, index::Integer, value::Integer)::Vector{UInt8}
-# 	if cache[index] != 0
-# 		cache[index] = value
-# 		@info "Cached hash $index"
-# 	end
-
-# 	cache
-# end

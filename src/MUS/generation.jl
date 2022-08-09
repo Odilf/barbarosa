@@ -1,14 +1,11 @@
-function cache_by_depth(cache::Vector{UInt8}, cube::Cube{N}, threshold::Integer, moves::Integer = 0)::Vector{UInt8} where N
-	if moves > threshold
-		return cache
+function cache_by_depth(cache::Vector{UInt8}, cube::Cube{N}, threshold::Integer, moves::Integer = 0)where N
+	for connection in neighbouring_moves
+		if moves < threshold
+			cache = cache_by_depth(cache, move(cube, connection.moves), threshold, moves + connection.cost)
+		end
 	end
 
-	for connection in connections
-		cache = cache_by_depth(cache, move(cube, connection.moves), threshold, moves + connection.cost)
-	end
-
-	i = N == 12 ? hash(cube)[1] : hash(cube)
-
+	i = hash(cube)
 	v = cache[i]
 	if v > moves
 		cache[i] = moves
@@ -25,13 +22,11 @@ function cache_corners_by_depth(depth::Integer)
 end
 
 function cache_edges_by_depth(depth::Integer)
-	edge_cache = cache_by_depth(cache.edges, HalfEdges(), depth)
+	edge_cache = cache_by_depth(getcache().edges, HalfEdges(), depth)
 	cache = getcache()
 	cache.edges = edge_cache
 	savecache(cache)
 end
-
-
 
 function mus_corner_heuristic(cache::Vector{UInt8}; fallback=manhattan)
 	if length(cache) != corner_permutations
@@ -40,7 +35,7 @@ function mus_corner_heuristic(cache::Vector{UInt8}; fallback=manhattan)
 
 	function heuristic(cube::Corners)
 		cached = cache[hash(cube)]
-		if cached != 0
+		if cached != 0xff
 			# println("Is cached")
 			return cached
 		else
@@ -57,7 +52,7 @@ function cache_corners(cache::Cache, range::AbstractRange; fallback=cube->manhat
 	heuristic = mus_corner_heuristic(cache.corners; fallback)
 
 	for i in range
-		if cache.corners[i] != 0
+		if cache.corners[i] != 0xff
 			println("Skipping caching hash $i")
 		else
 			state = dehash_corners(i)
@@ -72,6 +67,10 @@ function cache_corners(cache::Cache, range::AbstractRange; fallback=cube->manhat
 	cache
 end
 
+cache_corners(range::AbstractRange; kwargs...) = cache_corners(getcache().corners)
+
+savecache(getcache().corners, Edges)
+
 function mus_edge_heuristic(cache::Vector{UInt8}, fallback=manhattan)
 	if length(cache) != edge_permutations
 		error("Incorrect cache passed to function (it is $(length(cache)) instead of $edge_permutations")
@@ -79,7 +78,7 @@ function mus_edge_heuristic(cache::Vector{UInt8}, fallback=manhattan)
 
 	function heuristic(cube::HalfEdges)
 		cached = cache[hash(cube)]
-		if cached != 0
+		if cached != 0xff
 			return cached
 		else
 			return fallback(cube)
@@ -93,7 +92,7 @@ function cache_edges(cache::Cache, range::AbstractRange; kwargs...)
 	heuristic = mus_edge_heuristic(cache.edges)
 
 	for i in range
-		if cache.edges[i] != 0
+		if cache.edges[i] != 0xff
 			println("Skipping caching hash $i")
 		else
 			state = dehash_edges(i)
@@ -107,17 +106,3 @@ function cache_edges(cache::Cache, range::AbstractRange; kwargs...)
 
 	cache
 end
-
-# let 
-# 	h = mus_corner_heuristic(getcache().corners; fallback=x -> manhattan(x)*10)
-# 	c = move(Corners(), "R L D F R L D2 F R D")
-# 	steps = IDAstar(c, h)
-
-# 	h.(steps), reconstruct_solution(steps)
-# end
-
-# let
-# 	cache = cache_by_depth(Cache().corners, Corners(), 2, 0)
-# 	i = hash(move(Corners(), "R2 F"))
-# 	cache[i]
-# end

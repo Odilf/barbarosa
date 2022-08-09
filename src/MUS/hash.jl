@@ -43,11 +43,11 @@ function Base.hash(half::HalfEdges)::Integer
 	permutation_hash * 2^6 + orientation_hash + 1
 end
 
-function Base.hash(edges::Edges)::Vector{Integer}
-	halves = [HalfEdges(edges.pieces[1:6]), HalfEdges([Piece(piece.id, piece.position .* -1, piece.normal) for piece in edges.pieces[7:12]])]
+# function Base.hash(edges::Edges)::Vector{Integer}
+# 	halves = [HalfEdges(edges.pieces[1:6]), HalfEdges([Piece(piece.id, piece.position .* -1, piece.normal) for piece in edges.pieces[7:12]])]
 
-	[hash(halves[1]), hash(halves[2])]
-end
+# 	[hash(halves[1]), hash(halves[2])]
+# end
 
 function Base.hash(cube::Cube)::Vector{Integer}
 	[hash(Corners(cube)), hash(Edges(cube))...]
