@@ -38,7 +38,7 @@ end
 
 function Base.show(io::IO, cache::Cache)
 	((cc, ct, cp), (ec, et, ep)) = cacheprogress(cache)
-	print(io, "Cache \n Corners: $cc/$ct ($cp%) \n Edges: $ec/$et ($ep%)")
+	print(io, "Cache \n Corners: $cc/$ct ($(cp * 100)%) \n Edges: $ec/$et ($(ep * 100)%)")
 end
 
 function savecache(cache::Cache, corner_path::AbstractString, edge_path::AbstractString)
