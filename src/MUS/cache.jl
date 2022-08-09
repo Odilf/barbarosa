@@ -10,13 +10,13 @@ mutable struct Cache
 	edges::Vector{UInt8}
 end
 
-Cache() = Cache(zeros(UInt8, corner_permutations), zeros(UInt8, edge_permutations))
+Cache() = Cache(fill(0xff, corner_permutations), fill(0xff, edge_permutations))
 
 function getcache()
 	caches = map(zip([corner_path, edge_path], [corner_permutations, edge_permutations])) do (path, perms)
 		if !isfile(path)
 			mkpath(base_path)
-			write(path, zeros(UInt8, perms))
+			write(path, fill(0xff, perms))
 		end
 
 		read(path)
@@ -27,7 +27,7 @@ end
 
 function cacheprogress(cache::Vector{UInt8})
 	total = length(cache)
-	cached = count(n -> n != 0, cache)
+	cached = count(n -> n != 0xff, cache)
 	percentage = cached/total
 	(cached, total, percentage)
 end
@@ -54,11 +54,11 @@ savecache(cache::Cache) = savecache(cache, corner_path, edge_path )
 
 resetcache(paths...) = savecache(Cache(), paths...)
 
-function cache(cache::Vector{UInt8}, index::Integer, value::Integer)::Vector{UInt8}
-	if cache[index] != 0
-		cache[index] = value
-		@info "Cached hash $index"
-	end
+# function cache(cache::Vector{UInt8}, index::Integer, value::Integer)::Vector{UInt8}
+# 	if cache[index] != 0
+# 		cache[index] = value
+# 		@info "Cached hash $index"
+# 	end
 
-	cache
-end
+# 	cache
+# end
