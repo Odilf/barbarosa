@@ -97,7 +97,7 @@ function IDAstar(cube::Cube{N}, heuristic; iterations = 100, silent = false)::Ve
 	end
 
 	for depth ∈ 1:iterations
-		silent || println("Searching at depth $depth, threhsold is $threshold")
+		silent || println("Searching at depth $depth, threshold is $threshold")
 
 		solution = search(cube, 0)
 		if length(solution) != 0
