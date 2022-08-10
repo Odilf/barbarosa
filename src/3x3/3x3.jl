@@ -21,7 +21,7 @@ Base.show(io::IO, ::MIME"text/plain", vec3::Vector3) = print(io, vec3)
 
 @enum Axis X Y Z
 
-function rotate_90(p::Vector3, axis::Axis)
+function rotate_90(p::Vector3, axis::Axis)::Vector3
 	if axis == X
 		@SVector[p[1], p[3], -p[2]]
 	elseif axis == Y
@@ -31,7 +31,7 @@ function rotate_90(p::Vector3, axis::Axis)
 	end
 end
 
-function rotate_270(p::Vector3, axis::Axis)
+function rotate_270(p::Vector3, axis::Axis)::Vector3
 	if axis == X
 		@SVector[p[1], -p[3], p[2]]
 	elseif axis == Y
@@ -41,7 +41,7 @@ function rotate_270(p::Vector3, axis::Axis)
 	end
 end
 
-function rotate_180(p::Vector3, axis::Axis)
+function rotate_180(p::Vector3, axis::Axis)::Vector3
 	if axis == X
 		@SVector[p[1], -p[2], -p[3]]
 	elseif axis == Y
@@ -116,14 +116,6 @@ end
 
 Base.show(io::IO, alg::Vector{Move}) = print(io, join(name.(alg), " "))
 Base.show(io::IO, ::MIME"text/plain", alg::Vector{Move}) = print(io, join(name.(alg), " "))
-
-function movedata(move::Move)
-	
-
-	angle = move.amount * π/2 * ((move.face ∈ [R, U, F]) ? 1 : -1)
-
-	(angle, axis)
-end
 
 function move(vector::Vector3, input::Move)::Vector3
 	axis = input.face == R || input.face == L ? X : 
