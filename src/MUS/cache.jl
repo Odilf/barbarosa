@@ -44,15 +44,15 @@ function Base.show(io::IO, cache::Cache)
 	print(io, "Cache \n Corners: $cc/$ct ($(cp * 100)%) \n Edges: $ec/$et ($(ep * 100)%)")
 end
 
-savecache(cache::Vector{UInt8}, path::AbstractString) = write(path, cache)
+function savecache(cache::Vector{UInt8}, path::AbstractString)
+	write(path, cache)
+
+	@info "Saved cache, now it is $(getcache())"
+end
 
 function savecache(cache::Cache, corner_path::AbstractString, edge_path::AbstractString)
 	savecache(cache.corners, corner_path)
 	savecache(cache.edges, edge_path)
-
-	@info "Saved cache $cache"
-
-	return cache
 end
 
 savecache(cache::Vector{UInt8}, ::Type{Corners}) = savecache(cache, corner_path)
@@ -63,3 +63,5 @@ resetcache(paths...) = savecache(Cache(), paths...)
 
 Base.max(cache::Vector{UInt8}, check_range=1:30) = max(check_range[[i ∈ cache for i ∈ check_range]]...)
 Base.max(cache::Cache, check_range=1:30) = (corners=max(cache.corners, check_range), edges=max(cache.edges, check_range))
+
+first_uncached(cache::Vector{UInt8}) = findfirst(v -> v == 0xff, cache)
