@@ -43,20 +43,3 @@ function cache_if_uncached_symmetry(state::Cube, cache::Vector{UInt8}, value::In
 
 	return cache
 end
-
-function symmetry_cache(depth::Integer, max_depth::Integer, state::Cube, cache::Vector{UInt8})
-	if depth >= max_depth
-		return cache
-	end
-
-	h = hash(state)
-	if depth < cache[h]
-		cache[h] = depth
-	end
-
-	for cube ∈ symmetries(state)
-		cache = symmetry_cache(depth + 1, max_depth, move(cube, "R"), cache)
-	end
-
-	return cache
-end
