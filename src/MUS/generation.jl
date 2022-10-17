@@ -1,77 +1,58 @@
-using Dates
+function cache_by_depth(state::Cube, depth:: Integer, max_depth::Integer, cache::Vector{UInt8})
+	if depth >= max_depth
+		return cache
+	end
 
-function cache_by_depth(cache::Vector{UInt8}, cube::Cube{N}, threshold::Integer, moves::Integer = 0) where N
-	for connection ∈ neighbouring_moves
-		if moves < threshold
-			cache = cache_by_depth(cache, move(cube, connection.moves), threshold, moves + connection.cost)
+	cache = cache_if_uncached_symmetry(state, cache, depth)
+
+	for connection in Cube3x3.neighbouring_moves
+		try
+			cache_by_depth(move(state, connection.moves), depth + connection.cost, max_depth, cache)
+		catch
+			return cache
 		end
 	end
 
-	i = hash(cube)
-	v = cache[i]
-	if v > moves
-		cache[i] = moves
-	end
-
-	cache
+	return cache
 end
 
-CacheSet = Union{Type{Corners}, Type{Edges}}
-
-function cache_by_depth(depth::Integer, set::CacheSet)
-	cache = cache_by_depth(getcache(set), set == Edges ? HalfEdges() : set(), depth)
-	savecache(cache, set)
+function cache_by_depth(max_depth::Integer, hashset::C) where C <: Cube
+	cache = cache_by_depth(hashset, 0, max_depth, getcache(C))
+	savecache(cache, C)
 end
 
-function mus_heuristic(set::Set, cache::Vector{UInt8}; fallback) where {Set <: CacheSet}
-	if length(cache) != permutations(set)
-		error("Incorrect cache passed to function (it is $(length(cache)) instead of $(permutations(set))")
-	end
-
-	function heuristic(cube)
-		cached = cache[hash(cube)]
-		if cached != 0xff
-			return cached
-		else
-			return fallback(cube)
+function cache_if_uncached_symmetry(state::Cube, cache::Vector{UInt8}, value::Integer)
+	hashes::Vector{Int} = Vector{Int}(undef, 48)
+	for (i, m) in enumerate(symmetry_matrices)
+		h = hash(transform(state, m))
+		if cache[h] <= value
+			# @info "State $h already hashed. Skipping rest of hash sets"
+			return cache
 		end
+		hashes[i] = h
 	end
-end
-
-function cache_by_hash(set::CacheSet, cache::Vector{UInt8}, range::AbstractRange; fallback, silent=true, IDA_kwargs...)
-	heuristic = mus_heuristic(set, cache; fallback)
-
-	for i ∈ range
-		if cache[i] != 0xff
-			println("Skipping caching hash $i because it is cached already ($(cache[i]))")
-		else
-			println("Caching $i")
-			state = dehash(i, set)
-			solution = IDAstar(state, heuristic; silent, IDA_kwargs...)
-			v = UInt8(length(solution))
-			cache[i] = v
-			@info "Cached hash $i to $(v)!"
-		end
+	
+	# @info "Caching sets $hashes"
+	for h in hashes
+		cache[h] = value
 	end
 
-	cache
+	return cache
 end
 
-function cache_by_hash(set::CacheSet, range::AbstractRange; kwargs...)
-	cache = cache_by_hash(set, getcache(set), range; kwargs...)
-	savecache(cache, set)
-end
-
-function cache_by_hash(set::CacheSet; limit::Integer=permutations(set), IDAkwargs...)
-	start_time = Dates.format(now(), "HH:MM:SS")
-	@info "Started at $start_time"
-
-	cache = getcache(set)
-	range = first_uncached(cache):limit
-	fallback = _ -> max(cache) + 1
-	try
-		cache = cache_by_hash(set, cache, range; fallback, IDAkwargs...)
-	finally
-		savecache(cache, set)
+function symmetry_cache(depth::Integer, max_depth::Integer, state::Cube, cache::Vector{UInt8})
+	if depth >= max_depth
+		return cache
 	end
+
+	h = hash(state)
+	if depth < cache[h]
+		cache[h] = depth
+	end
+
+	for cube ∈ symmetries(state)
+		cache = symmetry_cache(depth + 1, max_depth, move(cube, "R"), cache)
+	end
+
+	return cache
 end
