@@ -6,6 +6,7 @@ function cache_by_depth(state::Cube, depth:: Integer, max_depth::Integer, cache:
 	cache = cache_if_uncached_symmetry(state, cache, depth)
 
 	for connection in Cube3x3.neighbouring_moves
+		# We use try/catch in case we want to stop the program with ctrl+C
 		try
 			cache_by_depth(move(state, connection.moves), depth + connection.cost, max_depth, cache)
 		catch
@@ -29,14 +30,12 @@ function cache_if_uncached_symmetry(state::Cube, cache::Vector{UInt8}, value::In
 	hashes::Vector{Int} = Vector{Int}(undef, 48)
 	for (i, m) in enumerate(symmetry_matrices)
 		h = hash(transform(state, m))
-		if cache[h] <= value
-			# @info "State $h already hashed. Skipping rest of hash sets"
+		if cache[h] <= value # There is some cached symmetry, so we skip the rest.
 			return cache
 		end
 		hashes[i] = h
 	end
 	
-	# @info "Caching sets $hashes"
 	for h in hashes
 		cache[h] = value
 	end
