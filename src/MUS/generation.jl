@@ -37,3 +37,22 @@ function cache_if_uncached_symmetry(state::Cube, cache::Vector{UInt8}, value::In
 
 	return cache
 end
+
+function cache_by_hash(range::AbstractRange, Set::Union{Type{Corners}, Type{Edges}}, cache=getcache(Set))
+	try
+		for h in range
+			if cache[h] != 0xff
+				@info "Skipping hash $h"
+				continue
+			end
+
+			@info "Caching hash $h"
+
+			cube = dehash(h, Set)
+			solve_length = IDAstar(cube, cache_heuristic(Set)) |> length
+			cache[h] = UInt8(solve_length)
+		end
+	finally
+		savecache(cache, Set)
+	end
+end
