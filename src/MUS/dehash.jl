@@ -1,3 +1,8 @@
+using ..Cube3x3
+using ..Cube3x3: permutations
+using ..Search
+
+
 function dehash_permutations(hash::Integer; length::Integer, max::Integer=length)
 	decisions = map(1:length) do i
 		i = i - 1
@@ -50,3 +55,4 @@ function dehash(hash::Integer, ::Union{Type{Edges}, Type{HalfEdges}})::HalfEdges
 		Piece(piece.id, position, orientation)
 	end |> HalfEdges
 end
+
