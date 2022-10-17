@@ -1,14 +1,3 @@
-struct StopException{T}
-	S::T
-	cache::Vector{UInt8}
-end
-
-function Base.showerror(io::IO, ex::StopException, bt; backtrace=true)
-    Base.with_output_color(get(io, :color, false) ? :green : :nothing, io) do io
-        showerror(io, ex.S)
-    end
-end
-
 function cache_by_depth(state::Cube, depth:: Integer, max_depth::Integer, cache::Vector{UInt8})
 	if depth >= max_depth
 		return cache
