@@ -310,7 +310,3 @@ const neighbouring_moves = let
 		movecombinations(F, B)...,
 	)
 end
-
-function neighbours(cube::Cube{N})::SVector{18, Neighbour{N, Int}} where N
-	map(m -> move(cube, m), all_possible_moves)
-end
