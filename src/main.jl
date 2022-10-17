@@ -16,19 +16,15 @@ module Search
 end
 
 module MUS
-	export edge_permutations, corner_permutations, hash, dehash, getcache
+	export getcache, cache_by_depth, cache_heuristic
 
 	using ..Cube3x3
+	using ..Cube3x3: permutations
+
 	using ..Search
 
 	include("MUS/hash.jl")
 	include("MUS/dehash.jl")
 	include("MUS/cache.jl")
 	include("MUS/generation.jl")
-end
-
-module Barbarosa
-	using ..Cube3x3
-	using ..MUS
-	using ..Search
 end
