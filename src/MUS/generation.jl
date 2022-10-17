@@ -16,8 +16,12 @@ function cache_by_depth(state::Cube, depth:: Integer, max_depth::Integer, cache:
 	return cache
 end
 
+using Dates
+
 function cache_by_depth(max_depth::Integer, hashset::C) where C <: Cube
+	@info "Started at $(now())"
 	cache = cache_by_depth(hashset, 0, max_depth, getcache(C))
+	@info "Finished at $(now())"
 	savecache(cache, C)
 end
 
@@ -56,3 +60,5 @@ function symmetry_cache(depth::Integer, max_depth::Integer, state::Cube, cache::
 
 	return cache
 end
+
+cache_by_depth(3, Corners())
