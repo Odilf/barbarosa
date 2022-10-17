@@ -60,5 +60,3 @@ function symmetry_cache(depth::Integer, max_depth::Integer, state::Cube, cache::
 
 	return cache
 end
-
-cache_by_depth(3, Corners())
