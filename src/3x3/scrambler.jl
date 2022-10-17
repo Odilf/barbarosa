@@ -102,7 +102,7 @@ function issolvable(cube::Cube{N}) where N
 	return true
 end
 
-function permutations(cube::Cube{N}; pool::Cube{M}=Cube{N}())::SVector{N, <: Integer} where {N, M}
+function permutations(cube::Cube{N}; pool::Cube{M}=Cube{N}())::SVector{N, <: Integer} where { N, M }
 	map(cube.pieces) do piece
 		findfirst(pool_piece -> pool_piece.position == piece.position, pool.pieces)
 	end
