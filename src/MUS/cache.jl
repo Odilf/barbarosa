@@ -75,7 +75,7 @@ first_uncached(cache::Cache) = max(first_uncached(cache.corners), first_uncached
 
 function cache_heuristic(cache::Cache=getcache(); fallback=manhattan)
 	base = first_uncached(cache)
-	function h(cube)
+	function h(cube::Cube3x3.FullCube)
 		corner_cache = cache.corners[Corners(cube) |> hash]
 		edge_cache_1, edge_cache_2 = let 
 			h1, h2 = Edges(cube) |> hash
@@ -91,6 +91,18 @@ function cache_heuristic(cache::Cache=getcache(); fallback=manhattan)
 	end
 
 	return h
+end
+
+function cache_heuristic(Set::Union{Type{Corners}, Type{Edges}}, cache::Vector{UInt8}=getcache(Set); fallback=manhattan)
+	base = first_uncached(cache)
+	function h(cube)
+		corner_cache = cache[hash(cube)]
+		if corner_cache != 0xff
+			corner_cache
+		else
+			base + fallback(cube)
+		end
+	end
 end
 
 let
