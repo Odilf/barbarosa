@@ -48,6 +48,3 @@ function cache_if_uncached_symmetry(state::Cube, cache::Vector{UInt8}, value::In
 
 	return cache
 end
-
-cache_by_depth(5, Corners())
-# cache_by_depth(5, HalfEdges())
