@@ -42,17 +42,27 @@ function cache_by_hash(range::AbstractRange, Set::Union{Type{Corners}, Type{Edge
 	try
 		for h in range
 			if cache[h] != 0xff
-				@info "Skipping hash $h"
+				# @info "Skipping hash $h"
 				continue
 			end
 
 			@info "Caching hash $h"
 
 			cube = dehash(h, Set)
-			solve_length = IDAstar(cube, cache_heuristic(Set)) |> length
-			cache[h] = UInt8(solve_length)
+			solve_length = IDAstar(cube, cache_heuristic(Set); silent=true) |> reconstruct_solution
+			cache[h] = UInt8(solve_length |> length)
+		end
+	catch e
+		if typeof(e) != InterruptException
+			rethrow(e)
 		end
 	finally
 		savecache(cache, Set)
 	end
 end
+
+function cache_by_hash(Set::Union{Type{Corners}, Type{Edges}})
+	cache_by_hash(first_uncached(getcache(Set)):permutations(Set), Set)
+end
+
+cache_by_hash(Edges)

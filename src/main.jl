@@ -16,7 +16,7 @@ module Search
 end
 
 module MUS
-	export getcache, cache_by_depth, cache_heuristic
+	export getcache, cache_by_depth, cache_by_hash, cache_heuristic
 
 	using ..Cube3x3
 	using ..Cube3x3: permutations
