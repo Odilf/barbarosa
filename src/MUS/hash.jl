@@ -82,7 +82,7 @@ function Base.hash(corners::Corners)::Integer
 	orientation_hash = hash_orientations(orientation.(corners.pieces[1:end-1]), 3)
 
 	# Stuff to get the number (1 indexed)
-	permutation_hash + orientation_hash * factorial(8) + 1
+	return permutation_hash + orientation_hash * factorial(8) + 1
 end
 
 function Base.hash(half::HalfEdges)::Integer
@@ -90,11 +90,15 @@ function Base.hash(half::HalfEdges)::Integer
 	orientation_hash = hash_orientations(orientation.(half.pieces), 2)
 
 	# Stuff to get the number (1 indexed)
-	permutation_hash * 2^6 + orientation_hash + 1
+	return permutation_hash * 2^6 + orientation_hash + 1
 end
 
 function Base.hash(edges::Edges)::Tuple{Int64, Int64}
 	hash(HalfEdges(edges.pieces[1:6])), hash(HalfEdges(edges.pieces[7:12]))
+end
+
+function Base.hash(cube::Cube{20})::Tuple{Int64, Int64, Int64}
+	(hash(Corners(cube)), hash(Edges(cube))...)
 end
 
 function symmetryhashes(cube::C) where C <: Cube
