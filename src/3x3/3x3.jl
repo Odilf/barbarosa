@@ -98,7 +98,7 @@ function Move(input::AbstractString)
 	regex = r"([RUFLDB]{1})(\d*)('?)"
 	m = match(regex, input)
 	if m === nothing
-		error("Invalid input for move")
+		error("Invalid input for move: \"$input\"")
 	end
 
 	face, amount, reverse = m.captures
