@@ -73,9 +73,14 @@ Base.max(cache::Cache, check_range=1:30) = (corners=max(cache.corners, check_ran
 first_uncached(cache::Vector{UInt8}) = findfirst(v -> v == 0xff, cache)
 first_uncached(cache::Cache) = max(first_uncached(cache.corners), first_uncached(cache.edges))
 
+
+
 function cache_heuristic(cache::Cache=getcache(); fallback=manhattan)
-	# base = filter(x -> x != 0xff, getcache(Set)) |> maximum
-	base = 0
+	base = max(
+		filter(x -> x != 0xff, getcache().corners) |> maximum,
+		filter(x -> x != 0xff, getcache().edges) |> maximum,
+	)
+	
 	function h(cube::Cube3x3.FullCube)
 		corner_cache = cache.corners[Corners(cube) |> hash]
 		edge_cache_1, edge_cache_2 = let 
@@ -83,13 +88,35 @@ function cache_heuristic(cache::Cache=getcache(); fallback=manhattan)
 			cache.edges[h1], cache.edges[h2]
 		end
 
-		r = max(corner_cache, edge_cache_1, edge_cache_2)
-		if r == 0xff
+		r = filter(x -> x != 0xff, [corner_cache, edge_cache_1, edge_cache_2])
+		if length(r) == 0
 			base + fallback(cube)
-			69
 		else
-			69
+			maximum(r)
 		end
+	end
+
+	return h
+end
+
+function full_cache_heuristic(cache::Cache=getcache())
+	if length(filter(x -> x != 0xff, cache.corners)) != length(cache.corners)
+		error("Corner cache is not full: $cache")
+	end
+
+
+	if length(filter(x -> x != 0xff, cache.edges)) != length(cache.edges)
+		error("Edge cache is not full: $cache")
+	end
+
+	function h(cube::Cube3x3.FullCube)::Integer
+		corner_cache = cache.corners[Corners(cube) |> hash]
+		edge_cache_1, edge_cache_2 = let 
+			h1, h2 = Edges(cube) |> hash
+			cache.edges[h1], cache.edges[h2]
+		end
+
+		min(corner_cache, edge_cache_1, edge_cache_2)
 	end
 
 	return h

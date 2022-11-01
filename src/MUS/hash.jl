@@ -85,16 +85,21 @@ function Base.hash(corners::Corners)::Integer
 	return permutation_hash + orientation_hash * factorial(8) + 1
 end
 
-function Base.hash(half::HalfEdges)::Integer
-	permutation_hash = hash_permutations(permutations(half; pool=Edges()); max=12)
+function Base.hash(half::HalfEdges; pool::Cube=Edges())::Integer
+	permutation_hash = hash_permutations(permutations(half; pool); max=12)
 	orientation_hash = hash_orientations(orientation.(half.pieces), 2)
 
 	# Stuff to get the number (1 indexed)
 	return permutation_hash * 2^6 + orientation_hash + 1
 end
 
+const second_edges = Edges([Edges().pieces[7:12]..., Edges().pieces[1:6]...])
+
 function Base.hash(edges::Edges)::Tuple{Int64, Int64}
-	hash(HalfEdges(edges.pieces[1:6])), hash(HalfEdges(edges.pieces[7:12]))
+	return (
+		hash(HalfEdges(edges.pieces[1:6]), pool=Edges()), 
+		hash(HalfEdges(edges.pieces[7:12]), pool=second_edges)
+	)
 end
 
 function Base.hash(cube::Cube{20})::Tuple{Int64, Int64, Int64}
