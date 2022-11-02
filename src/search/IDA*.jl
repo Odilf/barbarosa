@@ -6,6 +6,8 @@ function reconstruct_solution(nodes::Vector{<:Cube})
 				solution = [connection.moves..., solution...]
 				break
 			end
+
+			error("Can't reconstruct solution. ")
 		end
 	end
 	solution
