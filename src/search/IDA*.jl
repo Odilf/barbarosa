@@ -1,13 +1,13 @@
 function reconstruct_solution(nodes::Vector{<:Cube})
 	solution = []
+
+	# `i` is essentially `i - 1` here, since we start at `2`.
 	for (i, node) ∈ enumerate(nodes[2:end])
 		for connection ∈ neighbouring_moves
 			if move(node, connection.moves) == nodes[i]
 				solution = [connection.moves..., solution...]
 				break
 			end
-
-			error("Can't reconstruct solution. ")
 		end
 	end
 	solution
@@ -56,3 +56,6 @@ function IDAstar(cube::Cube{N}, heuristic; iterations = 100, silent = false)::Ve
 
 	error("Couldn't find solution after $iterations iterations")
 end
+
+
+IDAstar(move(Cube(), "R2 D2 F2"), manhattan; iterations=100, silent=true) |> reconstruct_solution
