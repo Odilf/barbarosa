@@ -1,9 +1,9 @@
 function reconstruct_solution(nodes::Vector{<:Cube})
 	solution = []
 	for (i, node) ∈ enumerate(nodes[2:end])
-		for m ∈ Cube3x3.all_possible_moves
-			if move(node, m) == nodes[i]
-				solution = [m, solution...]
+		for connection ∈ neighbouring_moves
+			if move(node, connection.moves) == nodes[i]
+				solution = [connection.moves..., solution...]
 				break
 			end
 		end
