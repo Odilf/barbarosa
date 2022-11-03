@@ -1,61 +1,5 @@
 using StaticArrays
 
-const symmetry_matrices = let 
-	v = Vector{SMatrix{3, 3, Int}}()
-	for i ∈ [-1, 1]
-		for j ∈ [-1, 1]
-			for k ∈ [-1, 1]
-				push!(v, 
-					@SMatrix[i 0 0; 0 j 0; 0 0 k],
-					@SMatrix[0 j 0; 0 0 k; i 0 0],
-					@SMatrix[0 0 k; i 0 0; 0 j 0],
-
-					@SMatrix[i 0 0; 0 0 k; 0 j 0],
-					@SMatrix[0 0 k; 0 j 0; i 0 0],
-					@SMatrix[0 j 0; i 0 0; 0 0 k],
-				)
-			end
-		end
-	end
-	v
-end
-
-struct DeltaPiece
-	id::Vector3
-	Δ::Vector3
-	orientation::Integer
-end
-
-DeltaPiece(piece::Piece) = DeltaPiece(piece.id, piece.position - piece.id, orientation(piece))
-
-function transform(piece::DeltaPiece, matrix::SMatrix{3, 3, Int})
-	id = matrix * piece.id
-	position = id + matrix * piece.Δ
-	Piece(id, position, piece.orientation)
-end
-
-function transform(cube::C, matrix::SMatrix{3, 3, Int}) where C
-	map(cube.pieces) do piece
-		transform(DeltaPiece(piece), matrix)
-	end |> C
-end
-
-function Base.sort(cube::C) where C <: Cube
-	map(C().pieces) do sorted
-		index = findfirst(piece -> piece.id == sorted.id, cube.pieces)
-		cube.pieces[index]
-	end |> C
-end
-
-function symmetries(cube::C) where C <: Cube
-	delta_cube = map(DeltaPiece, cube.pieces)
-
-	map(symmetry_matrices) do m
-		pieces = map(piece -> transform(piece, m), delta_cube)
-		SVector(pieces...) |> C |> sort
-	end
-end
-
 Cube3x3.permutations(elements::Integer, choose::Integer) = reduce(*, (elements - choose + 1):elements)
 
 function hash_permutations(vector::SVector{N, <:Integer}; max::Integer=N)::Integer where N
@@ -105,11 +49,3 @@ end
 function Base.hash(cube::Cube{20})::Tuple{Int64, Int64, Int64}
 	(hash(Corners(cube)), hash(Edges(cube))...)
 end
-
-function symmetryhashes(cube::C) where C <: Cube
-	map(symmetries(cube)) do scube
-		hash(scube)
-	end
-end
-
-symmetryhash(cube::Cube) = symmetryhashes(cube) |> minimum
