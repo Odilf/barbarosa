@@ -21,19 +21,3 @@ end
 		dehash(hash(c), HalfEdges)  == HalfEdges(c.pieces[1:6])
 	end |> all
 end
-
-@testset "Symmetries" begin
-	@test let cube = move(Cube(), Algs.T)
-		symmetries = [transform(cube, m) |> MUS.sort for m ∈ MUS.symmetry_matrices]
-
-		rotated = move(Cube(), "F U F' U' F' L F2 U' F' U' F U F' L'")
-		rotated ∈ symmetries
-	end
-
-	@test let cube = move(Cube(), "R U R' U R U2 R'")
-		symmetries = [transform(cube, m) |> MUS.sort for m ∈ MUS.symmetry_matrices]
-
-		# move(Cube(), "F U F' U F U2 F'") ∈ symmetries && 
-		move(Cube(), "R F R' F R F2 R'") ∈ symmetries
-	end
-end

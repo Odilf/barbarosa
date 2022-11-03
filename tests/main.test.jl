@@ -24,7 +24,7 @@ using Test
 		using ..Cube3x3
 		using ..Cube3x3: permutations
 		using ..MUS
-		using ..MUS: hash_permutations, dehash_permutations, hash, dehash, symmetry_matrices, transform
+		using ..MUS: hash_permutations, dehash_permutations, hash, dehash
 
 		include("MUS.test.jl")
 	end
