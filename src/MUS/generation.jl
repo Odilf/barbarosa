@@ -1,115 +1,80 @@
-using Dates
+using .Threads
 
-function cache_by_depth(state::Cube, depth:: Integer, max_depth::Integer, cache::Vector{UInt8})
-	if depth >= max_depth
-		return cache
+function cache!(hash::Integer, value::Integer, cache::Vector{UInt8})
+	if value < cache[hash]
+		cache[hash] = value
 	end
-
-	cache = cache_if_uncached_symmetry(state, cache, depth)
-
-	for connection in Cube3x3.neighbouring_moves
-		cache = cache_by_depth(move(state, connection.moves), depth + connection.cost, max_depth, cache)
-	end	
-
-	return cache
 end
 
-function cache_by_depth(max_depth::Integer, hashset::C) where C <: Cube
-	@info "Started at $(now())"
+"""
+	cache_to_depth!(depth::Integer, ::C, cache=getcache(C)) where C <: Cube
 
-	Set = C == Edges ? HalfEdges : C
+Caches all combinations of moves up to a certain depth. 
 
-	cache = cache_by_depth(Set(), 0, max_depth, getcache(C))
+Modifies `cache` in place.
+"""
+function cache_to_depth!(depth::Integer, ::C, cache=getcache(C)) where C <: Cube
 
-	@info "Finished at $(now())"
-	savecache(cache, C)
-end
-
-function cache_if_uncached_symmetry(state::Cube, cache::Vector{UInt8}, value::Integer)
-	h = hash(state)
-	if value >= cache[h] # The state is cached, so we skip it
-		return cache
-	end
-	
-	cache[h] = value 
-	for m ∈ symmetry_matrices[2:48]
-		h = hash(transform(state, m))
-		cache[h] = value
-	end
-
-	return cache
-end
-
-function find_closest_cached_hash(state::Cube, cache::Vector{UInt8}, depth::Integer, max_depth::Integer)
-	if depth >= max_depth
-		return Nothing
-	end
-
-	h = hash(state)
-	if cache[h] != 0xff
-		return cache[h]
-	end
-
-	map(neighbouring_moves) do c
-		moves, cost = c.moves, c.cost
-
-		result = find_closest_cached_hash(move(state, moves), cache, depth + cost, max_depth)
-
-		if result == Nothing
-			Inf
-		else
-			result + cost
+	function depth_loop(state::Cube, current_depth::Integer)
+		if current_depth > depth
+			return
 		end
-	end |> minimum
+
+		cache!(hash(state), current_depth, cache)
+
+		for connection ∈ neighbouring_moves
+			depth_loop(move(state, connection.moves), current_depth + connection.cost)
+		end
+	end
+
+	depth_loop(C(), 0)
+	return cache
 end
 
-function cache_by_hash(range::AbstractRange, Set::Union{Type{Corners}, Type{Edges}}, cache=getcache(Set))
-	try
-		Threads.@threads for h in range
-			if cache[h] == 0xff
-				# I'm not sure this is even better
-				# Iterative deepening
-				i = 1
-				result = Inf
-				while result == Inf
-					result = find_closest_cached_hash(dehash(h, Set), cache, 0, i)
-					i += 1
-				end
-				
-				cache[h] = result
+"""
+	cache_neighbours(::C, cache::Vector{UInt8}; target::Integer) where C <: Cube
+	cache_neighbours(::C) where C <: Cube
+
+Caches value `target` if a neighbour has cache `target - 1`.
+
+This produces complete results only if cache for `target - 1` is complete. 
+
+Uses multithreading. 
+"""
+function cache_neighbours!(::C, cache::Vector{UInt8}; target::Integer) where C <: Cube
+	visited = 0
+	@threads for h ∈ 1:length(cache)
+		if cache[h] == target - 1
+			state = dehash(h, C)
+			for m ∈ Cube3x3.all_possible_moves
+				cache!(hash(move(state, m)), target, cache)
 			end
+
+			visited += 1
 		end
-	catch e
-		savecache(cache, Set)
-	finally
-		savecache(cache, Set)
-		return cache
-	end 
-end
-
-
-function generate_cache(Set::Union{Type{Corners}, Type{Edges}})
-	cache = getcache(Set)
-	cached_states = filter(x -> x != 0xff, cache) |> length
-
-	# Cache up to depth 5 (~34s)
-	if (Set == Corners && cached_states < 212817) || ((Set == HalfEdges) || (Set == Edges) && cached_states < 994633)
-		@info "Initializing cache by caching up to depth 5"
-		cache_by_depth(5, Set())
 	end
 
-	@info "Starting to cache hashes in order"
-
-	chunk_size = 10_000
-
-	i = first_uncached(getcache(Set))
-
-	while i < permutations(Set)
-		@info "Caching from $i to $(i + chunk_size)"
-
-		# This saves the cache
-		cache_by_hash(i:(i + chunk_size), Set, getcache(Set))
-		i += chunk_size
-	end
+	println("Visited $visited nodes")
 end
 
+function cache_neighbours(::C, range::AbstractRange) where C <: Cube
+	set = C == Edges ? HalfEdges : Corners
+	cache = getcache(set)
+
+	# Start by caching the first state (`hash(C())` should be 1)
+	cache[hash(set())] = 0x00
+
+	println("Starting with cache $(getcache()) \n")
+
+	for i ∈ range	
+		println("Iteration $i")
+		
+		@time try
+			cache_neighbours!(C(), cache; target=i)
+		finally
+			savecache(cache, C)
+		end
+
+		println()
+	end
+end
