@@ -17,9 +17,12 @@ fn bench_ida(c: &mut Criterion) {
 	
 	for alg in algs {
 		let cube = Cube::from(&alg);
-		group.bench_with_input(format!("{} moves", &alg.len()), &alg, |b, _alg| b.iter(|| {
-			cube.solve(heuristics::manhattan)
-		}));
+
+		group.bench_with_input(
+			format!("{} moves", &alg.len()), 
+			&alg, 
+			|b, _alg| b.iter(|| cube.solve(heuristics::manhattan))
+		);
 	}
 }
 
