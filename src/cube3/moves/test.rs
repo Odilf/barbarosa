@@ -1,5 +1,7 @@
 #![cfg(test)]
 
+use rand::seq::SliceRandom;
+
 use crate::cube3::{Cube, moves::alg::perm};
 
 use super::*;
@@ -69,23 +71,43 @@ fn parses_moves() {
 
 #[test]
 fn six_sexy_moves_solves_cube() {
-	let mut cube = Cube::solved();
+	let mut cube = Cube::new_solved();
 
 	for _ in 0..6 {
 		cube.apply_alg(perm::SEXY_MOVE.iter());
 	}
 
-	assert_eq!(cube, Cube::solved());
+	assert_eq!(cube, *Cube::solved());
 }
 
 #[test]
 fn two_t_perms_solve_cube() {
-	let mut cube = Cube::solved();
+	let mut cube = Cube::new_solved();
 
 	for _ in 0..2 {
 		cube.apply_alg(perm::T.iter());
 	}
 
-	assert_eq!(cube, Cube::solved());
+	assert_eq!(cube, *Cube::solved());
+}
+
+#[test]
+fn alg_and_inverse_solve_cube() {
+	let alg: Vec<_> = (0..30)
+		.map(|_| {
+			let moves = Move::all();
+			moves
+				.choose(&mut rand::thread_rng())
+				.expect("Move::all() should not be empty")
+				.clone()
+		})
+		.collect();
+
+	let mut cube = Cube::new_solved();
+
+	cube.apply_alg(alg.iter());
+	cube.apply_alg(alg::reverse(alg).iter());
+
+	assert!(cube.is_solved());
 }
 

@@ -63,7 +63,7 @@ pub enum AmountParseError {
 	InvalidAmount(char),
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Move {
 	pub face: Face,
 	pub amount: Amount,
@@ -149,7 +149,7 @@ impl Rotation {
 	}
 
 	pub fn rotate_corner(&self, corner: &mut Corner) {
-		self.axis.map_on_slice(&mut corner.position, |vec| Self::rotate_vec(&self.amount, vec));
+		corner.position = self.axis.map_on_slice(corner.position, |vec| Self::rotate_vec(&self.amount, vec));
 		match (self.amount, Axis::other(corner.orientation_axis, self.axis)) {
 			(Amount::Double, _) => (),
 			(_, Some(other_axis)) => corner.orientation_axis = other_axis,
