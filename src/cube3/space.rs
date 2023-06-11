@@ -55,26 +55,20 @@ impl Axis {
 	/// Maps vector on slice in the specified axis. That is, you look at the
 	/// axis head on and just assign `x` and `y` accordingly. 
 	// TODO: Make this own and return instead of `&mut`
-	pub fn map_on_slice<T: Clone>(&self, vec: &mut Vector3<T>, f: impl FnOnce(Vector2<T>) -> Vector2<T>) {
+	pub fn map_on_slice<T: Clone>(&self, mut vec: Vector3<T>, f: impl FnOnce(Vector2<T>) -> Vector2<T>) -> Vector3<T> {
 		// Why tf doesn't dot syntax work on generic vectors??
 		// This should be a lot simpler :(
-		match self {
-			Axis::X => {
-				let mapped = f(vector![vec[1].clone(), vec[2].clone()]);
-				vec[1] = mapped[0].clone();
-				vec[2] = mapped[1].clone();
-			},
-			Axis::Y => {
-				let mapped = f(vector![vec[2].clone(), vec[0].clone()]);
-				vec[2] = mapped[0].clone();
-				vec[0] = mapped[1].clone();
-			},
-			Axis::Z => {
-				let mapped = f(vector![vec[0].clone(), vec[1].clone()]);
-				vec[0] = mapped[0].clone();
-				vec[1] = mapped[1].clone();
-			},
-		}
+		let (x, y) = match self {
+			Axis::X => (1, 2),
+			Axis::Y => (2, 0),
+			Axis::Z => (0, 1),
+		};
+
+		let mapped = f(vector![vec[x].clone(), vec[y].clone()]);
+		vec[x] = mapped[0].clone();
+		vec[y] = mapped[1].clone();
+
+		vec
 	}
 
 	pub fn extract_from_vec<'a, T>(&self, vec: &'a Vector3<T>) -> &'a T {

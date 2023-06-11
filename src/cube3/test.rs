@@ -10,7 +10,7 @@ use super::*;
 
 #[test]
 fn solved_cube_visits_all_coordinates() {
-	let solved_cube = Cube::solved();
+	let solved_cube = Cube::new_solved();
 
 	let positions: HashSet<_> = solved_cube.into_iter().map(|piece| piece.position()).collect();
 

@@ -4,7 +4,7 @@ use super::Cube;
 
 impl Cube {
 	pub fn random_with_rng(rng: &mut impl Rng) {
-		let mut cube = Cube::solved();
+		let mut cube = Cube::new_solved();
 
 		// Move pieces
 		cube.edges.shuffle(rng);
