@@ -91,16 +91,15 @@ pub struct Edge {
 	/// The position of the edge on the slice
 	pub position: Vector2<Direction>,
 
-	/// TODO: Expalin orientation
+	/// Whether the edge is oriented or not.
+	/// 
+	/// See [Edge::oriented()] for more information. 
 	pub oriented: bool,
 }
 
 impl Piece for Edge {
 	fn position(&self) -> Vec3 {
-		// TODO: Uggo
-		let mut output = Vec3::zeros();
-		self.normal_axis.map_on_slice(&mut output, |_| self.position.map(|dir| dir.scalar()));
-		output
+		self.normal_axis.map_on_slice(Vec3::zeros(), |_| self.position.map(|dir| dir.scalar()))
 	}
 
 	fn rotate(&mut self, rotation: &Rotation) {
@@ -108,10 +107,7 @@ impl Piece for Edge {
 	}
 
 	fn in_face(&self, face: &Face) -> bool {
-		face.contains_edge(self)
-
-		// TODO: Check alternative implementation
-		// self.faces().contains(face)
+		self.faces().contains(face)
 	}
 }
 
