@@ -17,10 +17,6 @@ mod manhattan {
 		a.iter().zip(b.iter()).map(|(a, b)| abs_dif(*a, *b)).sum()
 	}
 
-	fn int_vec_distance(a: &Vector3<i8>, b: &Vector3<i8>) -> i8 {
-		a.iter().zip(b.iter()).map(|(a, b)| (a - b).abs()).sum()
-	}
-
 	fn corner_distance(a: &Corner, b: &Corner) -> i8 {
 		dir_vec_distance(&a.position, &b.position)
 	}

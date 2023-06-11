@@ -3,10 +3,19 @@ use thiserror::Error;
 
 use crate::cube3::Cube;
 
-use super::Move;
+use super::{Move, MoveParseError};
 
-pub fn parse_alg(input: &str) -> Result<Vec<Move>, ()> {
-	input.split_whitespace().map(|s| Move::parse(s).map_err(|_| ())).collect()
+pub fn parse_alg(input: &str) -> Result<Vec<Move>, AlgParseError> {
+	input.split_whitespace()
+		.map(|s| Move::parse(s)
+			.map_err(AlgParseError::MoveParseError))
+		.collect()
+}
+
+#[derive(Debug, Error)]
+pub enum AlgParseError {
+	#[error("Move parse error: {0}")]
+	MoveParseError(MoveParseError),
 }
 
 pub mod perm {
@@ -24,7 +33,7 @@ pub fn try_from_states(states: Vec<Cube>) -> Result<Vec<Move>, FromStatesError> 
 
 		Move::all().into_iter()
 			.find(|mov| &from.clone().into_move(mov) == to)
-			.ok_or(FromStatesError::StatesNotConnected { from: from.clone(), to: to.clone() })
+			.ok_or(FromStatesError::StatesNotConnected { from: Box::new(from.clone()), to: Box::new(to.clone()) })
 	}).collect();
 
 	moves
@@ -33,7 +42,7 @@ pub fn try_from_states(states: Vec<Cube>) -> Result<Vec<Move>, FromStatesError> 
 #[derive(Debug, Error)]
 pub enum FromStatesError {
 	#[error("States not connected (from: {from:?}, to: {to:?})")]
-	StatesNotConnected { from: Cube, to: Cube },
+	StatesNotConnected { from: Box<Cube>, to: Box<Cube> },
 }
 
 pub fn reverse(alg: Vec<Move>) -> Vec<Move> {

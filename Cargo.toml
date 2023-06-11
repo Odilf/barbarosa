@@ -20,5 +20,5 @@ pathfinding = "4.3.0"
 criterion = { version = "0.5.1", features = ["html_reports"] }
 
 [[bench]]
-name = "my_benchmark"
+name = "manhattan"
 harness = false

@@ -108,8 +108,8 @@ impl Hash for Cube {
 	}
 }
 
-impl From<Vec<Move>> for Cube {
-	fn from(alg: Vec<Move>) -> Self {
+impl From<&Vec<Move>> for Cube {
+	fn from(alg: &Vec<Move>) -> Self {
 		let mut cube = Self::solved();
 		cube.apply_alg(alg.iter());
 		cube
