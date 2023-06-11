@@ -18,13 +18,17 @@ pub struct Cube {
 	pub corners: [Corner; 8],
 }
 
+// TODO: Make this const
 static SOLVED_CUBE: Lazy<Cube> = Lazy::new(Cube::construct_solved);
 
 impl Cube {
-	/// Creates a new cube in the solved state.
-	// TODO: Make this const
-	pub fn solved() -> Self {
-		SOLVED_CUBE.clone()
+	/// Returns a new cube in the solved state.
+	pub fn solved() -> &'static Self {
+		&SOLVED_CUBE
+	}
+
+	pub fn new_solved() -> Self {
+		Self::solved().clone()
 	}
 
 	fn construct_solved() -> Self {
@@ -110,7 +114,7 @@ impl Hash for Cube {
 
 impl From<&Vec<Move>> for Cube {
 	fn from(alg: &Vec<Move>) -> Self {
-		let mut cube = Self::solved();
+		let mut cube = Self::new_solved();
 		cube.apply_alg(alg.iter());
 		cube
 	}
