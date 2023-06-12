@@ -6,13 +6,16 @@ pub fn criterion_benchmark(c: &mut Criterion) {
 }
 
 fn bench_ida(c: &mut Criterion) {
-	let mut group = c.benchmark_group("Ida*");
+	let mut group = c.benchmark_group("A* manhattan move ladder");
 	let algs = [
 		"R",
 		"R U",
 		"L D F",
 		"R2 F D L",
 		"R2 F D L U",
+		"D2 F D L U R'",
+		"D2 F D L U R' D2",
+		// "D2 F D L U R' D2 B'",
 	].map(|alg| parse_alg(alg).unwrap());
 	
 	for alg in algs {
@@ -21,7 +24,7 @@ fn bench_ida(c: &mut Criterion) {
 		group.bench_with_input(
 			format!("{} moves", &alg.len()), 
 			&alg, 
-			|b, _alg| b.iter(|| cube.solve(heuristics::manhattan))
+			|b, _alg| b.iter(|| cube.solve_with_heuristic(heuristics::manhattan))
 		);
 	}
 }
