@@ -7,7 +7,7 @@ use super::*;
 #[test]
 fn test_solved() {
 	let cube = Cube::solved();
-	let solution = cube.solve(heuristics::manhattan);
+	let solution = cube.solve_with_heuristic(heuristics::manhattan);
 	assert_eq!(solution.len(), 0);
 }
 
@@ -15,7 +15,7 @@ fn assert_solves_alg(alg: Vec<Move>, heuristic: impl Fn(&Cube) -> i8) {
 	let mut cube = Cube::new_solved();
 	cube.apply_alg(alg.iter());
 
-	let solution = cube.solve(heuristic);
+	let solution = cube.solve_with_heuristic(heuristic);
 
 	assert_eq!(solution, reverse(alg));
 }

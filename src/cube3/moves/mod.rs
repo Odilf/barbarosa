@@ -1,3 +1,5 @@
+//! Module for handling rotations and moves. 
+
 mod test;
 pub mod alg;
 
@@ -8,13 +10,15 @@ use nalgebra::{Vector2, vector};
 use strum::{IntoEnumIterator, EnumIter};
 use thiserror::Error;
 
-use super::{space::{Face, Axis, Direction, FaceParseError}, pieces::{Corner, Edge}};
+use super::{space::{Face, Axis, Direction, FaceParseError}, piece::{Corner, Edge}};
 
+/// A move amount (either single, double or reverse)
  #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter)]
+ #[allow(missing_docs)]
 pub enum Amount {
 	Single,
 	Double,
-	Reverse,
+	Inverse,
 }
 
 impl Display for Amount {
@@ -22,7 +26,7 @@ impl Display for Amount {
 		match self {
 			Amount::Single => write!(f, ""),
 			Amount::Double => write!(f, "2"),
-			Amount::Reverse => write!(f, "'"),
+			Amount::Inverse => write!(f, "'"),
 		}
 	}
 }
@@ -39,33 +43,39 @@ impl std::ops::Mul<Direction> for Amount {
 		use Direction::*;
 
 		match (self, rhs) {
-			(Single, Positive) | (Reverse, Negative) => Single,
+			(Single, Positive) | (Inverse, Negative) => Single,
 			(Double, _) => Double,
-			(Reverse, Positive) | (Single, Negative) => Reverse,
+			(Inverse, Positive) | (Single, Negative) => Inverse,
 		}
 	}
 }
 
 impl Amount {
+	/// Parses an [Amount]
     pub fn parse(value: Option<char>) -> Result<Amount, AmountParseError> {
 		match value {
 			None => Ok(Amount::Single),
 			Some('2') => Ok(Amount::Double),
-			Some('\'') => Ok(Amount::Reverse),
+			Some('\'') => Ok(Amount::Inverse),
 			Some(other) => Err(AmountParseError::InvalidAmount(other)),
 		}
     }
 }
 
+/// An error that can occur when parsing an [Amount]
 #[derive(Debug, Error)]
 pub enum AmountParseError {
+	/// Found a character wasn't `2` or `'`
 	#[error("Invalid amount: {0}")]
 	InvalidAmount(char),
 }
 
+/// A move on the 3x3x3 cube
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Move {
+	/// The face that is being rotated
 	pub face: Face,
+	/// The amount of rotation
 	pub amount: Amount,
 }
 
@@ -76,6 +86,7 @@ impl Display for Move {
 }
 
 impl Move {
+	/// Creates a new [Move]
 	pub fn new(face: Face, amount: Amount) -> Self {
 		Self { face, amount }
 	}
@@ -88,9 +99,15 @@ impl Move {
 		}
 	}
 
+	/// Parses a [Move]	from a string
 	pub fn parse(value: &str) -> Result<Move, MoveParseError> {
-		let face = value.chars().next().ok_or(MoveParseError::UnexpectedEnd)?;
-		let amount = value.chars().nth(1);
+		let mut chars = value.chars();
+		let face = chars.next().ok_or(MoveParseError::UnexpectedEnd)?;
+		let amount = chars.next();
+
+		if let Some(next) = chars.next() {
+			return Err(MoveParseError::ExpectedEnd(next));
+		}
 
 		let face = Face::parse(face).map_err(MoveParseError::InvalidFace)?;
 		let amount = Amount::parse(amount).map_err(MoveParseError::InvalidAmount)?;
@@ -98,10 +115,11 @@ impl Move {
 		Ok(Move { face, amount })
     }
 
-	pub const ALL_MOVES_SIZE: usize = 3 * 2 * 3;
-
-	pub fn all() -> [Move; Self::ALL_MOVES_SIZE] {
-		let mut moves: [MaybeUninit<Move>; Self::ALL_MOVES_SIZE] = unsafe { 
+	const DISTINCT_MOVES: usize = 3 * 2 * 3;
+	
+	/// Returns an array of all moves
+	pub fn all() -> [Move; Self::DISTINCT_MOVES] {
+		let mut moves: [MaybeUninit<Move>; Self::DISTINCT_MOVES] = unsafe { 
 			MaybeUninit::uninit().assume_init()
 		};
 
@@ -110,32 +128,41 @@ impl Move {
 			moves[i].write(mov);
 		}
 
-		unsafe { mem::transmute::<_, [Move; Self::ALL_MOVES_SIZE]>(moves) }
+		unsafe { mem::transmute::<_, [Move; Self::DISTINCT_MOVES]>(moves) }
 	}
 
+	/// Returns the inverse of this move
 	pub fn reversed(&self) -> Move {
 		Move::new(self.face.clone(), self.amount * Direction::Negative)
 	}
 }
 
+/// A rotation around an axis. This is similar to a [Move], but it doesn't
+/// specify the face. Mainly, this is used because L and R' are the same rotation,
+/// the only difference is the pieces selected in the rotation. 
 pub struct Rotation {
+	/// The axis that is being rotated around
 	pub axis: Axis,
+	/// The amount of rotation
 	pub amount: Amount,
 }
 
 impl Rotation {
+	/// Creates a new [Rotation]
 	pub fn new(axis: Axis, amount: Amount) -> Self {
 		Self { axis, amount }
 	}
 
+	/// Rotates a [Vector2]
 	pub fn rotate_vec(amount: &Amount, vec: Vector2<Direction>) -> Vector2<Direction> {
 		match amount {
 			Amount::Single => vector![vec.y, -vec.x],
 			Amount::Double => vector![-vec.x, -vec.y],
-			Amount::Reverse => vector![-vec.y, vec.x],
+			Amount::Inverse => vector![-vec.y, vec.x],
 		}
 	}
 
+	/// Rotates a [Face]
 	pub fn rotate_face(&self, face: Face) -> Face {
 		if self.axis == face.axis {
 			return face;
@@ -144,10 +171,11 @@ impl Rotation {
 		match self.amount {
 			Amount::Double => face.opposite(),
 			Amount::Single => face.next_around(&self.axis),
-			Amount::Reverse => face.prev_around(&self.axis),
+			Amount::Inverse => face.prev_around(&self.axis),
 		}
 	}
 
+	/// Rotates a [Corner]
 	pub fn rotate_corner(&self, corner: &mut Corner) {
 		corner.position = self.axis.map_on_slice(corner.position, |vec| Self::rotate_vec(&self.amount, vec));
 		match (self.amount, Axis::other(&corner.orientation_axis, &self.axis)) {
@@ -157,6 +185,7 @@ impl Rotation {
 		}
 	}
 
+	/// Rotates an [Edge]
 	pub fn rotate_edge(&self, edge: &mut Edge) {
 		// Orientation changes whenever there's a not double move on the X axis
 		if self.axis == Axis::X && self.amount != Amount::Double {
@@ -175,10 +204,14 @@ impl Rotation {
 	}
 }
 
+/// An error that can occur when parsing a [Face]
 #[derive(Debug, Error)]
+#[allow(missing_docs)]
 pub enum MoveParseError {
 	#[error("Unexpected end of string")]
 	UnexpectedEnd,
+	#[error("Expected end of input, got {0}")]
+	ExpectedEnd(char),
 	#[error("Invalid face: {0}")]
 	InvalidFace(FaceParseError),
 	#[error("Invalid amount: {0}")]

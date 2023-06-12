@@ -1,9 +1,11 @@
+//! Collection of heuristics for the A* search algorithm.
+
 pub use manhattan::manhattan;
 
 mod manhattan {
     use nalgebra::Vector3;
 
-    use crate::cube3::{space::Direction, Cube, pieces::{Corner, Edge, Piece}};
+    use crate::cube3::{space::Direction, Cube, Corner, Edge, Piece};
 
 	fn abs_dif(a: Direction, b: Direction) -> i8 {
 		if a == b {
@@ -29,6 +31,7 @@ mod manhattan {
 			.sum()
 	}
 
+	/// Heuristic based on the manhattan distance
 	pub fn manhattan(cube: &Cube) -> i8 {
 		let edge_distance: i8 = Cube::solved().edges
 			.iter()
@@ -42,6 +45,6 @@ mod manhattan {
 			.map(|(a, b)| corner_distance(a, b))
 			.sum();
 
-		(edge_distance + corner_distance) / 20
+		(edge_distance + corner_distance) / (8 * 2)
 	}
 }

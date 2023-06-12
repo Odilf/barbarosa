@@ -1,14 +1,13 @@
-use std::{fmt::{Display, Debug}, ops::Neg};
+//! Module for operations in space. 
+
+use std::{fmt::{Display, Debug}, ops::{Neg, Index}};
 
 use nalgebra::{Vector3, Vector2, vector};
 use rand::{prelude::Distribution, distributions::Standard};
 use strum::EnumIter;
 use thiserror::Error;
 
-use super::pieces::{Corner, Edge};
-
-/// Small vector type used everywhere
-pub type Vec3 = Vector3<i8>;
+use super::piece::{Corner, Edge};
 
 /// The three axes in space.
 /// 
@@ -30,6 +29,14 @@ pub enum Axis {
 	Z = 2,
 }
 
+impl<T> Index<Axis> for Vector3<T> {
+    type Output = T;
+
+    fn index(&self, index: Axis) -> &Self::Output {
+        &self[index as usize]
+    }
+}
+
 impl Distribution<Axis> for Standard {
     fn sample<R: rand::Rng + ?Sized>(&self, rng: &mut R) -> Axis {
         match rng.gen_range(0..3) {
@@ -41,12 +48,12 @@ impl Distribution<Axis> for Standard {
     }
 }
 
-impl From<&Axis> for Vec3 {
-	fn from(axis: &Axis) -> Vec3 {
+impl From<&Axis> for Vector3<i8> {
+	fn from(axis: &Axis) -> Vector3<i8> {
 		match axis {
-			Axis::X => Vec3::new(1, 0, 0),
-			Axis::Y => Vec3::new(0, 1, 0),
-			Axis::Z => Vec3::new(0, 0, 1),
+			Axis::X => Vector3::new(1, 0, 0),
+			Axis::Y => Vector3::new(0, 1, 0),
+			Axis::Z => Vector3::new(0, 0, 1),
 		}
 	}
 }
@@ -57,6 +64,7 @@ impl Axis {
 	pub fn map_on_slice<T: Clone>(&self, mut vec: Vector3<T>, f: impl FnOnce(Vector2<T>) -> Vector2<T>) -> Vector3<T> {
 		// Why tf doesn't dot syntax work on generic vectors??
 		// This should be a lot simpler :(
+		// TODO: Look into this
 		let (x, y) = match self {
 			Axis::X => (1, 2),
 			Axis::Y => (2, 0),
@@ -69,15 +77,7 @@ impl Axis {
 
 		vec
 	}
-
-	pub fn extract_from_vec<'a, T>(&self, vec: &'a Vector3<T>) -> &'a T {
-		match self {
-			Axis::X => &vec[0],
-			Axis::Y => &vec[1],
-			Axis::Z => &vec[2],
-		}
-	}
-
+	 
 	/// Calculates the offset between two axes. Basically:
 	/// - 0 if the axes are the same
 	/// - 1 if the axes are `(X, Y)`, `(Y, Z)`, or `(Z, X)`
@@ -119,6 +119,7 @@ impl Axis {
 
 /// Spacial direction, used to indicate the two different directions along an axis
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]
+#[allow(missing_docs)]
 pub enum Direction {
 	Positive = 1,
 	Negative = -1,
@@ -151,15 +152,18 @@ impl Neg for Direction {
 	}
 }
 
+/// One of the 6 faces of a cube
 #[derive(Clone, PartialEq, Eq)]
 pub struct Face {
+	/// The axis of the face
 	pub axis: Axis,
+	/// The direction along the axis of the face
 	pub direction: Direction,
 }
 
-impl From<&Face> for Vec3 {
-	fn from(face: &Face) -> Vec3 {
-		Vec3::from(&face.axis) * i8::from(&face.direction)
+impl From<&Face> for Vector3<i8> {
+	fn from(face: &Face) -> Vector3<i8> {
+		Vector3::from(&face.axis) * i8::from(&face.direction)
 	}
 }
 
@@ -184,21 +188,30 @@ impl Display for Face {
 }
 
 impl Face {
+	/// Creates a new face with the specified axis and direction
 	pub const fn new(axis: Axis, direction: Direction) -> Face {
 		Face { axis, direction }
 	}
 
+	/// The right face
 	pub const R: Face = Face::new(Axis::X, Direction::Positive);
+	/// The left face
 	pub const L: Face = Face::new(Axis::X, Direction::Negative);
+	/// The "up" face
 	pub const U: Face = Face::new(Axis::Y, Direction::Positive);
+	/// The "down" face
 	pub const D: Face = Face::new(Axis::Y, Direction::Negative);
+	/// The front face
 	pub const F: Face = Face::new(Axis::Z, Direction::Positive);
+	/// The back face
 	pub const B: Face = Face::new(Axis::Z, Direction::Negative);
 
+	/// Whether the face contains the given corner
 	pub fn contains_corner(&self, corner: &Corner) -> bool {
-		self.axis.extract_from_vec(&corner.position) == &self.direction
+		&corner.position[self.axis] == &self.direction
 	}
 
+	/// Whether the face contains the given edge
 	pub fn contains_edge(&self, edge: &Edge) -> bool {
 		let offset = edge.normal_axis.offset(&self.axis);
 
@@ -210,6 +223,7 @@ impl Face {
 		}
 	}
 
+	/// Gets the opposite face
 	pub fn opposite(&self) -> Face {
 		Face {
 			axis: self.axis,
@@ -275,6 +289,7 @@ impl Face {
 		}
 	}
 
+	/// Parses a face from a character
 	pub fn parse(value: char) -> Result<Face, FaceParseError> {
         match value {
 			'R' => Ok(Face::R),
@@ -296,7 +311,9 @@ fn text_next_around() {
 	assert_eq!(Face::D.next_around(&Axis::X), Face::F);
 }
 
+/// An error that can occur when parsing a face
 #[derive(Debug, Error)]
+#[allow(missing_docs)]
 pub enum FaceParseError {
 	#[error("Invalid face name: {0}")]
 	InvalidFaceName(char),

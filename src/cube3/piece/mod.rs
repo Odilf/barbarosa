@@ -4,18 +4,27 @@ use enum_dispatch::enum_dispatch;
 use nalgebra::{Vector3, Vector2, vector};
 use thiserror::Error;
 
-use super::{space::{Direction, Axis, Vec3, Face}, moves::Rotation};
+use super::{space::{Direction, Axis, Face}, moves::Rotation};
 
+/// An enum that represents either a corner or a face.
+/// 
+/// This is useful for when you want to iterate over all pieces without having to use
+/// dinamic dispatch or caring about the trait being object safe and what not. 
 #[enum_dispatch]
 pub enum PieceEnum {
+	/// The corner piece variant. Visit [Corner] for more information.
 	Corner,
+	/// The edge piece variant. Visit [Edge] for more information.
 	Edge,
 }
 
+/// A trait that represents a piece of the cube.
+/// 
+/// [Corner] and [Edge] implement this trait.
 #[enum_dispatch(PieceEnum)]
 pub trait Piece {
 	/// The position of the piece, relative to the center of the cube.
-	fn position(&self) -> Vec3;
+	fn position(&self) -> Vector3<i8>;
 
 	/// A piece only rotates. Moves are part of the cube, since
 	/// they're just rotations but only to a subset of the pieces.
@@ -25,8 +34,10 @@ pub trait Piece {
 	fn in_face(&self, face: &Face) -> bool;
 }
 
+/// A corner piece of the cube.
 #[derive(Debug, PartialEq, Eq, Clone, Hash)]
 pub struct Corner {
+	/// The position of the corner piece, relative to the center of the cube.
 	pub position: Vector3<Direction>,
 
 	/// The orientation of the corner piece, determined by the axis of the
@@ -35,7 +46,7 @@ pub struct Corner {
 }
 
 impl Piece for Corner {
-    fn position(&self) -> Vec3 {
+    fn position(&self) -> Vector3<i8> {
 		self.position.map(|direction| direction.scalar())
     }
 
@@ -50,7 +61,7 @@ impl Piece for Corner {
 
 impl Corner {
 	/// Construct a new oriented corner at the specified position
-	pub fn oriented(position: Vector3<Direction>) -> Self {
+	pub const fn oriented(position: Vector3<Direction>) -> Self {
 		Self {
 			position,
 			orientation_axis: Axis::X,
@@ -83,6 +94,7 @@ impl Corner {
 	}
 }
 
+/// An edge piece of the cube.
 #[derive(PartialEq, Eq, Hash, Clone)]
 pub struct Edge {
 	/// The axis of the normal of the face the edge is on (i.e. the axis where the coordinate is 0)
@@ -98,8 +110,8 @@ pub struct Edge {
 }
 
 impl Piece for Edge {
-	fn position(&self) -> Vec3 {
-		self.normal_axis.map_on_slice(Vec3::zeros(), |_| self.position.map(|dir| dir.scalar()))
+	fn position(&self) -> Vector3<i8> {
+		self.normal_axis.map_on_slice(Vector3::zeros(), |_| self.position.map(|dir| dir.scalar()))
 	}
 
 	fn rotate(&mut self, rotation: &Rotation) {
@@ -139,7 +151,8 @@ impl Debug for Edge {
 }
 
 impl Edge {
-	pub fn oriented(slice_axis: Axis, position: Vector2<Direction>) -> Self {
+	/// Creates a new oriented edge
+	pub const fn oriented(slice_axis: Axis, position: Vector2<Direction>) -> Self {
 		Self {
 			normal_axis: slice_axis,
 			position,
@@ -147,6 +160,7 @@ impl Edge {
 		}
 	}
 
+	/// Gets the faces of the edge
 	pub fn faces(&self) -> [Face; 2] {
 		let x = self.normal_axis.next();
 		let y = x.next();
@@ -157,11 +171,17 @@ impl Edge {
 		]
 	}
 
+	/// Returns the edge with the opposite orientation.
+	/// 
+	/// See also [Edge::flip()] for mutating instead of owning.
 	pub fn flipped(mut self) -> Self {
 		self.oriented = !self.oriented;
 		self
 	}
 
+	/// Flips the orientation of the edge.
+	/// 
+	/// See also [Edge::flipped()] for owning instead of mutating.
 	pub fn flip(&mut self) {
 		self.oriented = !self.oriented;
 	}

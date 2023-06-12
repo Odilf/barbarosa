@@ -1,3 +1,5 @@
+//! 3x3x3 Rubik's cube searching. 
+
 mod test;
 pub mod heuristics;
 
@@ -8,12 +10,20 @@ use crate::cube3::{Cube, moves::{Move, alg}};
 impl Cube {
 	fn successors(&self) -> Vec<(Self, i8)> {
 		Move::all().into_iter().map(|mov| {
-			let cube = self.clone().into_move(&mov);
+			let cube = self.clone().moved(&mov);
 			(cube, 1i8)
 		}).collect()
 	}
 
-	pub fn solve(&self, heuristic: impl Fn(&Self) -> i8) -> Vec<Move> {
+	/// Solves the cube using A* with the given heuristic.
+	/// 
+	/// Currently it can solve 5 moves in ~2.5s.
+	/// 
+	/// To get an optimal solution, the heuristic must be admissible. That is,
+	/// it must never overestimate the number of moves required to solve the cube.
+	/// 
+	/// See [`heuristics`] for some available heuristics.
+	pub fn solve_with_heuristic(&self, heuristic: impl Fn(&Self) -> i8) -> Vec<Move> {
 		let (states, _cost) = astar(
 			self,
 			|cube| cube.successors(),

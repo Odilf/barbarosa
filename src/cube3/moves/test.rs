@@ -1,7 +1,5 @@
 #![cfg(test)]
 
-use rand::seq::SliceRandom;
-
 use crate::cube3::{Cube, moves::alg::perm};
 
 use super::*;
@@ -16,7 +14,7 @@ fn rotates_u_face() {
 	let rotated = Rotation::new(Axis::X, Amount::Double).rotate_face(face.clone());
 	assert_eq!(rotated, Face::D);
 
-	let rotated = Rotation::new(Axis::X, Amount::Reverse).rotate_face(face.clone());
+	let rotated = Rotation::new(Axis::X, Amount::Inverse).rotate_face(face.clone());
 	assert_eq!(rotated, Face::F);
 }
 
@@ -30,7 +28,7 @@ fn rotates_d_face() {
 	let rotated = Rotation::new(Axis::X, Amount::Double).rotate_face(face.clone());
 	assert_eq!(rotated, Face::U);
 
-	let rotated = Rotation::new(Axis::X, Amount::Reverse).rotate_face(face.clone());
+	let rotated = Rotation::new(Axis::X, Amount::Inverse).rotate_face(face.clone());
 	assert_eq!(rotated, Face::B);
 }
 
@@ -45,7 +43,7 @@ fn rotates_edges() {
 	Rotation::new(Axis::X, Amount::Double).rotate_edge(&mut edge);
 	assert_eq!(edge, Edge::try_from([Face::R, Face::D]).unwrap().flipped());
 
-	Rotation::new(Axis::X, Amount::Reverse).rotate_edge(&mut edge);
+	Rotation::new(Axis::X, Amount::Inverse).rotate_edge(&mut edge);
 	assert_eq!(edge, Edge::try_from([Face::R, Face::B]).unwrap());
 
 	let mut edge = Edge::try_from([Face::U, Face::B]).unwrap();
@@ -58,15 +56,41 @@ fn rotates_edges() {
 	Rotation::new(Axis::Y, Amount::Double).rotate_edge(&mut edge);
 	assert_eq!(edge, Edge::try_from([Face::U, Face::L]).unwrap());
 
-	Rotation::new(Axis::Y, Amount::Reverse).rotate_edge(&mut edge);
+	Rotation::new(Axis::Y, Amount::Inverse).rotate_edge(&mut edge);
 	assert_eq!(edge, Edge::try_from([Face::U, Face::F]).unwrap());
 }
 
 #[test]
 fn parses_moves() {
 	assert_eq!(Move::parse("R2").unwrap(), Move::new(Face::R, Amount::Double));
-	assert_eq!(Move::parse("L'").unwrap(), Move::new(Face::L, Amount::Reverse));
+	assert_eq!(Move::parse("L'").unwrap(), Move::new(Face::L, Amount::Inverse));
 	assert_eq!(Move::parse("D").unwrap(), Move::new(Face::D, Amount::Single));
+}
+
+#[test]
+fn errors_on_invalid_algs() {
+	let inputs = [
+		"P",
+		"µ",
+		"R2'",
+	];
+	
+	for input in inputs {
+		assert!(Move::parse(input).is_err());
+	}
+}
+
+#[test]
+fn errors_completely_when_parsing_invalid_move_in_alg() {
+	let inputs = [
+		"R2 P",
+		"R2 µ",
+		"R2 R2'",
+	];
+	
+	for input in inputs {
+		assert!(alg::parse_alg(input).is_err());
+	}
 }
 
 #[test]
