@@ -143,14 +143,14 @@ impl Rotation {
 
 		match self.amount {
 			Amount::Double => face.opposite(),
-			Amount::Single => face.next_around(self.axis),
-			Amount::Reverse => face.prev_around(self.axis),
+			Amount::Single => face.next_around(&self.axis),
+			Amount::Reverse => face.prev_around(&self.axis),
 		}
 	}
 
 	pub fn rotate_corner(&self, corner: &mut Corner) {
 		corner.position = self.axis.map_on_slice(corner.position, |vec| Self::rotate_vec(&self.amount, vec));
-		match (self.amount, Axis::other(corner.orientation_axis, self.axis)) {
+		match (self.amount, Axis::other(&corner.orientation_axis, &self.axis)) {
 			(Amount::Double, _) => (),
 			(_, Some(other_axis)) => corner.orientation_axis = other_axis,
 			_ => (),
@@ -162,28 +162,16 @@ impl Rotation {
 		if self.axis == Axis::X && self.amount != Amount::Double {
 			edge.oriented = !edge.oriented;
 		}
-		
+
 		// Position
-		if self.axis == edge.normal_axis {
-			edge.position = Self::rotate_vec(&self.amount, edge.position);
-		}
-
 		let faces = edge.faces().map(|face| self.rotate_face(face));
+		let Ok((axis, position)) = Edge::position_from_faces(faces) else {
+			edge.position = Self::rotate_vec(&self.amount, edge.position);
+			return;
+		};
 
-		// dbg!(&faces);
-		// let slice_axis = Axis::other(faces[0].axis, faces[1].axis).expect("Faces should be perpendicular");
-
-		// TODO: Make this not bad lol
-		let correct_question_mark = Edge::try_from(faces).expect("Faces should be valid");
-		edge.position = correct_question_mark.position;
-		edge.normal_axis = correct_question_mark.normal_axis;
-
-		// edge.position = Vector2::new(
-		// 	faces[0].direction,
-		// 	faces[1].direction,
-		// );
-
-		// edge.slice_axis = slice_axis;
+		edge.position = position;
+		edge.normal_axis = axis;
 	}
 }
 

@@ -115,19 +115,7 @@ impl TryFrom<[Face; 2]> for Edge {
     type Error = EdgeFromFacesError;
 
     fn try_from([a, b]: [Face; 2]) -> Result<Self, Self::Error> {
-        let slice_axis = Axis::other(a.axis, b.axis)
-			.ok_or(EdgeFromFacesError::SameAxes([a.axis, b.axis]))?;
-
-		let x = slice_axis.next();
-		let y = x.next();
-
-		let position = if x == a.axis && y == b.axis {
-			vector![a.direction, b.direction]
-		} else if x == b.axis && y == a.axis {
-			vector![b.direction, a.direction]
-		} else {
-			unreachable!()
-		};
+		let (slice_axis, position) = Self::position_from_faces([a, b])?;
 
 		Ok(Edge::oriented(slice_axis, position))
     }
@@ -176,5 +164,26 @@ impl Edge {
 
 	pub fn flip(&mut self) {
 		self.oriented = !self.oriented;
+	}
+
+	/// Calculates the position information of an edge placed in between the given faces.
+	/// 
+	/// Errors if the faces are not perpendicular
+	pub fn position_from_faces([a, b]: [Face; 2]) -> Result<(Axis, Vector2<Direction>), EdgeFromFacesError> {
+		let slice_axis = Axis::other(&a.axis, &b.axis)
+			.ok_or(EdgeFromFacesError::SameAxes([a.axis, b.axis]))?;
+
+		let x = slice_axis.next();
+		let y = x.next();
+
+		let position = if x == a.axis && y == b.axis {
+			vector![a.direction, b.direction]
+		} else if x == b.axis && y == a.axis {
+			vector![b.direction, a.direction]
+		} else {
+			unreachable!()
+		};
+
+		Ok((slice_axis, position))
 	}
 }

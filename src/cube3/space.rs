@@ -247,7 +247,7 @@ impl Face {
 	}
 
 	/// Gets the next face around a 90deg counterclockwise rotation around the given axis.
-	pub fn prev_around(self, axis: Axis) -> Face {
+	pub fn prev_around(self, axis: &Axis) -> Face {
 		match axis {
 			Axis::X => match self {
 				Face::F => Face::D,
