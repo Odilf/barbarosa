@@ -1,4 +1,5 @@
 use once_cell::sync::Lazy;
+use rand::seq::SliceRandom;
 use thiserror::Error;
 
 use crate::cube3::Cube;
@@ -47,4 +48,17 @@ pub enum FromStatesError {
 
 pub fn reverse(alg: Vec<Move>) -> Vec<Move> {
 	alg.into_iter().rev().map(|mov| mov.reversed()).collect()
+}
+
+/// Creates `Vec` of random `Move`s of the given size.
+pub fn random(size: usize) -> Vec<Move> {
+	let mut rng = rand::thread_rng();
+
+	(0..size)
+		.map(|_| Move::all()
+			.choose(&mut rng)
+			.expect("`Moves::all()` has more than zero moves")
+			.clone()
+		)
+		.collect()
 }

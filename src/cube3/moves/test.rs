@@ -93,15 +93,7 @@ fn two_t_perms_solve_cube() {
 
 #[test]
 fn alg_and_inverse_solve_cube() {
-	let alg: Vec<_> = (0..30)
-		.map(|_| {
-			let moves = Move::all();
-			moves
-				.choose(&mut rand::thread_rng())
-				.expect("Move::all() should not be empty")
-				.clone()
-		})
-		.collect();
+	let alg = alg::random(30);
 
 	let mut cube = Cube::new_solved();
 
