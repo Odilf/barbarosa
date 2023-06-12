@@ -54,7 +54,6 @@ impl From<&Axis> for Vec3 {
 impl Axis {
 	/// Maps vector on slice in the specified axis. That is, you look at the
 	/// axis head on and just assign `x` and `y` accordingly. 
-	// TODO: Make this own and return instead of `&mut`
 	pub fn map_on_slice<T: Clone>(&self, mut vec: Vector3<T>, f: impl FnOnce(Vector2<T>) -> Vector2<T>) -> Vector3<T> {
 		// Why tf doesn't dot syntax work on generic vectors??
 		// This should be a lot simpler :(
@@ -106,7 +105,7 @@ impl Axis {
 	}
 
 	/// Returns the axis that is not `a` or `b`, or `None` if they are the same.
-	pub fn other(a: Axis, b: Axis) -> Option<Axis> {
+	pub fn other(a: &Axis, b: &Axis) -> Option<Axis> {
 		use Axis::*;
 
 		match (a, b) {
@@ -219,7 +218,7 @@ impl Face {
 	}
 
 	/// Gets the next face around a 90deg clockwise rotation around the given axis.
-	pub fn next_around(self, axis: Axis) -> Face {
+	pub fn next_around(self, axis: &Axis) -> Face {
 		match axis {
 			Axis::X => match self {
 				Face::F => Face::U,
@@ -291,10 +290,10 @@ impl Face {
 
 #[test]
 fn text_next_around() {
-	assert_eq!(Face::F.next_around(Axis::X), Face::U);
-	assert_eq!(Face::U.next_around(Axis::X), Face::B);
-	assert_eq!(Face::B.next_around(Axis::X), Face::D);
-	assert_eq!(Face::D.next_around(Axis::X), Face::F);
+	assert_eq!(Face::F.next_around(&Axis::X), Face::U);
+	assert_eq!(Face::U.next_around(&Axis::X), Face::B);
+	assert_eq!(Face::B.next_around(&Axis::X), Face::D);
+	assert_eq!(Face::D.next_around(&Axis::X), Face::F);
 }
 
 #[derive(Debug, Error)]
