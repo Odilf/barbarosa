@@ -12,6 +12,7 @@ pub mod space;
 pub mod moves;
 pub mod random;
 
+mod mus;
 mod test;
 
 /// A 3x3x3 Rubik's cube.
