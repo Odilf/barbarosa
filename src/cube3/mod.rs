@@ -1,174 +1,183 @@
 //! 3x3x3 Rubik's cube implementation.
 
-use std::{hash::Hash};
+use std::hash::Hash;
 
 use nalgebra::vector;
 
-pub use self::{piece::{Edge, Corner, PieceEnum, Piece}, space::{Direction, Axis}, moves::Move};
+pub use self::{
+    moves::Move,
+    piece::{Corner, Edge, Piece, PieceEnum},
+    space::{Axis, Direction},
+};
 
 mod piece;
 
-pub mod space;
 pub mod moves;
 pub mod random;
+pub mod space;
 
 mod mus;
 mod test;
 
 /// A 3x3x3 Rubik's cube.
-/// 
+///
 /// The cube is represented by 12 [Edge] pieces and 8 [Corner] pieces.
-/// 
+///
 /// # Piece position
 /// A piece only stores where it is, not what it is. That is, you couldn't tell
 /// the color of, for example, a corner just by the information in the [Corner] struct.
-/// 
-/// Rather, the cube is responsible for keeping track for which piece is which. Simply, 
+///
+/// Rather, the cube is responsible for keeping track for which piece is which. Simply,
 /// the "color" of a piece is determined by that position in [Cube::solved()]
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Cube {
-	/// The edges of the cube.
-	pub edges: [Edge; 12],
+    /// The edges of the cube.
+    pub edges: [Edge; 12],
 
-	/// The corners of the cube.
-	pub corners: [Corner; 8],
+    /// The corners of the cube.
+    pub corners: [Corner; 8],
 }
 
 const SOLVED_CUBE: Cube = {
-	use Axis::*;
-	use Direction::*;
+    use Axis::*;
+    use Direction::*;
 
-	Cube {
-		edges: [
-			Edge::oriented(X, vector![Positive, Positive]),
-			Edge::oriented(X, vector![Positive, Negative]),
-			Edge::oriented(X, vector![Negative, Positive]),
-			Edge::oriented(X, vector![Negative, Negative]),
-			Edge::oriented(Y, vector![Positive, Positive]),
-			Edge::oriented(Y, vector![Positive, Negative]),
-			Edge::oriented(Y, vector![Negative, Positive]),
-			Edge::oriented(Y, vector![Negative, Negative]),
-			Edge::oriented(Z, vector![Positive, Positive]),
-			Edge::oriented(Z, vector![Positive, Negative]),
-			Edge::oriented(Z, vector![Negative, Positive]),
-			Edge::oriented(Z, vector![Negative, Negative]),
-		],
-		corners: [
-			Corner::oriented(vector![Positive, Positive, Positive]),
-			Corner::oriented(vector![Positive, Positive, Negative]),
-			Corner::oriented(vector![Positive, Negative, Positive]),
-			Corner::oriented(vector![Positive, Negative, Negative]),
-			Corner::oriented(vector![Negative, Positive, Positive]),
-			Corner::oriented(vector![Negative, Positive, Negative]),
-			Corner::oriented(vector![Negative, Negative, Positive]),
-			Corner::oriented(vector![Negative, Negative, Negative]),
-		]
-	} 
+    Cube {
+        edges: [
+            Edge::oriented(X, vector![Positive, Positive]),
+            Edge::oriented(X, vector![Positive, Negative]),
+            Edge::oriented(X, vector![Negative, Positive]),
+            Edge::oriented(X, vector![Negative, Negative]),
+            Edge::oriented(Y, vector![Positive, Positive]),
+            Edge::oriented(Y, vector![Positive, Negative]),
+            Edge::oriented(Y, vector![Negative, Positive]),
+            Edge::oriented(Y, vector![Negative, Negative]),
+            Edge::oriented(Z, vector![Positive, Positive]),
+            Edge::oriented(Z, vector![Positive, Negative]),
+            Edge::oriented(Z, vector![Negative, Positive]),
+            Edge::oriented(Z, vector![Negative, Negative]),
+        ],
+        corners: [
+            Corner::oriented(vector![Positive, Positive, Positive]),
+            Corner::oriented(vector![Positive, Positive, Negative]),
+            Corner::oriented(vector![Positive, Negative, Positive]),
+            Corner::oriented(vector![Positive, Negative, Negative]),
+            Corner::oriented(vector![Negative, Positive, Positive]),
+            Corner::oriented(vector![Negative, Positive, Negative]),
+            Corner::oriented(vector![Negative, Negative, Positive]),
+            Corner::oriented(vector![Negative, Negative, Negative]),
+        ],
+    }
 };
 
-
 impl Cube {
-	/// A reference to a solved cube. 
-	pub fn solved() -> &'static Self {
-		&SOLVED_CUBE
-	}
+    /// A reference to a solved cube.
+    pub const fn solved() -> &'static Self {
+        &SOLVED_CUBE
+    }
 
-	/// A new solved cube.
-	pub fn new_solved() -> Self {
-		Self::solved().clone()
-	}
+    /// A new solved cube.
+    pub fn new_solved() -> Self {
+        Self::solved().clone()
+    }
 
-	// fn construct_solved() -> Self {
-	// 	let edges = array::from_fn(|i| {
-	// 		let x = if i / 2 % 2 == 0 { Direction::Positive } else { Direction::Negative };
-	// 		let y = if i % 2 == 0 { Direction::Positive } else { Direction::Negative };
+    // fn construct_solved() -> Self {
+    // 	let edges = array::from_fn(|i| {
+    // 		let x = if i / 2 % 2 == 0 { Direction::Positive } else { Direction::Negative };
+    // 		let y = if i % 2 == 0 { Direction::Positive } else { Direction::Negative };
 
-	// 		let axis = match i {
-	// 			0..=3 => Axis::X,
-	// 			4..=7 => Axis::Y,
-	// 			8..=11 => Axis::Z,
-	// 			_ => unreachable!("Index should be in range 0..12"),
-	// 		};
+    // 		let axis = match i {
+    // 			0..=3 => Axis::X,
+    // 			4..=7 => Axis::Y,
+    // 			8..=11 => Axis::Z,
+    // 			_ => unreachable!("Index should be in range 0..12"),
+    // 		};
 
-	// 		Edge::oriented(axis, vector![x, y])
-	// 	});
+    // 		Edge::oriented(axis, vector![x, y])
+    // 	});
 
-	// 	let corners = array::from_fn(|i| {
-	// 		let coords = [1, 2, 4].map(|axis_index| {
-	// 			if (i / axis_index) % 2 == 0 { Direction::Positive } else { Direction::Negative }
-	// 		}).into();
+    // 	let corners = array::from_fn(|i| {
+    // 		let coords = [1, 2, 4].map(|axis_index| {
+    // 			if (i / axis_index) % 2 == 0 { Direction::Positive } else { Direction::Negative }
+    // 		}).into();
 
-	// 		Corner::oriented(coords)
-	// 	});
+    // 		Corner::oriented(coords)
+    // 	});
 
-	// 	Self { edges, corners }
-	// }
+    // 	Self { edges, corners }
+    // }
 
-	/// Determines if the cube is solved.
-	pub fn is_solved(&self) -> bool {
-		let solved = Self::solved();
-		solved.edges == self.edges && solved.corners == self.corners
-	}
+    /// Determines if the cube is solved.
+    pub fn is_solved(&self) -> bool {
+        let solved = Self::solved();
+        solved.edges == self.edges && solved.corners == self.corners
+    }
 }
 
 impl Default for Cube {
-	fn default() -> Self {
-		Self::new_solved()
-	}
+    fn default() -> Self {
+        Self::new_solved()
+    }
 }
 
 impl IntoIterator for Cube {
-	type Item = PieceEnum;
-	type IntoIter = std::iter::Chain<std::array::IntoIter<PieceEnum, 12>, std::array::IntoIter<PieceEnum, 8>>;
+    type Item = PieceEnum;
+    type IntoIter =
+        std::iter::Chain<std::array::IntoIter<PieceEnum, 12>, std::array::IntoIter<PieceEnum, 8>>;
 
-	fn into_iter(self) -> Self::IntoIter {
-		self.edges.map(|edge| edge.into()).into_iter().chain(
-			self.corners.map(|corner| corner.into()).into_iter()
-		)
-	}
+    fn into_iter(self) -> Self::IntoIter {
+        self.edges
+            .map(|edge| edge.into())
+            .into_iter()
+            .chain(self.corners.map(|corner| corner.into()).into_iter())
+    }
 }
 
 impl Cube {
-	fn move_piece<T: Piece>(piece: &mut T, mov: &Move) {
-		if piece.in_face(&mov.face) {
-			piece.rotate(&mov.rotation());
-		}
-	}
+    fn move_piece<T: Piece>(piece: &mut T, mov: &Move) {
+        if piece.in_face(&mov.face) {
+            piece.rotate(&mov.rotation());
+        }
+    }
 
-	/// Applies a move to the cube.
-	/// 
-	/// See also [Cube::into_move] for the owned version.
-	pub fn do_move(&mut self, mov: &Move) {
-		self.edges.iter_mut().for_each(|edge| Self::move_piece(edge, mov));
-		self.corners.iter_mut().for_each(|corner| Self::move_piece(corner, mov));
-	}
+    /// Applies a move to the cube.
+    ///
+    /// See also [Cube::into_move] for the owned version.
+    pub fn do_move(&mut self, mov: &Move) {
+        self.edges
+            .iter_mut()
+            .for_each(|edge| Self::move_piece(edge, mov));
+        self.corners
+            .iter_mut()
+            .for_each(|corner| Self::move_piece(corner, mov));
+    }
 
-	/// Gets the moved cube. 
-	/// 
-	/// See also [Cube::do_move] for the mutable version.
-	pub fn moved(self, mov: &Move) -> Self {
-		let mut cube = self;
-		cube.do_move(mov);
-		cube
-	}
+    /// Gets the moved cube.
+    ///
+    /// See also [Cube::do_move] for the mutable version.
+    pub fn moved(self, mov: &Move) -> Self {
+        let mut cube = self;
+        cube.do_move(mov);
+        cube
+    }
 
-	/// Applies an algorithm to the cube.
-	pub fn apply_alg<'a>(&mut self, alg: impl Iterator<Item = &'a Move>) {
-		alg.into_iter().for_each(|mov| self.do_move(mov));
-	}
+    /// Applies an algorithm to the cube.
+    pub fn apply_alg<'a>(&mut self, alg: impl Iterator<Item = &'a Move>) {
+        alg.into_iter().for_each(|mov| self.do_move(mov));
+    }
 }
 
 impl Hash for Cube {
-	fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-		self.edges.hash(state);
-		self.corners.hash(state);
-	}
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.edges.hash(state);
+        self.corners.hash(state);
+    }
 }
 
 impl From<&Vec<Move>> for Cube {
-	fn from(alg: &Vec<Move>) -> Self {
-		let mut cube = Self::new_solved();
-		cube.apply_alg(alg.iter());
-		cube
-	}
+    fn from(alg: &Vec<Move>) -> Self {
+        let mut cube = Self::new_solved();
+        cube.apply_alg(alg.iter());
+        cube
+    }
 }
