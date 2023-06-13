@@ -8,7 +8,7 @@ use super::Cube;
 
 impl Cube {
     /// Same as [Cube::random()], but with a specified RNG
-    pub fn random_with_rng(rng: &mut impl Rng) {
+    pub fn random_with_rng(rng: &mut impl Rng) -> Self {
         let mut cube = Cube::new_solved();
 
         // Move pieces
@@ -47,6 +47,8 @@ impl Cube {
         for _ in 0..corner_orientation_offset {
             cube.corners[0].twist();
         }
+
+        cube
     }
 
     /// Generates a random, solvable cube.
@@ -88,9 +90,9 @@ impl Cube {
     /// fact that we're changing the state of the pieces at the start of the already uniform shuffled array
     /// messes with things. I'm pretty sure it doesn't because it's random in the first place, but who knows
     /// lol (i haven't really looked into it yet)
-    pub fn random() {
+    pub fn random() -> Self {
         let mut rng = rand::thread_rng();
-        Self::random_with_rng(&mut rng);
+        Self::random_with_rng(&mut rng)
     }
 }
 
@@ -100,7 +102,7 @@ fn swap_cycles<T: Eq, const N: usize>(given: &[T; N], original: &[T; N]) -> i32 
     let mut cycles = 0;
 
     loop {
-        if permutations[current_index].is_none() {
+        if permutations[current_index].is_some() {
             let Some(first_unvisited) = permutations.iter().position(|x| x.is_none()) else {
 				return cycles;
 			};
