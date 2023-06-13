@@ -8,8 +8,8 @@ pub const fn factorial(n: usize) -> usize {
     }
 }
 
-mod test;
 mod implementations;
+mod test;
 
 pub trait PositionIndexable {
     fn position_index(&self) -> usize;
@@ -21,14 +21,7 @@ pub trait OrientationIndexable {
     const ORIENTATION_SET_SIZE: usize;
 }
 
-pub trait Indexable {
-    fn index(&self) -> usize;
-
-    const TOTAL_SET_SIZE: usize;
-}
-
-/// Every type that is indexable by position and orientation is automatically also regular [Indexable]
-impl<T: PositionIndexable + OrientationIndexable> Indexable for T {
+pub trait Indexable: PositionIndexable + OrientationIndexable {
     fn index(&self) -> usize {
         self.position_index() * Self::ORIENTATION_SET_SIZE + self.orientation_index()
     }
@@ -36,7 +29,22 @@ impl<T: PositionIndexable + OrientationIndexable> Indexable for T {
     const TOTAL_SET_SIZE: usize = Self::POSITION_SET_SIZE * Self::ORIENTATION_SET_SIZE;
 }
 
-fn disposition_multipliers<T: PositionIndexable, const N: usize, const T_POSITION_SET_SIZE: usize>() -> [usize; N] {
+impl<T: PositionIndexable + OrientationIndexable> Indexable for T {}
+
+/// Every type that is indexable by position and orientation is automatically also regular [Indexable]
+// impl<T: > Indexable for T {
+//     fn index(&self) -> usize {
+//         self.position_index() * Self::ORIENTATION_SET_SIZE + self.orientation_index()
+//     }
+
+//     const TOTAL_SET_SIZE: usize = Self::POSITION_SET_SIZE * Self::ORIENTATION_SET_SIZE;
+// }
+
+pub fn disposition_multipliers<
+    T: PositionIndexable,
+    const N: usize,
+    const T_POSITION_SET_SIZE: usize,
+>() -> [usize; N] {
     let mut output = [0; N];
     let mut iteration_index = T_POSITION_SET_SIZE - N;
     let mut multiplier = 1;
@@ -51,7 +59,9 @@ fn disposition_multipliers<T: PositionIndexable, const N: usize, const T_POSITIO
 }
 
 // PERFORMANCE: Maybe this can be done more efficiently
-fn disposition_choices<T: PositionIndexable, const N: usize, const T_POSITION_SET_SIZE: usize>(input: &[T; N]) -> [usize; N] {
+fn disposition_choices<T: PositionIndexable, const N: usize, const T_POSITION_SET_SIZE: usize>(
+    input: &[T; N],
+) -> [usize; N] {
     let mut used = [false; T_POSITION_SET_SIZE];
     let mut output = [0; N];
 
@@ -68,11 +78,21 @@ fn disposition_choices<T: PositionIndexable, const N: usize, const T_POSITION_SE
 // Disposition is actually a more accurate term than permutation, since you don't
 // have to actually select all the elements in edge "permutations"
 // TODO: `const T_POSITION_SET_SIZE: usize` should not be necessary. It has to always be `T::POSITION_SET_SIZE`.
-fn position_disposition_index<T: PositionIndexable, const N: usize, const T_POSITION_SET_SIZE: usize>(input: &[T; N]) -> usize {
+fn position_disposition_index<
+    T: PositionIndexable,
+    const N: usize,
+    const T_POSITION_SET_SIZE: usize,
+>(
+    input: &[T; N],
+) -> usize {
     let multipliers = disposition_multipliers::<T, N, T_POSITION_SET_SIZE>();
     let choices = disposition_choices::<T, N, T_POSITION_SET_SIZE>(input);
 
-    multipliers.iter().zip(choices.iter()).map(|(multiplier, choice)| multiplier * choice).sum()
+    multipliers
+        .iter()
+        .zip(choices.iter())
+        .map(|(multiplier, choice)| multiplier * choice)
+        .sum()
 
     // PERFORMANCE: Try the more imperative approach
     // let mut output = 0;
@@ -116,13 +136,17 @@ fn orientation_permutation_index<T: OrientationIndexable, const N: usize>(
 impl Cube {
     fn edge_partition(&self) -> [&[Edge; 6]; 2] {
         [
-            self.edges[0..6].try_into().expect("`self.edges` has a const length of 12, and [0, 6) is in the range [0, 12)"),
-            self.edges[6..12].try_into().expect("`self.edges` has a const length of 12, and [7, 12) is in the range [0, 12)"),
+            self.edges[0..6].try_into().expect(
+                "`self.edges` has a const length of 12, and [0, 6) is in the range [0, 12)",
+            ),
+            self.edges[6..12].try_into().expect(
+                "`self.edges` has a const length of 12, and [7, 12) is in the range [0, 12)",
+            ),
         ]
     }
 
     /// Returns the indices of the cube's corners and edges.
-    /// 
+    ///
     /// Indices are unique and contiguous, so they can be used to index into a table of precomputed values.
     pub fn indices(&self) -> CubeIndices {
         CubeIndices {
@@ -134,5 +158,5 @@ impl Cube {
 
 pub struct CubeIndices {
     pub corners: usize,
-    pub edges: [usize; 2]
+    pub edges: [usize; 2],
 }

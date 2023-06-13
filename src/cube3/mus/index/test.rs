@@ -25,13 +25,23 @@ impl OrientationIndexable for usize {
 
 #[test]
 fn test_disposition_multipliers() {
-	let multipliers_corners = disposition_multipliers::<usize, 8, 8>();
+    let multipliers_corners = disposition_multipliers::<usize, 8, 8>();
 
-	assert_eq!(multipliers_corners.to_vec(), (0..8).into_iter().rev().map(|i| factorial(i)).collect_vec());
+    assert_eq!(
+        multipliers_corners.to_vec(),
+        (0..8).into_iter().rev().map(|i| factorial(i)).collect_vec()
+    );
 
-	let multipliers_edges = disposition_multipliers::<usize, 6, 12>();
+    let multipliers_edges = disposition_multipliers::<usize, 6, 12>();
 
-	assert_eq!(multipliers_edges.to_vec(), (6..12).into_iter().rev().map(|i| factorial(i) / factorial(6)).collect_vec());
+    assert_eq!(
+        multipliers_edges.to_vec(),
+        (6..12)
+            .into_iter()
+            .rev()
+            .map(|i| factorial(i) / factorial(6))
+            .collect_vec()
+    );
 }
 
 #[test]
@@ -46,7 +56,10 @@ fn first_permutation_indices() {
     ];
 
     for (i, perm) in permutations.iter().enumerate() {
-        assert_eq!(position_disposition_index::<_, 6, { usize::POSITION_SET_SIZE }>(perm), i);
+        assert_eq!(
+            position_disposition_index::<_, 6, { usize::POSITION_SET_SIZE }>(perm),
+            i
+        );
     }
 }
 
@@ -54,7 +67,10 @@ fn first_permutation_indices() {
 fn last_permutation_is_reverse() {
     let permutation = [5, 4, 3, 2, 1, 0];
 
-    assert_eq!(position_disposition_index::<_, 6, { usize::POSITION_SET_SIZE }>(&permutation), factorial(6) - 1);
+    assert_eq!(
+        position_disposition_index::<_, 6, { usize::POSITION_SET_SIZE }>(&permutation),
+        factorial(6) - 1
+    );
 }
 
 #[test]
@@ -97,38 +113,47 @@ fn first_and_last_edge_index() {
 
 #[test]
 fn first_and_last_corner_set() {
-	let first_corners = Cube::new_solved().corners;
-	let last_corners = {
-		let mut corners = Cube::new_solved().corners;
-		corners.reverse();
-		corners.iter_mut().for_each(|corner| {
-			corner.twist();
-			corner.twist();
-		});
+    let first_corners = Cube::new_solved().corners;
+    let last_corners = {
+        let mut corners = Cube::new_solved().corners;
+        corners.reverse();
+        corners.iter_mut().for_each(|corner| {
+            corner.twist();
+            corner.twist();
+        });
 
-		corners
-	};
+        corners
+    };
 
-	assert_eq!(first_corners.index(), 0);
-	assert_eq!(last_corners.index(), <[Corner; 8]>::TOTAL_SET_SIZE - 1);
+    assert_eq!(first_corners.index(), 0);
+    assert_eq!(last_corners.index(), <[Corner; 8]>::TOTAL_SET_SIZE - 1);
 }
 
 #[test]
 fn first_and_last_edge_set() {
-	let first_edges = Cube::new_solved().edge_partition()[0].clone();
-	let last_edges = {
-		let cube = Cube::new_solved();
-		let mut edges = cube.edge_partition()[1].clone();
-		edges.reverse();
-		edges.iter_mut().for_each(|edge| edge.flip());
-		edges
-	};
+    let first_edges = Cube::new_solved().edge_partition()[0].clone();
+    let last_edges = {
+        let cube = Cube::new_solved();
+        let mut edges = cube.edge_partition()[1].clone();
+        edges.reverse();
+        edges.iter_mut().for_each(|edge| edge.flip());
+        edges
+    };
 
-	assert_eq!(first_edges.index(), 0);
+    assert_eq!(first_edges.index(), 0);
 
-	dbg!(last_edges.iter().map(|edge| edge.position_index()).collect_vec());
+    dbg!(last_edges
+        .iter()
+        .map(|edge| edge.position_index())
+        .collect_vec());
 
-	assert_eq!(last_edges.position_index(), <[Edge; 6]>::POSITION_SET_SIZE - 1);
-	assert_eq!(last_edges.orientation_index(), <[Edge; 6]>::ORIENTATION_SET_SIZE - 1);
-	assert_eq!(last_edges.index(), <[Edge; 6]>::TOTAL_SET_SIZE - 1);
+    assert_eq!(
+        last_edges.position_index(),
+        <[Edge; 6]>::POSITION_SET_SIZE - 1
+    );
+    assert_eq!(
+        last_edges.orientation_index(),
+        <[Edge; 6]>::ORIENTATION_SET_SIZE - 1
+    );
+    assert_eq!(last_edges.index(), <[Edge; 6]>::TOTAL_SET_SIZE - 1);
 }

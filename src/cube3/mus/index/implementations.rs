@@ -1,6 +1,9 @@
 use crate::cube3::{Corner, Cube, Edge};
 
-use super::{PositionIndexable, OrientationIndexable, position_disposition_index, factorial, orientation_permutation_index};
+use super::{
+    factorial, orientation_permutation_index, position_disposition_index, OrientationIndexable,
+    PositionIndexable,
+};
 
 impl PositionIndexable for Corner {
     fn position_index(&self) -> usize {
@@ -44,7 +47,6 @@ impl OrientationIndexable for Edge {
 
     const ORIENTATION_SET_SIZE: usize = 2;
 }
-
 
 impl PositionIndexable for [Edge; 6] {
     fn position_index(&self) -> usize {

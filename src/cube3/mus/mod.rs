@@ -1,2 +1,2 @@
-mod index;
-mod deindex;
+pub mod deindex;
+pub mod index;
