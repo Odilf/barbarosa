@@ -88,7 +88,7 @@ fn first_orientation_indices() {
     ];
 
     for (i, orientation) in orientations.iter().enumerate() {
-        assert_eq!(orientation_permutation_index(orientation, false), i);
+        assert_eq!(orientation_permutation_index(orientation), i);
     }
 }
 

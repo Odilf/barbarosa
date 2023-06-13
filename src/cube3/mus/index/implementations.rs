@@ -25,6 +25,9 @@ impl OrientationIndexable for Corner {
     const ORIENTATION_SET_SIZE: usize = 3;
 }
 
+
+
+
 impl PositionIndexable for Edge {
     fn position_index(&self) -> usize {
         Cube::solved()
@@ -48,6 +51,9 @@ impl OrientationIndexable for Edge {
     const ORIENTATION_SET_SIZE: usize = 2;
 }
 
+
+
+
 impl PositionIndexable for [Edge; 6] {
     fn position_index(&self) -> usize {
         position_disposition_index::<_, 6, { Edge::POSITION_SET_SIZE }>(self)
@@ -58,11 +64,14 @@ impl PositionIndexable for [Edge; 6] {
 
 impl OrientationIndexable for [Edge; 6] {
     fn orientation_index(&self) -> usize {
-        orientation_permutation_index(self, false)
+        orientation_permutation_index(self)
     }
 
     const ORIENTATION_SET_SIZE: usize = 2usize.pow(6);
 }
+
+
+
 
 impl PositionIndexable for [Corner; 8] {
     fn position_index(&self) -> usize {
@@ -74,7 +83,9 @@ impl PositionIndexable for [Corner; 8] {
 
 impl OrientationIndexable for [Corner; 8] {
     fn orientation_index(&self) -> usize {
-        orientation_permutation_index(self, true)
+        // The last corner is determined by the other 7 so we should ignore it
+        let useful_corners: &[Corner; 7] = self[0..7].try_into().unwrap();
+        orientation_permutation_index(useful_corners)
     }
 
     const ORIENTATION_SET_SIZE: usize = 3usize.pow(7);

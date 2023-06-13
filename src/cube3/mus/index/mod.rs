@@ -59,7 +59,11 @@ pub fn disposition_multipliers<
 }
 
 // PERFORMANCE: Maybe this can be done more efficiently
-fn disposition_choices<T: PositionIndexable, const N: usize, const T_POSITION_SET_SIZE: usize>(
+pub fn disposition_choices<
+    T: PositionIndexable,
+    const N: usize,
+    const T_POSITION_SET_SIZE: usize,
+>(
     input: &[T; N],
 ) -> [usize; N] {
     let mut used = [false; T_POSITION_SET_SIZE];
@@ -78,7 +82,7 @@ fn disposition_choices<T: PositionIndexable, const N: usize, const T_POSITION_SE
 // Disposition is actually a more accurate term than permutation, since you don't
 // have to actually select all the elements in edge "permutations"
 // TODO: `const T_POSITION_SET_SIZE: usize` should not be necessary. It has to always be `T::POSITION_SET_SIZE`.
-fn position_disposition_index<
+pub fn position_disposition_index<
     T: PositionIndexable,
     const N: usize,
     const T_POSITION_SET_SIZE: usize,
@@ -111,20 +115,13 @@ fn position_disposition_index<
 /// * `input` - Just the input of the function
 /// * `is_last_determined` - Whether the last element in the input is determined by the rest of the input (yes for corners, no for edges)
 // TODO: Maybe don't make this reversed, since it might have performance implications
-fn orientation_permutation_index<T: OrientationIndexable, const N: usize>(
+pub fn orientation_permutation_index<T: OrientationIndexable, const N: usize>(
     input: &[T; N],
-    is_last_determined: bool,
 ) -> usize {
     let mut output = 0;
     let mut multiplier = 1;
 
-    let iter = if is_last_determined {
-        input[0..N - 1].iter().rev()
-    } else {
-        input.iter().rev()
-    };
-
-    for elem in iter {
+    for elem in input.iter().rev() {
         let elem_index = elem.orientation_index();
         output += elem_index * multiplier;
         multiplier *= T::ORIENTATION_SET_SIZE;
