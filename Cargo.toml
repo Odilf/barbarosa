@@ -24,7 +24,7 @@ clap = { version = "4.3.4", features = ["derive"] }
 criterion = { version = "0.5.1", features = ["html_reports"] }
 
 [[bench]]
-name = "manhattan"
+name = "mod"
 harness = false
 
 [profile.release]
