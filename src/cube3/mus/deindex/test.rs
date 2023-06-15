@@ -1,6 +1,6 @@
 #![cfg(test)]
 
-use rand::{thread_rng, random, SeedableRng, rngs::StdRng};
+use rand::{random, rngs::StdRng, thread_rng, SeedableRng};
 
 use super::*;
 

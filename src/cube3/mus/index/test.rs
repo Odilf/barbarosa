@@ -2,7 +2,7 @@
 
 use itertools::Itertools;
 
-use crate::cube3::Corner;
+use crate::cube3::{mus::Corners, Corner};
 
 use super::*;
 
@@ -126,7 +126,7 @@ fn first_and_last_corner_set() {
     };
 
     assert_eq!(first_corners.index(), 0);
-    assert_eq!(last_corners.index(), <[Corner; 8]>::TOTAL_SET_SIZE - 1);
+    assert_eq!(last_corners.index(), Corners::TOTAL_SET_SIZE - 1);
 }
 
 #[test]
@@ -149,11 +149,11 @@ fn first_and_last_edge_set() {
 
     assert_eq!(
         last_edges.position_index(),
-        <[Edge; 6]>::POSITION_SET_SIZE - 1
+        <HalfEdges>::POSITION_SET_SIZE - 1
     );
     assert_eq!(
         last_edges.orientation_index(),
-        <[Edge; 6]>::ORIENTATION_SET_SIZE - 1
+        <HalfEdges>::ORIENTATION_SET_SIZE - 1
     );
-    assert_eq!(last_edges.index(), <[Edge; 6]>::TOTAL_SET_SIZE - 1);
+    assert_eq!(last_edges.index(), <HalfEdges>::TOTAL_SET_SIZE - 1);
 }

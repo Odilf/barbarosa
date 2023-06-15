@@ -1,14 +1,24 @@
 //! 3x3x3 Rubik's cube searching.
 
-pub mod heuristics;
 mod test;
 
 use pathfinding::directed::astar::astar;
 
 use crate::cube3::{
-    moves::{alg, Move},
-    Cube,
+    moves::{alg, do_move, Move},
+    Cube, Piece,
 };
+
+pub fn successors<P: Piece + Clone, const N: usize>(pieces: &[P; N]) -> Vec<([P; N], i8)> {
+    Move::all()
+        .into_iter()
+        .map(|mov| {
+            let mut pieces = pieces.clone();
+            do_move(&mut pieces, &mov);
+            (pieces, 1i8)
+        })
+        .collect()
+}
 
 impl Cube {
     fn successors(&self) -> Vec<(Self, i8)> {

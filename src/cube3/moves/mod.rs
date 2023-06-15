@@ -16,6 +16,7 @@ use thiserror::Error;
 use super::{
     piece::{Corner, Edge},
     space::{Axis, Direction, Face, FaceParseError},
+    Piece,
 };
 
 /// A move amount (either single, double or reverse)
@@ -213,6 +214,18 @@ impl Rotation {
 
         edge.position = position;
         edge.normal_axis = axis;
+    }
+}
+
+fn move_piece<T: Piece>(piece: &mut T, mov: &Move) {
+    if piece.in_face(&mov.face) {
+        piece.rotate(&mov.rotation());
+    }
+}
+
+pub fn do_move(pieces: &mut [impl Piece], mov: &Move) {
+    for piece in pieces {
+        move_piece(piece, mov);
     }
 }
 

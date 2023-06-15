@@ -4,18 +4,21 @@ use std::hash::Hash;
 
 use nalgebra::vector;
 
+use self::moves::do_move;
 pub use self::{
     moves::Move,
-    piece::{Corner, Edge, Piece, PieceEnum},
+    piece::{Corner, Edge, Piece},
     space::{Axis, Direction},
 };
 
 mod piece;
 
+pub mod heuristics;
 pub mod moves;
 pub mod random;
 pub mod space;
 
+pub mod invariants;
 mod mus;
 mod test;
 
@@ -38,6 +41,7 @@ pub struct Cube {
     pub corners: [Corner; 8],
 }
 
+// TODO: Would be cool if this was replaced with a macro
 const SOLVED_CUBE: Cube = {
     use Axis::*;
     use Direction::*;
@@ -81,32 +85,6 @@ impl Cube {
         Self::solved().clone()
     }
 
-    // fn construct_solved() -> Self {
-    // 	let edges = array::from_fn(|i| {
-    // 		let x = if i / 2 % 2 == 0 { Direction::Positive } else { Direction::Negative };
-    // 		let y = if i % 2 == 0 { Direction::Positive } else { Direction::Negative };
-
-    // 		let axis = match i {
-    // 			0..=3 => Axis::X,
-    // 			4..=7 => Axis::Y,
-    // 			8..=11 => Axis::Z,
-    // 			_ => unreachable!("Index should be in range 0..12"),
-    // 		};
-
-    // 		Edge::oriented(axis, vector![x, y])
-    // 	});
-
-    // 	let corners = array::from_fn(|i| {
-    // 		let coords = [1, 2, 4].map(|axis_index| {
-    // 			if (i / axis_index) % 2 == 0 { Direction::Positive } else { Direction::Negative }
-    // 		}).into();
-
-    // 		Corner::oriented(coords)
-    // 	});
-
-    // 	Self { edges, corners }
-    // }
-
     /// Determines if the cube is solved.
     pub fn is_solved(&self) -> bool {
         let solved = Self::solved();
@@ -120,36 +98,13 @@ impl Default for Cube {
     }
 }
 
-impl IntoIterator for Cube {
-    type Item = PieceEnum;
-    type IntoIter =
-        std::iter::Chain<std::array::IntoIter<PieceEnum, 12>, std::array::IntoIter<PieceEnum, 8>>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.edges
-            .map(|edge| edge.into())
-            .into_iter()
-            .chain(self.corners.map(|corner| corner.into()).into_iter())
-    }
-}
-
 impl Cube {
-    fn move_piece<T: Piece>(piece: &mut T, mov: &Move) {
-        if piece.in_face(&mov.face) {
-            piece.rotate(&mov.rotation());
-        }
-    }
-
     /// Applies a move to the cube.
     ///
     /// See also [Cube::into_move] for the owned version.
     pub fn do_move(&mut self, mov: &Move) {
-        self.edges
-            .iter_mut()
-            .for_each(|edge| Self::move_piece(edge, mov));
-        self.corners
-            .iter_mut()
-            .for_each(|corner| Self::move_piece(corner, mov));
+        do_move(&mut self.edges, mov);
+        do_move(&mut self.corners, mov);
     }
 
     /// Gets the moved cube.

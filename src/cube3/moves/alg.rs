@@ -56,20 +56,24 @@ pub fn try_from_states(states: Vec<Cube>) -> Result<Vec<Move>, FromStatesError> 
     let moves = states
         .windows(2)
         .map(|window| {
-            let from = &window[0];
-            let to = &window[1];
+            let [from, to] = window else {
+                unreachable!("`window` should always have length 2")
+            };
 
-            Move::all()
-                .into_iter()
-                .find(|mov| &from.clone().moved(mov) == to)
-                .ok_or(FromStatesError::StatesNotConnected(
-                    Box::new(from.clone()),
-                    Box::new(to.clone()),
-                ))
+            get_connecting_move(from, to).ok_or(FromStatesError::StatesNotConnected(
+                Box::new(from.clone()),
+                Box::new(to.clone()),
+            ))
         })
         .collect();
 
     moves
+}
+
+pub fn get_connecting_move(from: &Cube, to: &Cube) -> Option<Move> {
+    Move::all()
+        .into_iter()
+        .find(|mov| &from.clone().moved(mov) == to)
 }
 
 /// An error that can occur when trying to create a [Vec] of [Move]s from a

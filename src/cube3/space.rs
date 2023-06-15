@@ -61,6 +61,20 @@ impl From<&Axis> for Vector3<i8> {
     }
 }
 
+// TODO: Maybe use actual error
+impl TryFrom<i32> for Axis {
+    type Error = ();
+
+    fn try_from(v: i32) -> Result<Self, Self::Error> {
+        match v {
+            0 => Ok(Axis::X),
+            1 => Ok(Axis::Y),
+            2 => Ok(Axis::Z),
+            _ => Err(()),
+        }
+    }
+}
+
 impl Axis {
     /// Maps vector on slice in the specified axis. That is, you look at the
     /// axis head on and just assign `x` and `y` accordingly.

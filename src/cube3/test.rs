@@ -9,13 +9,21 @@ use crate::cube3::piece::Piece;
 use super::*;
 
 #[test]
-fn solved_cube_visits_all_coordinates() {
+fn solved_cube_has_pieces_in_all_coordinates() {
     let solved_cube = Cube::new_solved();
 
-    let positions: HashSet<_> = solved_cube
+    let mut positions: HashSet<_> = solved_cube
+        .edges
         .into_iter()
-        .map(|piece| piece.position())
+        .map(|piece| piece.coordinates())
         .collect();
+
+    positions.extend(
+        solved_cube
+            .corners
+            .into_iter()
+            .map(|piece| piece.coordinates()),
+    );
 
     assert!(
         positions.len() == 20,

@@ -1,5 +1,7 @@
 use crate::cube3::{Cube, Edge};
 
+use super::{deindex::Deindexable, HalfEdges};
+
 pub const fn factorial(n: usize) -> usize {
     match n {
         0 | 1 => 1,
@@ -131,7 +133,7 @@ pub fn orientation_permutation_index<T: OrientationIndexable, const N: usize>(
 }
 
 impl Cube {
-    fn edge_partition(&self) -> [&[Edge; 6]; 2] {
+    pub fn edge_partition(&self) -> [&HalfEdges; 2] {
         [
             self.edges[0..6].try_into().expect(
                 "`self.edges` has a const length of 12, and [0, 6) is in the range [0, 12)",

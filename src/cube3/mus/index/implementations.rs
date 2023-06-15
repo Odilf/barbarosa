@@ -1,4 +1,7 @@
-use crate::cube3::{Corner, Cube, Edge};
+use crate::cube3::{
+    mus::{Corners, HalfEdges},
+    Corner, Cube, Edge,
+};
 
 use super::{
     factorial, orientation_permutation_index, position_disposition_index, OrientationIndexable,
@@ -25,9 +28,6 @@ impl OrientationIndexable for Corner {
     const ORIENTATION_SET_SIZE: usize = 3;
 }
 
-
-
-
 impl PositionIndexable for Edge {
     fn position_index(&self) -> usize {
         Cube::solved()
@@ -51,10 +51,7 @@ impl OrientationIndexable for Edge {
     const ORIENTATION_SET_SIZE: usize = 2;
 }
 
-
-
-
-impl PositionIndexable for [Edge; 6] {
+impl PositionIndexable for HalfEdges {
     fn position_index(&self) -> usize {
         position_disposition_index::<_, 6, { Edge::POSITION_SET_SIZE }>(self)
     }
@@ -62,7 +59,7 @@ impl PositionIndexable for [Edge; 6] {
     const POSITION_SET_SIZE: usize = factorial(12) / factorial(12 - 6);
 }
 
-impl OrientationIndexable for [Edge; 6] {
+impl OrientationIndexable for HalfEdges {
     fn orientation_index(&self) -> usize {
         orientation_permutation_index(self)
     }
@@ -70,10 +67,7 @@ impl OrientationIndexable for [Edge; 6] {
     const ORIENTATION_SET_SIZE: usize = 2usize.pow(6);
 }
 
-
-
-
-impl PositionIndexable for [Corner; 8] {
+impl PositionIndexable for Corners {
     fn position_index(&self) -> usize {
         position_disposition_index::<_, 8, { Corner::POSITION_SET_SIZE }>(self)
     }
@@ -81,7 +75,7 @@ impl PositionIndexable for [Corner; 8] {
     const POSITION_SET_SIZE: usize = factorial(8);
 }
 
-impl OrientationIndexable for [Corner; 8] {
+impl OrientationIndexable for Corners {
     fn orientation_index(&self) -> usize {
         // The last corner is determined by the other 7 so we should ignore it
         let useful_corners: &[Corner; 7] = self[0..7].try_into().unwrap();

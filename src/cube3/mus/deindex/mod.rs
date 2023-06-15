@@ -1,10 +1,13 @@
 mod implementations;
 mod test;
 
-use crate::cube3::{Corner, Cube, Edge};
+use crate::cube3::Cube;
 
-use super::index::{
-    disposition_multipliers, CubeIndices, Indexable, OrientationIndexable, PositionIndexable,
+use super::{
+    index::{
+        disposition_multipliers, CubeIndices, Indexable, OrientationIndexable, PositionIndexable,
+    },
+    Corners, HalfEdges,
 };
 
 pub trait Deindexable: Indexable {
@@ -72,10 +75,10 @@ fn deindex_positions<T: PositionIndexable, const N: usize, const T_POSITION_SET_
 
 impl Cube {
     pub fn from_indices(indices: CubeIndices) -> Self {
-        let corners = <[Corner; 8]>::from_index(indices.corners);
+        let corners = Corners::from_index(indices.corners);
         let edges = indices
             .edges
-            .map(|edge_index| <[Edge; 6]>::from_index(edge_index));
+            .map(|edge_index| HalfEdges::from_index(edge_index));
 
         let edges = edges
             .concat()

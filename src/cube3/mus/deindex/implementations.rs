@@ -1,9 +1,10 @@
 use crate::cube3::mus::index::OrientationIndexable;
+use crate::cube3::mus::{Corners, HalfEdges};
 use crate::cube3::{Corner, Cube, Edge};
 
 use super::{deindex_orientations, deindex_positions, Deindexable};
 
-impl Deindexable for [Corner; 8] {
+impl Deindexable for Corners {
     fn from_index(index: usize) -> Self {
         let position_index = index / Self::ORIENTATION_SET_SIZE;
         let orientation_index = index % Self::ORIENTATION_SET_SIZE;
@@ -33,7 +34,7 @@ impl Deindexable for [Corner; 8] {
     }
 }
 
-impl Deindexable for [Edge; 6] {
+impl Deindexable for HalfEdges {
     fn from_index(index: usize) -> Self {
         let position_index = index / Self::ORIENTATION_SET_SIZE;
         let orientation_index = index % Self::ORIENTATION_SET_SIZE;

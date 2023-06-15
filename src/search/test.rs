@@ -1,13 +1,16 @@
 #![cfg(test)]
 
-use crate::cube3::moves::alg::{parse_alg, reverse};
+use crate::cube3::{
+    self,
+    moves::alg::{parse_alg, reverse},
+};
 
 use super::*;
 
 #[test]
 fn test_solved() {
     let cube = Cube::solved();
-    let solution = cube.solve_with_heuristic(heuristics::manhattan);
+    let solution = cube.solve_with_heuristic(cube3::heuristics::manhattan);
     assert_eq!(solution.len(), 0);
 }
 
@@ -25,6 +28,6 @@ fn test_solves_manhattan() {
     let algs = ["R2", "R", "R'", "R U", "R U R' U'", "R U R' U' F"];
 
     for alg in algs {
-        assert_solves_alg(parse_alg(alg).unwrap(), heuristics::manhattan);
+        assert_solves_alg(parse_alg(alg).unwrap(), cube3::heuristics::manhattan);
     }
 }

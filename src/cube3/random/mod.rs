@@ -4,7 +4,7 @@
 
 use rand::{seq::SliceRandom, Rng};
 
-use super::Cube;
+use super::{invariants::fix_corner_multiplicity, Cube};
 
 impl Cube {
     /// Same as [Cube::random()], but with a specified RNG
@@ -38,15 +38,7 @@ impl Cube {
         }
 
         // Fix corner orientation
-        let oriented_corners: i32 = cube
-            .corners
-            .iter()
-            .map(|corner| corner.orientation_index() as i32)
-            .sum();
-        let corner_orientation_offset = oriented_corners % 3;
-        for _ in 0..corner_orientation_offset {
-            cube.corners[0].twist();
-        }
+        fix_corner_multiplicity(&mut cube.corners);
 
         cube
     }
