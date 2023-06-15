@@ -142,11 +142,6 @@ fn first_and_last_edge_set() {
 
     assert_eq!(first_edges.index(), 0);
 
-    dbg!(last_edges
-        .iter()
-        .map(|edge| edge.position_index())
-        .collect_vec());
-
     assert_eq!(
         last_edges.position_index(),
         <HalfEdges>::POSITION_SET_SIZE - 1

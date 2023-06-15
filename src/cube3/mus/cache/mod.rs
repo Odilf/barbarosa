@@ -9,17 +9,14 @@ pub struct Cache {
     corners: Vec<u8>,
 }
 
-static CACHE: OnceLock<Cache> = OnceLock::new();
+static CACHE_LOCK: OnceLock<Cache> = OnceLock::new();
 
 pub fn get_or_init(cube: &Cube) -> u8 {
-    match CACHE.get() {
-        Some(cache) => cache.get(cube),
-        None => CACHE.get_or_init(|| Cache::init()).get(cube),
-    }
+    CACHE_LOCK.get_or_init(|| Cache::init()).get(cube)
 }
 
 pub fn get(cube: &Cube) -> Option<u8> {
-    CACHE.get().map(|cache| cache.get(cube))
+    CACHE_LOCK.get().map(|cache| cache.get(cube))
 }
 
 impl Cache {

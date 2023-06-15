@@ -1,7 +1,7 @@
 mod implementations;
 mod test;
 
-use crate::cube3::Cube;
+use crate::cube3::{Cube, moves::{Rotation, Amount}, Axis};
 
 use super::{
     index::{
@@ -50,8 +50,6 @@ fn choices_to_permutations<const N: usize, const T_POSITION_SET_SIZE: usize>(
     let mut used = [false; T_POSITION_SET_SIZE];
 
     for (choice, perm_index) in choices.iter().zip(permutations.iter_mut()) {
-        // dbg!(used, choice, &perm_index);
-
         *perm_index = used
             .iter()
             .enumerate()
@@ -76,9 +74,11 @@ fn deindex_positions<T: PositionIndexable, const N: usize, const T_POSITION_SET_
 impl Cube {
     pub fn from_indices(indices: CubeIndices) -> Self {
         let corners = Corners::from_index(indices.corners);
-        let edges = indices
+        let mut edges = indices
             .edges
             .map(|edge_index| HalfEdges::from_index(edge_index));
+
+        adjust_second_edges_for_deindexing(&mut edges[1]);
 
         let edges = edges
             .concat()
@@ -88,3 +88,12 @@ impl Cube {
         Cube { corners, edges }
     }
 }
+
+/// Inverts what `index::adjust_second_edges_for_indexing` does
+/// 
+/// Fun fact: because of the way it's implemented, it's basically the same thing lol
+fn adjust_second_edges_for_deindexing(edges: &mut HalfEdges) {
+    for edge in edges.iter_mut() {
+        Rotation::new(Axis::X, Amount::Double).rotate_edge(edge)
+    }
+}  

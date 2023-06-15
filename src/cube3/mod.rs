@@ -47,18 +47,20 @@ const SOLVED_CUBE: Cube = {
     use Direction::*;
 
     Cube {
+        // Edges are set up this way so that an X2 rotation increases the index by 6
         edges: [
             Edge::oriented(X, vector![Positive, Positive]),
             Edge::oriented(X, vector![Positive, Negative]),
-            Edge::oriented(X, vector![Negative, Positive]),
-            Edge::oriented(X, vector![Negative, Negative]),
             Edge::oriented(Y, vector![Positive, Positive]),
             Edge::oriented(Y, vector![Positive, Negative]),
+            Edge::oriented(Z, vector![Positive, Positive]),
+            Edge::oriented(Z, vector![Negative, Positive]),
+            
+            Edge::oriented(X, vector![Negative, Negative]),
+            Edge::oriented(X, vector![Negative, Positive]),
             Edge::oriented(Y, vector![Negative, Positive]),
             Edge::oriented(Y, vector![Negative, Negative]),
-            Edge::oriented(Z, vector![Positive, Positive]),
-            Edge::oriented(Z, vector![Positive, Negative]),
-            Edge::oriented(Z, vector![Negative, Positive]),
+            Edge::oriented(Z, vector![Positive, Negative]),            
             Edge::oriented(Z, vector![Negative, Negative]),
         ],
         corners: [

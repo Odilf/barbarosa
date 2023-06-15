@@ -33,7 +33,6 @@ fn rotates_d_face() {
 }
 
 #[test]
-// #[ignore = ":("]
 fn rotates_edges() {
     let mut edge = Edge::try_from([Face::R, Face::F]).unwrap();
 
@@ -50,8 +49,6 @@ fn rotates_edges() {
 
     Rotation::new(Axis::Y, Amount::Single).rotate_edge(&mut edge);
     assert_eq!(edge, Edge::try_from([Face::U, Face::R]).unwrap());
-
-    dbg!(Edge::try_from([Face::U, Face::L]).unwrap());
 
     Rotation::new(Axis::Y, Amount::Double).rotate_edge(&mut edge);
     assert_eq!(edge, Edge::try_from([Face::U, Face::L]).unwrap());

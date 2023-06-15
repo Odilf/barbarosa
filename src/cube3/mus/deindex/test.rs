@@ -46,8 +46,6 @@ fn index_deindex_edges() {
     let indices = cube.indices();
     let deindexed_cube = Cube::from_indices(indices);
 
-    dbg!(&cube.edges, &deindexed_cube.edges);
-
     assert_eq!(cube.edges, deindexed_cube.edges);
 }
 
@@ -56,8 +54,6 @@ fn index_deindex_corners() {
     let cube = Cube::from(&parse_alg("U").unwrap());
     let indices = cube.indices();
     let deindexed_cube = Cube::from_indices(indices);
-
-    dbg!(&cube.corners, &deindexed_cube.corners);
 
     assert_eq!(cube.corners, deindexed_cube.corners);
 }
@@ -68,13 +64,11 @@ fn random_indexes_deindexes() {
     let indices = cube.indices();
     let deindexed_cube = Cube::from_indices(indices);
 
-    dbg!(&cube.corners, &deindexed_cube.corners);
-
     assert_eq!(cube.corners, deindexed_cube.corners);
 }
 
 #[test]
-#[ignore = "Not implemented (?)"]
+// #[ignore = "Not implemented (?)"]
 fn index_deindex_journey() {
     for _ in 0..10 {
         random_indexes_deindexes();
