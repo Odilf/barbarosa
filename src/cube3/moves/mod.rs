@@ -223,6 +223,7 @@ fn move_piece<T: Piece>(piece: &mut T, mov: &Move) {
     }
 }
 
+/// Convience function for applying a move to a slice of pieces
 pub fn do_move(pieces: &mut [impl Piece], mov: &Move) {
     for piece in pieces {
         move_piece(piece, mov);

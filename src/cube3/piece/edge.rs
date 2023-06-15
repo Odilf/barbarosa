@@ -32,8 +32,6 @@ pub struct EdgePosition {
 }
 
 impl Piece for Edge {
-    type Position = EdgePosition;
-
     fn coordinates(&self) -> Vector3<i8> {
         self.normal_axis
             .map_on_slice(Vector3::zeros(), |_| self.position.map(|dir| dir.scalar()))

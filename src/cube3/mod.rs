@@ -102,7 +102,7 @@ impl Default for Cube {
 impl Cube {
     /// Applies a move to the cube.
     ///
-    /// See also [Cube::into_move] for the owned version.
+    /// See also [Cube::moved] for the owned version.
     pub fn do_move(&mut self, mov: &Move) {
         do_move(&mut self.edges, mov);
         do_move(&mut self.corners, mov);

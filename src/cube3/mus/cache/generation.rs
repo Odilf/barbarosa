@@ -12,16 +12,16 @@ use crate::{
     search::successors,
 };
 
-use super::{disk_storage::DiskCacheable, Cache};
+use super::disk_storage::DiskCacheable;
 
 pub use super::disk_storage::load_or_build;
 
-pub fn build() -> io::Result<Cache> {
-    let edges = build_partial::<HalfEdges>()?;
-    let corners = build_partial::<Corners>()?;
+// pub fn build() -> io::Result<Cache> {
+//     let edges = build_partial::<HalfEdges>()?;
+//     let corners = build_partial::<Corners>()?;
 
-    Ok(Cache { edges, corners })
-}
+//     Ok(Cache { edges, corners })
+// }
 
 // TODO: REMOVE ALL THIS EWWWWW 🤮🤮
 pub trait MovableTemp {

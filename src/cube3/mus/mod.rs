@@ -21,7 +21,7 @@
 //! 
 //! ## Generation
 //! 
-//! For 
+//! todo!()
  
 use super::{Corner, Edge};
 

@@ -40,7 +40,7 @@ impl Cube {
     /// To get an optimal solution, the heuristic must be admissible. That is,
     /// it must never overestimate the number of moves required to solve the cube.
     ///
-    /// See [`heuristics`] for some available heuristics.
+    /// See [crate::cube3::heuristics] for some available heuristics.
     pub fn solve_with_heuristic(&self, heuristic: impl Fn(&Self) -> i8) -> Vec<Move> {
         let (states, _cost) = astar(
             self,

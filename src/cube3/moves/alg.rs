@@ -70,6 +70,8 @@ pub fn try_from_states(states: Vec<Cube>) -> Result<Vec<Move>, FromStatesError> 
     moves
 }
 
+/// Gets the move that goes from `from` to `to`. Returns `None` if such a move doesn't
+/// exist, which means that these two states are not connected by a single move.
 pub fn get_connecting_move(from: &Cube, to: &Cube) -> Option<Move> {
     Move::all()
         .into_iter()

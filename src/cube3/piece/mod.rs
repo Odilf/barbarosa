@@ -25,8 +25,6 @@ pub use edge::Edge;
 /// [Corner] and [Edge] implement this trait.
 // #[enum_dispatch(PieceEnum)]
 pub trait Piece {
-    type Position;
-
     /// The position of the piece, relative to the center of the cube.
     fn coordinates(&self) -> Vector3<i8>;
 

@@ -1,7 +1,12 @@
+//! Caching for MUS. 
+//! 
+//! Currently we can only cache MUS if we have filesystem access. This should be changed
+//! to somehow work on the web with WASM and such. 
+
 mod disk_storage;
 mod generation;
 
-use std::sync::OnceLock;
+use std::{sync::OnceLock, io};
 
 use crate::cube3::Cube;
 
@@ -56,5 +61,10 @@ impl Cache {
             .expect("User should have permission to write to cache directory. \
             If you have permissions and this still failed, it should probably \
             be reported as a bug.")
+    }
+
+    /// Loads the cache from disk (doesn't build it if it doesn't exist)
+    pub fn load() -> io::Result<Self> {
+        disk_storage::load()
     }
 }

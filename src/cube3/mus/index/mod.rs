@@ -1,9 +1,9 @@
 use crate::cube3::{
-    moves::{do_move, Amount, Rotation},
-    Axis, Cube, Edge,
+    moves::{Amount, Rotation},
+    Axis, Cube,
 };
 
-use super::{deindex::Deindexable, HalfEdges};
+use super::HalfEdges;
 
 pub const fn factorial(n: usize) -> usize {
     match n {

@@ -18,8 +18,6 @@ pub struct Corner {
 }
 
 impl Piece for Corner {
-    type Position = Vector3<Direction>;
-
     fn coordinates(&self) -> Vector3<i8> {
         self.position.map(|direction| direction.scalar())
     }
