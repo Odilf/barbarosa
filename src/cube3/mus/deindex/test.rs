@@ -65,7 +65,6 @@ fn random_indexes_deindexes() {
 }
 
 #[test]
-// #[ignore = "Not implemented (?)"]
 fn index_deindex_journey() {
     for _ in 0..10 {
         random_indexes_deindexes();
