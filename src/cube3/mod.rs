@@ -18,7 +18,7 @@ pub mod moves;
 pub mod random;
 pub mod space;
 
-pub mod invariants;
+mod invariants;
 pub mod mus;
 mod test;
 
@@ -55,12 +55,11 @@ const SOLVED_CUBE: Cube = {
             Edge::oriented(Y, vector![Positive, Negative]),
             Edge::oriented(Z, vector![Positive, Positive]),
             Edge::oriented(Z, vector![Negative, Positive]),
-            
             Edge::oriented(X, vector![Negative, Negative]),
             Edge::oriented(X, vector![Negative, Positive]),
             Edge::oriented(Y, vector![Negative, Positive]),
             Edge::oriented(Y, vector![Negative, Negative]),
-            Edge::oriented(Z, vector![Positive, Negative]),            
+            Edge::oriented(Z, vector![Positive, Negative]),
             Edge::oriented(Z, vector![Negative, Negative]),
         ],
         corners: [
