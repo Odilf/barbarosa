@@ -94,20 +94,20 @@ pub fn position_disposition_index<
     let multipliers = disposition_multipliers::<T, N, T_POSITION_SET_SIZE>();
     let choices = disposition_choices::<T, N, T_POSITION_SET_SIZE>(input);
 
-    multipliers
-        .iter()
-        .zip(choices.iter())
-        .map(|(multiplier, choice)| multiplier * choice)
-        .sum()
+    // multipliers
+    //     .iter()
+    //     .zip(choices.iter())
+    //     .map(|(multiplier, choice)| multiplier * choice)
+    //     .sum()
 
     // PERFORMANCE: Try the more imperative approach
-    // let mut output = 0;
+    let mut output = 0;
 
-    // for i in 0..N {
-    //     output += choices[i] * multipliers[i];
-    // }
+    for i in 0..N {
+        output += choices[i] * multipliers[i];
+    }
 
-    // output
+    output
 }
 
 /// TODO: missing_docs

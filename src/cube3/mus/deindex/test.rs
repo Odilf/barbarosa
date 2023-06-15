@@ -1,14 +1,13 @@
 #![cfg(test)]
 
-use rand::{random, rngs::StdRng, thread_rng, SeedableRng};
+use rand::{rngs::StdRng, SeedableRng};
 
 use super::*;
 
 use crate::cube3::{
-    moves::alg::{self, parse_alg},
+    moves::alg::parse_alg,
     mus::index::{
-        orientation_permutation_index, position_disposition_index, OrientationIndexable,
-        PositionIndexable,
+        orientation_permutation_index, position_disposition_index,
     },
     Cube,
 };

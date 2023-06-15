@@ -2,9 +2,9 @@ use std::{fs, io, path::Path};
 
 use chrono::Local;
 
-use crate::cube3::mus::{index::Indexable, Corners, HalfEdges};
+use crate::cube3::mus::{index::Indexable, Corners, HalfEdges, deindex::Deindexable};
 
-use super::{generation::build_partial, Cache};
+use super::{generation::{build_partial, MovableTemp}, Cache};
 
 pub fn load() -> io::Result<Cache> {
     let edges = load_partial::<HalfEdges>()?;
@@ -14,26 +14,18 @@ pub fn load() -> io::Result<Cache> {
 }
 
 pub fn load_or_build() -> io::Result<Cache> {
-    let edges = match load_partial::<HalfEdges>() {
-        Ok(edge_cache) => edge_cache,
-        Err(err) if err.kind() == io::ErrorKind::NotFound => build_partial::<HalfEdges>()?,
-        Err(err) => return Err(err),
-    };
-
-    let corners = match load_partial::<Corners>() {
-        Ok(corner_cache) => corner_cache,
-        Err(err) if err.kind() == io::ErrorKind::NotFound => build_partial::<Corners>()?,
-        Err(err) => return Err(err),
-    };
+    let edges = load_or_build_partial::<HalfEdges>()?;
+    let corners = load_or_build_partial::<Corners>()?;
 
     Ok(Cache { edges, corners })
 }
 
-pub fn write(cache: &Cache) -> io::Result<()> {
-    write_partial::<HalfEdges>(&cache.edges)?;
-    write_partial::<Corners>(&cache.corners)?;
-
-    Ok(())
+fn load_or_build_partial<T: DiskCacheable + Deindexable + MovableTemp>() -> io::Result<Vec<u8>> {
+    match load_partial::<T>() {
+        Ok(cache) => Ok(cache),
+        Err(err) if err.kind() == io::ErrorKind::NotFound => build_partial::<T>(),
+        Err(err) => Err(err),
+    }
 }
 
 pub trait DiskCacheable: Indexable {
@@ -59,6 +51,8 @@ pub fn load_partial<T: DiskCacheable>() -> io::Result<Vec<u8>> {
     Ok(bytes)
 }
 
+// TODO: Would be nice if there was some metadata stored along the actual cache. Mainly the cube for which this
+// cache was built, since the reference cube changes the indices. 
 pub fn write_partial<T: DiskCacheable>(bytes: &[u8]) -> io::Result<()> {
     print_with_timestamp::<T>("Writing cache to disk");
     assert_correct_cache_size::<T>(bytes.len());

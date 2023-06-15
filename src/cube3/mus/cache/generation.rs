@@ -14,6 +14,8 @@ use crate::{
 
 use super::{disk_storage::DiskCacheable, Cache};
 
+pub use super::disk_storage::load_or_build;
+
 pub fn build() -> io::Result<Cache> {
     let edges = build_partial::<HalfEdges>()?;
     let corners = build_partial::<Corners>()?;
@@ -47,8 +49,13 @@ fn cache_neighbours_at_depth<T: Indexable + Deindexable + MovableTemp + DiskCach
     // TODO: Make paralell
     for index in 0..T::TOTAL_SET_SIZE {
         // Only cache neighbours of states that are at the current depth
+        // match cache[index].get() {
+        //     Some(given) if given == move_depth - 1 => (),
+        //     _ => continue,
+        // }
+
         match cache[index].get() {
-            Some(given) if given == move_depth => (),
+            Some(given) if given == move_depth - 1 => (),
             _ => continue,
         }
 
@@ -57,7 +64,8 @@ fn cache_neighbours_at_depth<T: Indexable + Deindexable + MovableTemp + DiskCach
             let successor_entry = &mut cache[successor.index()];
 
             if successor_entry.get().is_none() {
-                successor_entry.0 = move_depth + edge_cost as u8;
+                debug_assert_eq!(edge_cost, 1);
+                successor_entry.0 = move_depth;
             }
         }
     }
@@ -77,14 +85,14 @@ pub fn build_partial<T: Indexable + Deindexable + MovableTemp + DiskCacheable>(
     // Start with the solved state
     cache[0] = PartialEntry(0);
 
-    for move_depth in 0.. {
+    for move_depth in 1.. {
         let stats = Stats::new(&cache, start_time);
 
         if stats.amount_cached == T::TOTAL_SET_SIZE {
             break;
         }
 
-        print_with_timestamp::<T>(&format!("Caching at depth {move_depth}. {stats}"));
+        print_with_timestamp::<T>(&format!("Caching at depth {move_depth}; {stats}"));
 
         cache_neighbours_at_depth::<T>(&mut cache, move_depth);
     }
@@ -139,11 +147,11 @@ impl Stats {
         let time_elapsed = Local::now().signed_duration_since(started);
         let states_per_second =
             amount_cached as f64 / time_elapsed.num_milliseconds() as f64 * 1000.0;
-        let eta = Duration::seconds(
-            (cache.len() - amount_cached)
-                .checked_div(states_per_second.round() as usize)
-                .unwrap_or(10_000) as i64,
-        );
+        let eta = {
+            let states_left = cache.len() - amount_cached;
+            let time_remaining = states_left as f64 / states_per_second;
+            Duration::seconds(time_remaining as i64)      
+        };
 
         Self {
             amount_cached,

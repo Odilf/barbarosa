@@ -19,7 +19,7 @@ pub mod random;
 pub mod space;
 
 pub mod invariants;
-mod mus;
+pub mod mus;
 mod test;
 
 /// A 3x3x3 Rubik's cube.

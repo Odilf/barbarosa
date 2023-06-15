@@ -18,6 +18,7 @@ pathfinding = "4.3.0"
 const_format = "0.2.31"
 chrono = "0.4.26"
 rayon = "1.7.0"
+clap = { version = "4.3.4", features = ["derive"] }
 
 [dev-dependencies]
 criterion = { version = "0.5.1", features = ["html_reports"] }
@@ -25,3 +26,6 @@ criterion = { version = "0.5.1", features = ["html_reports"] }
 [[bench]]
 name = "manhattan"
 harness = false
+
+[profile.release]
+debug = true

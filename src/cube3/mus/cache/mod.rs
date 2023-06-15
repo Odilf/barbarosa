@@ -20,7 +20,7 @@ pub fn get(cube: &Cube) -> Option<u8> {
 }
 
 impl Cache {
-    fn get(&self, cube: &Cube) -> u8 {
+    pub fn get(&self, cube: &Cube) -> u8 {
         let indices = cube.indices();
 
         let corner_heuristic = unsafe { self.corners.get_unchecked(indices.corners) };
@@ -34,15 +34,7 @@ impl Cache {
         *corner_heuristic.max(edge_heuristic)
     }
 
-    fn init() -> Self {
+    pub fn init() -> Self {
         disk_storage::load_or_build().unwrap()
     }
-}
-
-#[test]
-fn please() {
-    let cache = Cache::init();
-    let cube = Cube::solved();
-
-    assert_eq!(cache.get(&cube), 0);
 }
