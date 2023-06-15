@@ -2,9 +2,12 @@ use std::{fs, io, path::Path};
 
 use chrono::Local;
 
-use crate::cube3::mus::{index::Indexable, Corners, HalfEdges, deindex::Deindexable};
+use crate::cube3::mus::{deindex::Deindexable, index::Indexable, Corners, HalfEdges};
 
-use super::{generation::{build_partial, MovableTemp}, Cache};
+use super::{
+    generation::{build_partial, MovableTemp},
+    Cache,
+};
 
 pub fn load() -> io::Result<Cache> {
     let edges = load_partial::<HalfEdges>()?;
@@ -52,7 +55,7 @@ pub fn load_partial<T: DiskCacheable>() -> io::Result<Vec<u8>> {
 }
 
 // TODO: Would be nice if there was some metadata stored along the actual cache. Mainly the cube for which this
-// cache was built, since the reference cube changes the indices. 
+// cache was built, since the reference cube changes the indices.
 pub fn write_partial<T: DiskCacheable>(bytes: &[u8]) -> io::Result<()> {
     print_with_timestamp::<T>("Writing cache to disk");
     assert_correct_cache_size::<T>(bytes.len());

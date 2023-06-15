@@ -1,7 +1,10 @@
 mod implementations;
 mod test;
 
-use crate::cube3::{Cube, moves::{Rotation, Amount}, Axis};
+use crate::cube3::{
+    moves::{Amount, Rotation},
+    Axis, Cube,
+};
 
 use super::{
     index::{
@@ -90,10 +93,10 @@ impl Cube {
 }
 
 /// Inverts what `index::adjust_second_edges_for_indexing` does
-/// 
+///
 /// Fun fact: because of the way it's implemented, it's basically the same thing lol
 fn adjust_second_edges_for_deindexing(edges: &mut HalfEdges) {
     for edge in edges.iter_mut() {
         Rotation::new(Axis::X, Amount::Double).rotate_edge(edge)
     }
-}  
+}

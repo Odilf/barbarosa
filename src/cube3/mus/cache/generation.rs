@@ -150,7 +150,7 @@ impl Stats {
         let eta = {
             let states_left = cache.len() - amount_cached;
             let time_remaining = states_left as f64 / states_per_second;
-            Duration::seconds(time_remaining as i64)      
+            Duration::seconds(time_remaining as i64)
         };
 
         Self {

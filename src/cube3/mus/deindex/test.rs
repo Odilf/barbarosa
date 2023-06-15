@@ -6,9 +6,7 @@ use super::*;
 
 use crate::cube3::{
     moves::alg::parse_alg,
-    mus::index::{
-        orientation_permutation_index, position_disposition_index,
-    },
+    mus::index::{orientation_permutation_index, position_disposition_index},
     Cube,
 };
 
