@@ -9,6 +9,8 @@ use crate::cube3::{
     Cube, Piece,
 };
 
+/// Helper function to apply move to an array of pieces
+/// TODO: Remove this when implementing more generic descriptions of cubes, pieces and moves.
 pub fn successors<P: Piece + Clone, const N: usize>(pieces: &[P; N]) -> Vec<([P; N], i8)> {
     Move::all()
         .into_iter()

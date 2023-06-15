@@ -17,9 +17,9 @@ pub mod heuristics;
 pub mod moves;
 pub mod random;
 pub mod space;
+pub mod mus;
 
 mod invariants;
-pub mod mus;
 mod test;
 
 /// A 3x3x3 Rubik's cube.

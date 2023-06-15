@@ -75,6 +75,7 @@ fn deindex_positions<T: PositionIndexable, const N: usize, const T_POSITION_SET_
 }
 
 impl Cube {
+    /// Construct a cube from the indices of its corners and edges 
     pub fn from_indices(indices: CubeIndices) -> Self {
         let corners = Corners::from_index(indices.corners);
         let mut edges = indices

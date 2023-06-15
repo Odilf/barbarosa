@@ -136,7 +136,7 @@ pub fn orientation_permutation_index<T: OrientationIndexable, const N: usize>(
 }
 
 impl Cube {
-    pub fn edge_partition(&self) -> [&HalfEdges; 2] {
+    fn edge_partition(&self) -> [&HalfEdges; 2] {
         [
             self.edges[0..6].try_into().expect(
                 "`self.edges` has a const length of 12, and [0, 6) is in the range [0, 12)",

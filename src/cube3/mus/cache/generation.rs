@@ -49,11 +49,6 @@ fn cache_neighbours_at_depth<T: Indexable + Deindexable + MovableTemp + DiskCach
     // TODO: Make paralell
     for index in 0..T::TOTAL_SET_SIZE {
         // Only cache neighbours of states that are at the current depth
-        // match cache[index].get() {
-        //     Some(given) if given == move_depth - 1 => (),
-        //     _ => continue,
-        // }
-
         match cache[index].get() {
             Some(given) if given == move_depth - 1 => (),
             _ => continue,
@@ -89,6 +84,7 @@ pub fn build_partial<T: Indexable + Deindexable + MovableTemp + DiskCacheable>(
         let stats = Stats::new(&cache, start_time);
 
         if stats.amount_cached == T::TOTAL_SET_SIZE {
+            print_with_timestamp::<T>(&format!("Finished caching! {stats}"));
             break;
         }
 
@@ -167,7 +163,7 @@ impl Display for Stats {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{amount_cached: >7} states cached ({percent_cached:.2}%) in {time_elapsed}s at {states_per_second:.2} states/s (ETA: {eta:.2}m)",
+            "{amount_cached: >8} states cached ({percent_cached:.2}%) in {time_elapsed}s at {states_per_second:.2} states/s (ETA: {eta:.2}m)",
             amount_cached = self.amount_cached,
             percent_cached = self.percent_cached * 100.0,
             time_elapsed = self.time_elapsed.num_seconds(),
