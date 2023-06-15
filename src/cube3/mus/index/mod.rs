@@ -190,7 +190,7 @@ fn adjust_second_edges_for_indexing(edges: &HalfEdges) -> HalfEdges {
 #[test]
 fn second_edges_are_flip() {
     let [edges_1, edges_2] = Cube::solved().edge_partition();
-    let adjusted = &adjust_second_edges_for_indexing(&edges_2);
+    let adjusted = &adjust_second_edges_for_indexing(edges_2);
 
     assert_eq!(adjusted, edges_1);
 }

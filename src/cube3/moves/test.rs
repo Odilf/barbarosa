@@ -14,7 +14,7 @@ fn rotates_u_face() {
     let rotated = Rotation::new(Axis::X, Amount::Double).rotate_face(face.clone());
     assert_eq!(rotated, Face::D);
 
-    let rotated = Rotation::new(Axis::X, Amount::Inverse).rotate_face(face.clone());
+    let rotated = Rotation::new(Axis::X, Amount::Inverse).rotate_face(face);
     assert_eq!(rotated, Face::F);
 }
 
@@ -28,7 +28,7 @@ fn rotates_d_face() {
     let rotated = Rotation::new(Axis::X, Amount::Double).rotate_face(face.clone());
     assert_eq!(rotated, Face::U);
 
-    let rotated = Rotation::new(Axis::X, Amount::Inverse).rotate_face(face.clone());
+    let rotated = Rotation::new(Axis::X, Amount::Inverse).rotate_face(face);
     assert_eq!(rotated, Face::B);
 }
 

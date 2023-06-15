@@ -21,7 +21,7 @@ static CACHE_LOCK: OnceLock<Cache> = OnceLock::new();
 /// Gets the heuristic value of the cube from the cache, or initializes the cache if it hasn't been
 /// initialized yet
 pub fn get_or_init(cube: &Cube) -> u8 {
-    CACHE_LOCK.get_or_init(|| Cache::init()).get(cube)
+    CACHE_LOCK.get_or_init(Cache::init).get(cube)
 }
 
 /// Gets the heuristic value of the cube from the cache, or returns `None` if the cache hasn't been

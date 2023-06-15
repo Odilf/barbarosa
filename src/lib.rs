@@ -1,5 +1,5 @@
 #![warn(missing_docs)]
-#![warn(clippy::missing_docs_in_private_items)]
+// #![warn(clippy::missing_docs_in_private_items)]
 
 //! Barbarosa is a rust library for interacting with rubik's cubes. It is
 //! designed to be fast.

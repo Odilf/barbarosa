@@ -93,13 +93,13 @@ pub fn build_partial<T: Indexable + Deindexable + MovableTemp + DiskCacheable>(
         cache_neighbours_at_depth::<T>(&mut cache, move_depth);
     }
 
-    print_with_timestamp::<T>(&format!("Caching done! Attempting to save to disk."));
+    print_with_timestamp::<T>("Caching done! Attempting to save to disk.");
 
     let cache = unsafe { mem::transmute::<Vec<PartialEntry>, Vec<u8>>(cache) };
 
     write_partial::<T>(&cache)?;
 
-    print_with_timestamp::<T>(&format!("Cache saved to disk."));
+    print_with_timestamp::<T>("Cache saved to disk.");
 
     Ok(cache)
 }
@@ -120,7 +120,7 @@ impl PartialEntry {
     }
 }
 
-fn amount_cached(cache: &Vec<PartialEntry>) -> usize {
+fn amount_cached(cache: &[PartialEntry]) -> usize {
     cache.iter().filter(|entry| entry.get().is_some()).count()
 }
 

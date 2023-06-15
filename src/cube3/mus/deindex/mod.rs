@@ -80,7 +80,7 @@ impl Cube {
         let corners = Corners::from_index(indices.corners);
         let mut edges = indices
             .edges
-            .map(|edge_index| HalfEdges::from_index(edge_index));
+            .map(HalfEdges::from_index);
 
         adjust_second_edges_for_deindexing(&mut edges[1]);
 

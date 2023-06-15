@@ -29,7 +29,7 @@ fn test_disposition_multipliers() {
 
     assert_eq!(
         multipliers_corners.to_vec(),
-        (0..8).into_iter().rev().map(|i| factorial(i)).collect_vec()
+        (0..8).rev().map(factorial).collect_vec()
     );
 
     let multipliers_edges = disposition_multipliers::<usize, 6, 12>();
@@ -37,7 +37,6 @@ fn test_disposition_multipliers() {
     assert_eq!(
         multipliers_edges.to_vec(),
         (6..12)
-            .into_iter()
             .rev()
             .map(|i| factorial(i) / factorial(6))
             .collect_vec()
