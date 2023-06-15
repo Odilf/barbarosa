@@ -163,7 +163,8 @@ impl Display for Stats {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{amount_cached: >8} states cached ({percent_cached:.2}%) in {time_elapsed}s at {states_per_second:.2} states/s (ETA: {eta:.2}m)",
+            "{amount_cached: >8} states cached ({percent_cached:.2}%) \
+            in {time_elapsed}s at {states_per_second:.2} states/s (ETA: {eta:.2}m)",
             amount_cached = self.amount_cached,
             percent_cached = self.percent_cached * 100.0,
             time_elapsed = self.time_elapsed.num_seconds(),
