@@ -1,5 +1,7 @@
 //! Collection of functions to assert if cube invariants are upheld and to fix them.
-//!
+//! 
+//! TODO: This docs are written for a 3x3x3 cube, but they should be valid for any NxNxN cube.
+//! 
 //! Mainly used for [Cube3::random()]
 //!
 //! There are thre invariants we need to uphold in a 3x3x3 Rubik's cube. We can deduce them by analizing what
@@ -27,9 +29,7 @@
 
 use std::fmt::Debug;
 
-use crate::cube_n::{Corner, Cube3, Edge};
-
-use super::mus::index::PositionIndexable;
+use crate::cube_n::{Corner, Cube3, Edge, cube3::mus::index::PositionIndexable};
 
 /// Swaps `cube.edges[0]` and `cube.edges[1]` if the parity of the edge permutation is different from the parity of the corner permutation.
 ///

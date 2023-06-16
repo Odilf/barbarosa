@@ -130,3 +130,25 @@ pub enum EdgeFromFacesError {
     #[error("Faces must be on different axes")]
     SameAxes([Axis; 2]),
 }
+
+// Edges are set up this way so that an X2 rotation increases the index by 6.
+// This is useful for indexing into the edge permutation table.
+pub const SOLVED_EDGES: [Edge; 12] = {
+    use Axis::*;
+    use Direction::*;
+
+    [
+        Edge::oriented(X, vector![Positive, Positive]),
+        Edge::oriented(X, vector![Positive, Negative]),
+        Edge::oriented(Y, vector![Positive, Positive]),
+        Edge::oriented(Y, vector![Positive, Negative]),
+        Edge::oriented(Z, vector![Positive, Positive]),
+        Edge::oriented(Z, vector![Negative, Positive]),
+        Edge::oriented(X, vector![Negative, Negative]),
+        Edge::oriented(X, vector![Negative, Positive]),
+        Edge::oriented(Y, vector![Negative, Positive]),
+        Edge::oriented(Y, vector![Negative, Negative]),
+        Edge::oriented(Z, vector![Positive, Negative]),
+        Edge::oriented(Z, vector![Negative, Negative]),
+    ]
+};

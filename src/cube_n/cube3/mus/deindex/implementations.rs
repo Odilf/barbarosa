@@ -1,6 +1,6 @@
 use crate::{
+    cube_n::invariants::fix_corner_multiplicity,
     cube3::{
-        invariants::fix_corner_multiplicity,
         mus::{index::OrientationIndexable, Corners, HalfEdges},
         Corner, Cube3, Edge,
     },
@@ -25,22 +25,7 @@ impl Deindexable for Corners {
             }
         }
 
-        dbg!(&corners);
-
-        let oriented_corners: i32 = corners
-            .iter()
-            .map(|corner| corner.orientation_index() as i32)
-            .sum();
-
-        dbg!(oriented_corners);
         fix_corner_multiplicity(&mut corners);
-
-        // // TODO: This is tehcnially repeated from `Cube::random()`
-
-        // let corner_orientation_offset = oriented_corners % 3;
-        // for _ in 0..corner_orientation_offset {
-        //     corners[7].twist();
-        // }
 
         corners
     }

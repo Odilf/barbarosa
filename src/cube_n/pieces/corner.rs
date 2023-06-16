@@ -1,4 +1,4 @@
-use nalgebra::Vector3;
+use nalgebra::{Vector3, vector};
 
 use crate::{
     cube_n::space::{Axis, Direction, Face},
@@ -93,3 +93,18 @@ impl std::fmt::Debug for Corner {
         )
     }
 }
+
+pub const SOLVED_CORNERS: [Corner; 8] = {
+    use Direction::*;
+
+    [
+        Corner::oriented(vector![Positive, Positive, Positive]),
+        Corner::oriented(vector![Positive, Positive, Negative]),
+        Corner::oriented(vector![Positive, Negative, Positive]),
+        Corner::oriented(vector![Positive, Negative, Negative]),
+        Corner::oriented(vector![Negative, Positive, Positive]),
+        Corner::oriented(vector![Negative, Positive, Negative]),
+        Corner::oriented(vector![Negative, Negative, Positive]),
+        Corner::oriented(vector![Negative, Negative, Negative]),
+    ]
+};
