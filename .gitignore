@@ -1,3 +1,5 @@
 /target
 *.barbarosa
 flamegraph.svg
+mus-cache
+.vscode
