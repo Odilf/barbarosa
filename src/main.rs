@@ -10,6 +10,7 @@ fn main() {
     let args = CliArgs::parse();
 
     if args.build_cache {
-        barbarosa::cube3::mus::cache::Cache::init();
+        todo!()
+        // barbarosa::cube3::mus::cache::Cache::init();
     }
 }

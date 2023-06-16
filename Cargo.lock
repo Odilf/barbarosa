@@ -101,6 +101,7 @@ dependencies = [
  "once_cell",
  "pathfinding",
  "rand",
+ "rand_derive2",
  "rayon",
  "strum",
  "thiserror",
@@ -704,6 +705,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "proc_macro2_helper"
+version = "0.2.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "79528bef70da112116feb5ecb6b64f1394e5360660d6474a760789ea07885501"
+dependencies = [
+ "proc-macro2",
+ "syn 2.0.18",
+]
+
+[[package]]
 name = "quote"
 version = "1.0.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -740,6 +751,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ec0be4795e2f6a28069bec0b5ff3e2ac9bafc99e6a9a7dc3547996c5c816922c"
 dependencies = [
  "getrandom",
+]
+
+[[package]]
+name = "rand_derive2"
+version = "0.1.20"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f1c607706c3845484c43e017c7444038235c6af3a0097ebe12e17f91375eb1b7"
+dependencies = [
+ "proc-macro2",
+ "proc_macro2_helper",
+ "quote",
+ "syn 2.0.18",
 ]
 
 [[package]]
