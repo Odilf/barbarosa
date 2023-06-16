@@ -1,7 +1,10 @@
 //! Sequences of moves.
 
+use std::{fmt::Debug, marker::PhantomData};
+
 use itertools::Itertools;
 use rand::{distributions::Standard, prelude::Distribution, Rng};
+use thiserror::Error;
 
 use super::{parse, Movable, Move, Parsable};
 
@@ -56,18 +59,20 @@ where
     }
 }
 
-impl<M: Move, T: Movable<M> + Eq + Clone> TryFrom<Vec<T>> for Alg<M> {
-    type Error = ();
+impl<M: Move + Debug, T: Movable<M> + Eq + Clone> TryFrom<Vec<T>> for Alg<M> {
+    type Error = TryFromStatesError<M, T>;
 
     fn try_from(value: Vec<T>) -> Result<Self, Self::Error> {
         Self::try_from_states(value)
     }
 }
 
-impl<M: Move> Alg<M> {
+impl<M: Move + Debug> Alg<M> {
     /// Simple implementation to understand where the trait bounds fail, if that happens.
     /// Otherwise you can just use `TryFrom<Vec<T>>` directly.
-    pub fn try_from_states<T: Movable<M> + Eq + Clone>(states: Vec<T>) -> Result<Self, ()> {
+    pub fn try_from_states<T: Movable<M> + Eq + Clone>(
+        states: Vec<T>,
+    ) -> Result<Self, TryFromStatesError<M, T>> {
         let alg = states
             .windows(2)
             .map(|window| {
@@ -75,12 +80,23 @@ impl<M: Move> Alg<M> {
                     unreachable!("windows(2) always returns slices of length 2")
                 };
 
-                M::connect(from, to).ok_or(())
+                M::connect(from, to).ok_or_else(|| {
+                    TryFromStatesError::NotConnected(from.to_owned(), to.to_owned(), PhantomData)
+                })
+                // M::connect(from, to).ok_or(())
             })
             .collect::<Result<Vec<_>, _>>()?;
 
         Ok(Self::new(alg))
     }
+}
+
+/// Error returned when trying to convert a vector of states to an alg
+#[allow(missing_docs)]
+#[derive(Debug, Error)]
+pub enum TryFromStatesError<M: Move, T: Movable<M> + Eq + Clone> {
+    #[error("There is no move connecting {0:?} and {1:?}")]
+    NotConnected(T, T, PhantomData<M>),
 }
 
 impl<M: Move + Parsable> TryFrom<&str> for Alg<M> {

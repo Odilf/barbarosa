@@ -1,6 +1,6 @@
 //! 3x3x3 Rubik's cube searching.
 
-use std::hash::Hash;
+use std::{fmt::Debug, hash::Hash};
 
 use crate::generic::{alg::Alg, Cube, Movable, Move};
 
@@ -9,7 +9,7 @@ mod test;
 /// Something that can be searched.
 ///
 /// This trait is auto-implemented for all cubes that can be moved and hashed.
-pub trait Searchable<M: Move>: Cube + Hash + Movable<M> {
+pub trait Searchable<M: Move + Debug>: Cube + Hash + Movable<M> {
     /// Solves the cube using A* with the given heuristic.
     ///
     /// Currently it can solve 5 moves in ~2.5s.
@@ -41,7 +41,7 @@ pub trait Searchable<M: Move>: Cube + Hash + Movable<M> {
 
 impl<M, C> Searchable<M> for C
 where
-    M: Move,
+    M: Move + Debug,
     C: Cube + Hash + Movable<M>,
 {
 }

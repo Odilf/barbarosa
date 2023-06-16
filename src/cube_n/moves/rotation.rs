@@ -30,7 +30,7 @@ pub trait Rotatable: Clone {
     /// See also [Self::rotate]
     fn rotated(mut self, rotation: &AxisRotation) -> Self {
         self.rotate(rotation);
-        self 
+        self
     }
 }
 
@@ -73,13 +73,13 @@ impl Rotatable for Edge {
 
         // Position
         let faces = self.faces().map(|face| face.rotated(rotation));
-        let Ok(new_edge_position) = Edge::position_from_faces(faces) else {
+        let Ok((new_normal, new_slice_position)) = Edge::position_from_faces(faces) else {
 			self.slice_position = rotate_vec2d(&rotation.amount, self.slice_position);
 			return;
 		};
 
-        self.slice_position = new_edge_position.slice_position;
-        self.normal_axis = new_edge_position.normal_axis;
+        self.normal_axis = new_normal;
+        self.slice_position = new_slice_position;
     }
 }
 
