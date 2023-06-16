@@ -1,7 +1,7 @@
 //! Collection of functions to assert if cube invariants are upheld and to fix them.
-//! 
+//!
 //! TODO: This docs are written for a 3x3x3 cube, but they should be valid for any NxNxN cube.
-//! 
+//!
 //! Mainly used for [Cube3::random()]
 //!
 //! There are thre invariants we need to uphold in a 3x3x3 Rubik's cube. We can deduce them by analizing what
@@ -24,12 +24,12 @@
 //! - Swapping `cube.edges[0]` and `cube.edges[1]` if the parity of the edge permutation is different from the parity of the corner permutation.
 //! - Flipping `cube.edges[11]` if the number of oriented edges is odd.
 //! - Twisting `cube.corners[7]` such that the sum of corner orientation indices is divisble by 3.
-//! 
-//! PS: The reason to change the orientation of the last piece is because it makes implementing [super::mus::index::OrientationIndexable] easier for corners. 
+//!
+//! PS: The reason to change the orientation of the last piece is because it makes implementing [super::mus::index::OrientationIndexable] easier for corners.
 
 use std::fmt::Debug;
 
-use crate::cube_n::{Corner, Cube3, Edge, cube3::mus::index::PositionIndexable};
+use crate::cube_n::{cube3::mus::index::PositionIndexable, Corner, Cube3, Edge};
 
 /// Swaps `cube.edges[0]` and `cube.edges[1]` if the parity of the edge permutation is different from the parity of the corner permutation.
 ///
@@ -66,7 +66,7 @@ fn swap_cycles<T: PositionIndexable + PartialEq + Debug, const N: usize>(values:
 }
 
 /// Flips `cube.edges[11]` if the number of oriented edges is odd.
-/// 
+///
 /// See the [module-level documentation](self) for more info.
 pub fn fix_edge_flip_parity(edges: &mut [Edge; 12]) {
     let oriented_edges = edges.iter().filter(|edge| edge.oriented).count();
@@ -76,7 +76,7 @@ pub fn fix_edge_flip_parity(edges: &mut [Edge; 12]) {
 }
 
 /// Twists `cube.corners[7]` such that the sum of corner orientation indices is divisble by 3.
-/// 
+///
 /// See the [module-level documentation](self) for more info.
 pub fn fix_corner_multiplicity(corners: &mut [Corner; 8]) {
     let oriented_corners: i32 = corners

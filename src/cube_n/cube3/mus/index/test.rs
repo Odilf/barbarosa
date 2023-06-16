@@ -2,7 +2,10 @@
 
 use itertools::Itertools;
 
-use crate::{cube3::{mus::Corners, Corner, Edge}, generic::Cube};
+use crate::{
+    cube3::{mus::Corners, Corner, Edge},
+    generic::Cube,
+};
 
 use super::*;
 

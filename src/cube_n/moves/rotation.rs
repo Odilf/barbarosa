@@ -28,10 +28,9 @@ pub trait Rotatable: Clone {
     /// Returns a rotated copy of the piece
     ///
     /// See also [Self::rotate]
-    fn rotated(self, rotation: &AxisRotation) -> Self {
-        let mut clone = self.clone();
-        clone.rotate(rotation);
-        clone
+    fn rotated(mut self, rotation: &AxisRotation) -> Self {
+        self.rotate(rotation);
+        self 
     }
 }
 

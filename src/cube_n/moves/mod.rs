@@ -1,8 +1,6 @@
 //! Moves for NxNxN cubes
 
-use std::{
-    mem::{self, MaybeUninit},
-};
+use std::mem::{self, MaybeUninit};
 
 use crate::generic::{self, parse, Parsable};
 

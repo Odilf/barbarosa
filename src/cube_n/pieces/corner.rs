@@ -1,4 +1,4 @@
-use nalgebra::{Vector3, vector};
+use nalgebra::{vector, Vector3};
 
 use crate::{
     cube_n::space::{Axis, Direction, Face},

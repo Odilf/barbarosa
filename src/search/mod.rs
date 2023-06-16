@@ -7,8 +7,8 @@ use crate::generic::{alg::Alg, Cube, Movable, Move};
 mod test;
 
 /// Something that can be searched.
-/// 
-/// This trait is auto-implemented for all cubes that can be moved and hashed. 
+///
+/// This trait is auto-implemented for all cubes that can be moved and hashed.
 pub trait Searchable<M: Move>: Cube + Hash + Movable<M> {
     /// Solves the cube using A* with the given heuristic.
     ///
@@ -39,4 +39,9 @@ pub trait Searchable<M: Move>: Cube + Hash + Movable<M> {
     }
 }
 
-impl<M, C> Searchable<M> for C where M: Move, C: Cube + Hash + Movable<M> {}
+impl<M, C> Searchable<M> for C
+where
+    M: Move,
+    C: Cube + Hash + Movable<M>,
+{
+}

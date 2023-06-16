@@ -6,9 +6,9 @@ use rand::{distributions::Standard, prelude::Distribution, Rng};
 use super::{parse, Movable, Move, Parsable};
 
 /// An alg. A sequence of moves.
-/// 
+///
 /// The name alg sort of means "algorithm", but I don't think it's super accurate to call it an algorithm. It's just a sequence of moves.
-/// However, that's the name it's used in the cubing community so I'm using it here. 
+/// However, that's the name it's used in the cubing community so I'm using it here.
 #[allow(missing_docs)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Alg<M: Move> {

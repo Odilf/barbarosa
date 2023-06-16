@@ -19,7 +19,7 @@ pub use super::disk_storage::load_or_build;
 fn cache_neighbours_at_depth<
     T: Indexable + Deindexable + Movable<AxisMove> + DiskCacheable + Clone,
 >(
-    cache: &mut Vec<PartialEntry>,
+    cache: &mut [PartialEntry],
     move_depth: u8,
 ) {
     // TODO: Make paralell

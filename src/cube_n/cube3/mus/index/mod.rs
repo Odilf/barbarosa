@@ -1,5 +1,5 @@
 //! 3x3x3 indexing for [mus](super)
-//! 
+//!
 //! See [Indexable] for more information
 
 use crate::{
@@ -10,7 +10,7 @@ use crate::{
 use super::HalfEdges;
 
 /// Const calculation of the factorial of a number
-/// 
+///
 /// If the number is greater than 20, it would overflow so it just returns 0
 pub const fn factorial(n: usize) -> usize {
     match n {
@@ -23,8 +23,8 @@ pub const fn factorial(n: usize) -> usize {
 mod implementations;
 mod test;
 
-/// Trait for indexing based on position. 
-/// 
+/// Trait for indexing based on position.
+///
 /// See also [Indexable]
 pub trait PositionIndexable {
     /// Returns the index of the position
@@ -35,7 +35,7 @@ pub trait PositionIndexable {
 }
 
 /// Trait for indexing based on orientation.
-/// 
+///
 /// See also [Indexable]
 pub trait OrientationIndexable {
     /// Returns the index of the orientation
@@ -48,7 +48,7 @@ pub trait OrientationIndexable {
 /// Trait for indexing. Every unique instance of a type that implements this trait has to return a
 /// unique index, and all indices have to be contiguous (starting from 0). In other words, you can index
 /// into an array of size [Self::TOTAL_SET_SIZE] with the index returned by [Self::index()].
-/// 
+///
 /// This type requires and is auto-implemented with [PositionIndexable] and [OrientationIndexable]
 // TODO: Write about the implementation
 pub trait Indexable: PositionIndexable + OrientationIndexable {
@@ -57,7 +57,7 @@ pub trait Indexable: PositionIndexable + OrientationIndexable {
         self.position_index() * Self::ORIENTATION_SET_SIZE + self.orientation_index()
     }
 
-    /// The amount of possible instances of this type. 
+    /// The amount of possible instances of this type.
     const TOTAL_SET_SIZE: usize = Self::POSITION_SET_SIZE * Self::ORIENTATION_SET_SIZE;
 }
 
@@ -83,11 +83,7 @@ pub fn disposition_multipliers<
 }
 
 // PERFORMANCE: Maybe this can be done more efficiently
-fn disposition_choices<
-    T: PositionIndexable,
-    const N: usize,
-    const T_POSITION_SET_SIZE: usize,
->(
+fn disposition_choices<T: PositionIndexable, const N: usize, const T_POSITION_SET_SIZE: usize>(
     input: &[T; N],
 ) -> [usize; N] {
     let mut used = [false; T_POSITION_SET_SIZE];
@@ -104,7 +100,7 @@ fn disposition_choices<
 }
 
 /// Returns the index of the disposition (or permutation) of the elements in the input
-/// 
+///
 /// Disposition is actually a more accurate term than permutation, since you don't
 /// have to actually select all the elements in edge "permutations"
 // TODO: Remove `const T_POSITION_SET_SIZE: usize` and use `T::POSITION_SET_SIZE` instead when it's possible.
@@ -128,7 +124,7 @@ pub fn position_disposition_index<
 }
 
 /// Returns the index of the orientation of the elements in the input
-/// 
+///
 /// Assumes that all elements can have any orientation. You should be careful if this is not
 /// the case, namely with the 3x3 corners. You should only pass `corners[0..7]` in that case.
 pub fn orientation_permutation_index<T: OrientationIndexable, const N: usize>(

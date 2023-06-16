@@ -301,7 +301,7 @@ impl Face {
     }
 
     /// Parses a face from a character.
-    /// 
+    ///
     /// Not implemented with [Parsable](crate::generic::parse::Parsable) because it's easier
     /// to just accept a char instead of a string.
     pub fn parse(value: char) -> parse::Result<Face> {

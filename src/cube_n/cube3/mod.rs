@@ -1,6 +1,6 @@
 //! The 3x3x3 Rubik's cube.
-//! 
-//! See [Cube3] for more information. Also [crate::cube_n] and [crate::generic] for more generic aspects 
+//!
+//! See [Cube3] for more information. Also [crate::cube_n] and [crate::generic] for more generic aspects
 //! about the 3x3, such as moving and pieces lol.
 
 pub mod heuristics;
@@ -10,7 +10,7 @@ mod test;
 use rand::seq::SliceRandom;
 
 use crate::{
-    cube_n::{space::Axis, pieces},
+    cube_n::{pieces, space::Axis},
     generic,
 };
 

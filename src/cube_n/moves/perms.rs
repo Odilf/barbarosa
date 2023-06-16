@@ -14,4 +14,4 @@ pub static T: Lazy<Alg<AxisMove>> =
     Lazy::new(|| "R U R' U' R' F R2 U' R' U' R U R' F'".try_into().unwrap());
 
 /// The [U perm](http://algdb.net/puzzle/333/pll/ua) (specifically Ua). Cycles RUF->RUB->RUL
-pub const U: Lazy<Alg<AxisMove>> = Lazy::new(|| "R2 U' R' U' R U R U R U' R".try_into().unwrap());
+pub static U: Lazy<Alg<AxisMove>> = Lazy::new(|| "R2 U' R' U' R U R U R U' R".try_into().unwrap());

@@ -1,9 +1,9 @@
 use crate::{
-    cube_n::invariants::fix_corner_multiplicity,
     cube3::{
         mus::{index::OrientationIndexable, Corners, HalfEdges},
         Corner, Cube3, Edge,
     },
+    cube_n::invariants::fix_corner_multiplicity,
     generic::Cube,
 };
 
