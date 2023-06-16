@@ -6,5 +6,8 @@
 //!
 //! Currently only the 3x3x3 cube is supported.
 
-pub mod cube3;
+pub mod cube_n;
+pub mod generic;
 pub mod search;
+
+pub use cube_n::cube3;

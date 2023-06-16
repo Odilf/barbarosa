@@ -1,38 +1,15 @@
 //! 3x3x3 Rubik's cube searching.
 
+use std::hash::Hash;
+
+use crate::generic::{alg::Alg, Cube, Movable, Move};
+
 mod test;
 
-use pathfinding::directed::astar::astar;
-
-use crate::cube3::{
-    moves::{alg, do_move, Move},
-    Cube, Piece,
-};
-
-/// Helper function to apply move to an array of pieces
-/// TODO: Remove this when implementing more generic descriptions of cubes, pieces and moves.
-pub fn successors<P: Piece + Clone, const N: usize>(pieces: &[P; N]) -> Vec<([P; N], i8)> {
-    Move::all()
-        .into_iter()
-        .map(|mov| {
-            let mut pieces = pieces.clone();
-            do_move(&mut pieces, &mov);
-            (pieces, 1i8)
-        })
-        .collect()
-}
-
-impl Cube {
-    fn successors(&self) -> Vec<(Self, i8)> {
-        Move::all()
-            .into_iter()
-            .map(|mov| {
-                let cube = self.clone().moved(&mov);
-                (cube, 1i8)
-            })
-            .collect()
-    }
-
+/// Something that can be searched.
+/// 
+/// This trait is auto-implemented for all cubes that can be moved and hashed. 
+pub trait Searchable<M: Move>: Cube + Hash + Movable<M> {
     /// Solves the cube using A* with the given heuristic.
     ///
     /// Currently it can solve 5 moves in ~2.5s.
@@ -41,15 +18,25 @@ impl Cube {
     /// it must never overestimate the number of moves required to solve the cube.
     ///
     /// See [crate::cube3::heuristics] for some available heuristics.
-    pub fn solve_with_heuristic(&self, heuristic: impl Fn(&Self) -> i8) -> Vec<Move> {
-        let (states, _cost) = astar(
+    fn solve_with_heuristic(&self, heuristic: impl Fn(&Self) -> i8) -> Alg<M>
+    where
+        Self: 'static,
+    {
+        let (states, _cost) = pathfinding::directed::astar::astar(
             self,
-            |cube| cube.successors(),
+            |cube| {
+                cube.successors()
+                    .into_iter()
+                    .map(|cube| (cube, 1i8))
+                    .collect::<Vec<_>>()
+            },
             |cube| heuristic(cube),
             |cube| cube.is_solved(),
         )
         .unwrap();
 
-        alg::try_from_states(states).expect("States should be connected")
+        Alg::try_from_states(states).expect("States should be connected")
     }
 }
+
+impl<M, C> Searchable<M> for C where M: Move, C: Cube + Hash + Movable<M> {}
