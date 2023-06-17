@@ -1,5 +1,6 @@
 use rand::seq::SliceRandom;
 
+use crate::generic::{self, Alg};
 
 use super::{pieces, AxisMove, Corner, invariants::fix_corner_multiplicity};
 
@@ -30,6 +31,9 @@ impl generic::Cube for Cube2 {
 
         cube
     }
+
+    type Move = AxisMove;
+    type Alg = Alg<AxisMove>;
 }
 
 impl generic::Movable<AxisMove> for Cube2 {
