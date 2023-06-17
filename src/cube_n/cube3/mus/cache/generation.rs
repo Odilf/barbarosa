@@ -10,6 +10,7 @@ use crate::{
     },
     cube_n::AxisMove,
     generic::Movable,
+    search::successors,
 };
 
 use super::disk_storage::DiskCacheable;
@@ -31,7 +32,7 @@ fn cache_neighbours_at_depth<
         }
 
         let state = T::from_index(index);
-        for successor in state.successors() {
+        for successor in successors(&state) {
             let successor_entry = &mut cache[successor.index()];
 
             if successor_entry.get().is_none() {

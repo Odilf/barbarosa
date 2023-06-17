@@ -21,7 +21,7 @@ pub trait Move: Sized + Clone {
     ///
     /// let cube = Cube3::solved();
     /// let mov = AxisMove::parse("B'").unwrap();
-    /// let moved = cube.clone().moved(&mov.clone().into());
+    /// let moved = cube.clone().moved(&mov);
     ///
     /// assert_eq!(AxisMove::connect(cube, &moved), Some(mov));
     /// ```
@@ -45,21 +45,6 @@ pub trait Movable<M: ?Sized>: Sized {
     fn moved(mut self, m: &M) -> Self {
         self.apply(m);
         self
-    }
-
-    /// Returns every state that can be reached by applying a single move to this object
-    fn successors(&self) -> Vec<Self>
-    where
-        Self: Clone,
-    {
-        todo!()
-        // M::iter()
-        //     .map(|m| {
-        //         let mut new = self.clone();
-        //         new.apply_move(&m);
-        //         new
-        //     })
-        //     .collect()
     }
 }
 

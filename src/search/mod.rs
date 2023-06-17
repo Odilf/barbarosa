@@ -25,9 +25,9 @@ pub trait Searchable<M: Move + Debug>: Cube + Hash + Movable<M> {
         let (states, _cost) = pathfinding::directed::astar::astar(
             self,
             |cube| {
-                cube.successors()
+                successors(cube)
                     .into_iter()
-                    .map(|cube| (cube, 1i8))
+                    .map(|cube| (cube, 1))
                     .collect::<Vec<_>>()
             },
             |cube| heuristic(cube),
@@ -44,4 +44,12 @@ where
     M: Move + Debug,
     C: Cube + Hash + Movable<M>,
 {
+}
+
+pub fn successors<M, T>(cube: &T) -> Vec<T>
+where
+    M: Move + Debug,
+    T: Movable<M> + Clone,
+{
+    M::iter().map(|m| cube.clone().moved(&m)).collect()
 }
