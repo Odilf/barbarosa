@@ -2,7 +2,7 @@ use rand::seq::SliceRandom;
 
 use crate::generic::{self, Alg};
 
-use super::{pieces, AxisMove, Corner, invariants::fix_corner_multiplicity};
+use super::{invariants::fix_corner_multiplicity, pieces, AxisMove, Corner};
 
 mod test;
 

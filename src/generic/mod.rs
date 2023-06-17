@@ -43,7 +43,7 @@ pub trait Cube: Sized + Clone + PartialEq + Eq + std::fmt::Debug {
     type Move: Move;
 
     /// The type of algorithm used by this cube, almost always `Alg<Self::Move>`
-    /// 
+    ///
     /// The only reason this is not default implemented as `Alg<Self::Move>` is because [associated type defaults
     /// are still unstable](https://github.com/rust-lang/rust/issues/29661)
     type Alg;
