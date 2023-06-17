@@ -7,7 +7,7 @@ use crate::cube_n::{
 
 use super::Amount;
 
-/// A rotation around an axis. This is similar to an [AxisMove], but it doesn't
+/// A rotation around an axis. This is similar to an [AxisMove](super::AxisMove), but it doesn't
 /// specify the face. Mainly, this is used because L and R' are the same rotation,
 /// the only difference is the pieces selected in the rotation.
 #[derive(Debug)]

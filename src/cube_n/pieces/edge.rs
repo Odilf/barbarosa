@@ -124,10 +124,11 @@ pub enum EdgeFromFacesError {
 /// A list of all the edges in a solved cube.
 /// 
 /// Edges are set up this way so that an X2 rotation increases the index by 6.
-/// This is useful for indexing into the HalfEdges permutation table. 
+/// That is, `SOLVED[n]` and `SOLVED[n + 6]` differ by an X2 rotation. This is 
+/// useful for indexing into the HalfEdges permutation table. 
 /// 
 /// See [crate::cube_n::cube3::mus] for more information.
-pub const SOLVED_EDGES: [Edge; 12] = {
+pub const SOLVED: [Edge; 12] = {
     use Axis::*;
     use Direction::*;
 

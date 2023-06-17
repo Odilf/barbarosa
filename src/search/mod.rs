@@ -1,4 +1,4 @@
-//! 3x3x3 Rubik's cube searching.
+//! Rubik's cube searching (and solving). 
 
 use std::{fmt::Debug, hash::Hash};
 

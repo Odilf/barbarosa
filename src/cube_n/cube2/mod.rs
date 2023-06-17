@@ -12,7 +12,7 @@ pub struct Cube2 {
 }
 
 const SOLVED_CUBE: Cube2 = Cube2 {
-    corners: pieces::corner::SOLVED_CORNERS,
+    corners: pieces::corner::SOLVED,
 };
 
 impl generic::Cube for Cube2 {

@@ -95,7 +95,7 @@ impl std::fmt::Debug for Corner {
 }
 
 /// Reference for a set of solved corners
-pub const SOLVED_CORNERS: [Corner; 8] = {
+pub const SOLVED: [Corner; 8] = {
     use Direction::*;
 
     [
