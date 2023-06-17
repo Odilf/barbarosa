@@ -16,7 +16,7 @@ fn test_solved() {
 }
 
 fn assert_solves_alg(alg: Alg<AxisMove>, heuristic: impl Fn(&Cube3) -> i8) {
-    let mut cube = Cube3::new_solved().moved(&alg);
+    let cube = Cube3::new_solved().moved(&alg);
 
     let solution = cube.solve_with_heuristic(heuristic);
 

@@ -1,6 +1,7 @@
-use crate::generic;
+use rand::seq::SliceRandom;
 
-use super::{pieces, AxisMove, Corner, Cube3};
+
+use super::{pieces, AxisMove, Corner, invariants::fix_corner_multiplicity};
 
 mod test;
 
@@ -21,9 +22,13 @@ impl generic::Cube for Cube2 {
     }
 
     fn random_with_rng(rng: &mut impl rand::Rng) -> Self {
-        Cube2 {
-            corners: Cube3::random_with_rng(rng).corners,
-        }
+        let mut cube = Self::new_solved();
+
+        cube.corners.shuffle(rng);
+
+        fix_corner_multiplicity(&mut cube.corners);
+
+        cube
     }
 }
 

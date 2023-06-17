@@ -11,7 +11,7 @@ use rand::seq::SliceRandom;
 
 use crate::{
     cube_n::{pieces, space::Axis},
-    generic,
+    generic::{self, Alg},
 };
 
 use super::invariants::{fix_corner_multiplicity, fix_edge_flip_parity, fix_swap_parity};
@@ -70,6 +70,9 @@ impl generic::Cube for Cube3 {
 
         cube
     }
+
+    type Move = AxisMove;
+    type Alg = Alg<AxisMove>;
 }
 
 impl generic::Movable<AxisMove> for Cube3 {
