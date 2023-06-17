@@ -1,6 +1,7 @@
 //! Generic cube traits and implementations
 
 pub use self::{
+    alg::Alg,
     moves::{Movable, Move},
     parse::Parsable,
     pieces::Piece,

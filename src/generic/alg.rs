@@ -3,6 +3,7 @@
 use std::{fmt::Debug, marker::PhantomData};
 
 use itertools::Itertools;
+use once_cell::sync::Lazy;
 use rand::{distributions::Standard, prelude::Distribution, Rng};
 use thiserror::Error;
 
@@ -37,12 +38,7 @@ impl<M: Move + Parsable> Parsable for Alg<M> {
     }
 }
 
-impl<M: Move> AsRef<Alg<M>> for Alg<M> {
-    fn as_ref(&self) -> &Alg<M> {
-        self
-    }
-}
-
+// Alg::random()
 impl<M> Alg<M>
 where
     M: Move,
@@ -109,13 +105,34 @@ impl<M: Move + Parsable> TryFrom<&str> for Alg<M> {
 
 impl<M: Move + std::fmt::Display> std::fmt::Display for Alg<M> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.moves.iter().map(|m| m.to_string()).join(" "))?;
-        Ok(())
+        write!(f, "{}", self.moves.iter().map(|m| m.to_string()).join(" "))
     }
 }
 
-impl<M: Move> From<M> for Alg<M> {
-    fn from(value: M) -> Self {
-        Self::new(vec![value])
+// impl<M: Move> From<M> for Alg<M> {
+//     fn from(value: M) -> Self {
+//         Self::new(vec![value])
+//     }
+// }
+
+impl<M: Move, T: Movable<M>> Movable<[M]> for T {
+    fn apply(&mut self, m: &[M]) {
+        for m in m {
+            self.apply(m);
+        }
+    }
+}
+
+impl<M: Move, T: Movable<M>> Movable<Alg<M>> for T {
+    fn apply(&mut self, m: &Alg<M>) {
+        <T as Movable<[M]>>::apply(self, &m.moves);
+    }
+}
+
+// For once_cell.
+// Kinda ugly, shouldn't be necessary.
+impl<M: Move, T: Movable<M>> Movable<Lazy<Alg<M>>> for T {
+    fn apply(&mut self, m: &Lazy<Alg<M>>) {
+        <T as Movable<Alg<M>>>::apply(self, m);
     }
 }

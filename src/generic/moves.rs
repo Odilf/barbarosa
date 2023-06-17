@@ -1,4 +1,4 @@
-use super::{alg::Alg, Piece};
+use super::Piece;
 
 /// A generic move.
 pub trait Move: Sized + Clone {
@@ -26,7 +26,7 @@ pub trait Move: Sized + Clone {
     /// assert_eq!(AxisMove::connect(cube, &moved), Some(mov));
     /// ```
     fn connect<T: Movable<Self> + Eq + Clone>(from: &T, to: &T) -> Option<Self> {
-        Self::iter().find(|m| from.clone().moved(&Alg::new(vec![m.clone()])) == *to)
+        Self::iter().find(|m| from.clone().moved(&m.clone()) == *to)
     }
 }
 
@@ -36,23 +36,14 @@ pub trait Move: Sized + Clone {
 /// by a single [crate::cube_n::AxisMove], but also by [crate::cube_n::WideAxisMove].
 ///
 /// [Movable] is auto-implemented for arrays of movables.
-pub trait Movable<M: Move>: Sized {
+// Note: M is `?Sized` to work with slices and vecs.
+pub trait Movable<M: ?Sized>: Sized {
     /// Applies a move to this object (in-place)
-    fn apply_move(&mut self, m: &M);
-
-    /// Applies an algorithm to this object (in-place)
-    fn apply(&mut self, alg: &Alg<M>) {
-        for m in &alg.moves {
-            self.apply_move(m);
-        }
-    }
+    fn apply(&mut self, m: &M);
 
     /// Moves this object, taking and returning ownership
-    fn moved(mut self, alg: &Alg<M>) -> Self
-    where
-        Self: Sized,
-    {
-        self.apply(alg);
+    fn moved(mut self, m: &M) -> Self {
+        self.apply(m);
         self
     }
 
@@ -61,13 +52,14 @@ pub trait Movable<M: Move>: Sized {
     where
         Self: Clone,
     {
-        M::iter()
-            .map(|m| {
-                let mut new = self.clone();
-                new.apply_move(&m);
-                new
-            })
-            .collect()
+        todo!()
+        // M::iter()
+        //     .map(|m| {
+        //         let mut new = self.clone();
+        //         new.apply_move(&m);
+        //         new
+        //     })
+        //     .collect()
     }
 }
 
@@ -77,9 +69,9 @@ where
     P: Piece + Movable<M>,
     M: Move,
 {
-    fn apply_move(&mut self, m: &M) {
+    fn apply(&mut self, m: &M) {
         for p in self {
-            p.apply_move(m);
+            p.apply(m);
         }
     }
 }

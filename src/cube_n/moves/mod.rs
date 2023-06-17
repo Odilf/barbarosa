@@ -75,7 +75,7 @@ impl AxisMove {
 }
 
 impl generic::Movable<AxisMove> for Edge {
-    fn apply_move(&mut self, mov: &AxisMove) {
+    fn apply(&mut self, mov: &AxisMove) {
         if !mov.face.contains_edge(self) {
             return;
         }
@@ -90,7 +90,7 @@ impl generic::Movable<AxisMove> for Edge {
 }
 
 impl generic::Movable<AxisMove> for Corner {
-    fn apply_move(&mut self, mov: &AxisMove) {
+    fn apply(&mut self, mov: &AxisMove) {
         if !mov.face.contains_corner(self) {
             return;
         }

@@ -6,6 +6,7 @@ use super::*;
 
 use crate::{
     cube3::mus::index::{orientation_permutation_index, position_disposition_index},
+    cube_n::AxisMove,
     generic::{alg::Alg, Cube, Movable, Parsable},
 };
 
@@ -38,7 +39,7 @@ fn index_deindex_solved() {
 
 #[test]
 fn index_deindex_edges() {
-    let cube = Cube3::new_solved().moved(&"R".try_into().unwrap());
+    let cube = Cube3::new_solved().moved(&Alg::<AxisMove>::parse("R").unwrap());
     let indices = cube.indices();
     let deindexed_cube = Cube3::from_indices(indices);
 
@@ -47,7 +48,7 @@ fn index_deindex_edges() {
 
 #[test]
 fn index_deindex_corners() {
-    let cube = Cube3::new_solved().moved(&Alg::parse("U").unwrap());
+    let cube = Cube3::new_solved().moved(&Alg::<AxisMove>::parse("U").unwrap());
     let indices = cube.indices();
     let deindexed_cube = Cube3::from_indices(indices);
 

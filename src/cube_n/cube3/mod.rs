@@ -73,8 +73,8 @@ impl generic::Cube for Cube3 {
 }
 
 impl generic::Movable<AxisMove> for Cube3 {
-    fn apply_move(&mut self, m: &AxisMove) {
-        self.corners.apply_move(m);
-        self.edges.apply_move(m);
+    fn apply(&mut self, m: &AxisMove) {
+        self.corners.apply(m);
+        self.edges.apply(m);
     }
 }

@@ -11,13 +11,12 @@ use super::*;
 #[test]
 fn test_solved() {
     let cube = Cube3::solved();
-    let solution = cube.solve_with_heuristic(heuristics::manhattan);
+    let solution: Alg<AxisMove> = cube.solve_with_heuristic(heuristics::manhattan);
     assert_eq!(solution.moves.len(), 0);
 }
 
 fn assert_solves_alg(alg: Alg<AxisMove>, heuristic: impl Fn(&Cube3) -> i8) {
-    let mut cube = Cube3::new_solved();
-    cube.apply(&alg);
+    let mut cube = Cube3::new_solved().moved(&alg);
 
     let solution = cube.solve_with_heuristic(heuristic);
 

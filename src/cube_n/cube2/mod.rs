@@ -28,7 +28,7 @@ impl generic::Cube for Cube2 {
 }
 
 impl generic::Movable<AxisMove> for Cube2 {
-    fn apply_move(&mut self, m: &AxisMove) {
-        self.corners.apply_move(m);
+    fn apply(&mut self, m: &AxisMove) {
+        self.corners.apply(m);
     }
 }

@@ -117,7 +117,7 @@ fn errors_completely_when_parsing_invalid_move_in_alg() {
     let inputs = ["R2 P", "R2 µ", "R2 R2'"];
 
     for input in inputs {
-        assert!(<Alg<AxisMove>>::parse(input).is_err());
+        assert!(Alg::<AxisMove>::parse(input).is_err());
     }
 }
 
@@ -127,6 +127,7 @@ fn six_sexy_moves_solves_cube() {
 
     for _ in 0..6 {
         cube.apply(&perms::SEXY_MOVE);
+        // cube.apply(&Alg::<AxisMove>::parse("R U R' U' R' F R2 U' R' U' R U R' F'").unwrap());
     }
 
     assert_eq!(cube, *Cube3::solved());
@@ -136,14 +137,9 @@ fn six_sexy_moves_solves_cube() {
 fn two_t_perms_solve_cube() {
     let mut cube = Cube3::new_solved();
 
-    println!("Alg: {}", perms::T.to_string());
-
     for _ in 0..2 {
-        dbg!(&cube);
         cube.apply(&perms::T);
     }
-
-    dbg!(&cube);
 
     assert!(cube.is_solved());
 }

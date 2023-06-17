@@ -1,6 +1,6 @@
 use barbarosa::{
     cube3::heuristics,
-    cube_n::Cube3,
+    cube_n::{AxisMove, Cube3},
     generic::{alg::Alg, Cube, Movable},
     search::Searchable,
 };
@@ -19,13 +19,15 @@ pub fn bench(c: &mut Criterion) {
     let amounts = [4, 6].into_iter();
 
     amounts.for_each(|move_amount: usize| {
-        let alg = Alg::random_with_rng(move_amount, &mut rng);
+        let alg = Alg::<AxisMove>::random_with_rng(move_amount, &mut rng);
         let cube = Cube3::new_solved().moved(&alg);
 
         let mut group = c.benchmark_group(format!("solving/{} moves", move_amount));
 
         for (name, heuristic) in &heuristics {
-            group.bench_function(*name, |b| b.iter(|| cube.solve_with_heuristic(heuristic)));
+            group.bench_function(*name, |b| {
+                b.iter(|| -> Alg<AxisMove> { cube.solve_with_heuristic(heuristic) })
+            });
         }
 
         group.finish();

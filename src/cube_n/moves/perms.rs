@@ -1,4 +1,4 @@
-//! Collection of "perms" (algs for permutating pieces) for nxnxn cubes
+//! Collection of "perms" (algs for permutating pieces) for NxNxN cubes
 
 use once_cell::sync::Lazy;
 
