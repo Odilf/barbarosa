@@ -68,7 +68,9 @@ impl Edge {
     /// Calculates the position information of an edge placed in between the given faces.
     ///
     /// Errors if the faces are not perpendicular
-    pub fn position_from_faces([a, b]: [Face; 2]) -> Result<(Axis, Vector2<Direction>), EdgeFromFacesError> {
+    pub fn position_from_faces(
+        [a, b]: [Face; 2],
+    ) -> Result<(Axis, Vector2<Direction>), EdgeFromFacesError> {
         let normal_axis =
             Axis::other(&a.axis, &b.axis).ok_or(EdgeFromFacesError::SameAxes([a.axis, b.axis]))?;
 
@@ -100,10 +102,7 @@ impl TryFrom<[Face; 2]> for Edge {
     type Error = EdgeFromFacesError;
 
     fn try_from(value: [Face; 2]) -> Result<Self, Self::Error> {
-        let (
-            normal_axis,
-            slice_position,
-         ) = Self::position_from_faces(value)?;
+        let (normal_axis, slice_position) = Self::position_from_faces(value)?;
 
         Ok(Self {
             normal_axis,
@@ -122,11 +121,11 @@ pub enum EdgeFromFacesError {
 }
 
 /// A list of all the edges in a solved cube.
-/// 
+///
 /// Edges are set up this way so that an X2 rotation increases the index by 6.
-/// That is, `SOLVED[n]` and `SOLVED[n + 6]` differ by an X2 rotation. This is 
-/// useful for indexing into the HalfEdges permutation table. 
-/// 
+/// That is, `SOLVED[n]` and `SOLVED[n + 6]` differ by an X2 rotation. This is
+/// useful for indexing into the HalfEdges permutation table.
+///
 /// See [crate::cube_n::cube3::mus] for more information.
 pub const SOLVED: [Edge; 12] = {
     use Axis::*;

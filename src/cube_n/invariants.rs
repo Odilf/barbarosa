@@ -25,7 +25,7 @@
 //! - Flipping `cube.edges[11]` if the number of oriented edges is odd.
 //! - Twisting `cube.corners[7]` such that the sum of corner orientation indices is divisble by 3.
 //!
-//! PS: The reason to change the orientation of the last piece is because it makes implementing 
+//! PS: The reason to change the orientation of the last piece is because it makes implementing
 //! [mus::index::OrientationIndexable](super::cube3::mus::index::OrientationIndexable) nicer for corners.
 
 use std::fmt::Debug;
