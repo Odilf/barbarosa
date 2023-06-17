@@ -44,14 +44,15 @@ pub fn fix_swap_parity(cube: &mut Cube3) {
     }
 }
 
+/// Counts the number of cycles of swaps needed to get all elements in their correct position.
 fn swap_cycles<T: PositionIndexable + PartialEq + Debug, const N: usize>(values: &[T; N]) -> i32 {
-    let mut permutations: [Option<usize>; N] = [None; N];
+    let mut visited: [bool; N] = [false; N];
     let mut current_index = 0;
     let mut cycles = 0;
 
     loop {
-        if permutations[current_index].is_some() {
-            let Some(first_unvisited) = permutations.iter().position(|x| x.is_none()) else {
+        if visited[current_index] {
+            let Some(first_unvisited) = visited.iter().position(|x| !x) else {
 				return cycles;
 			};
 
@@ -61,7 +62,7 @@ fn swap_cycles<T: PositionIndexable + PartialEq + Debug, const N: usize>(values:
 
         let next = values[current_index].position_index();
 
-        permutations[current_index] = Some(next);
+        visited[current_index] = true;
         current_index = next;
     }
 }
