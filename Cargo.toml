@@ -6,7 +6,7 @@ description = "A Rubik's cube library "
 readme = "README.md"
 repository = "https://github.com/Odilf/barbarosa"
 license = "GPL-3.0-or-later"
-keywords = ["rubik", "cube", "3x3", "3x3x3", "cubing", "speedcubing", "twisty-puzzle", "twisty", "puzzle", "solver", "algorithm"]
+keywords = ["rubik", "3x3", "cubing", "speedcubing", "twisty-puzzle"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
