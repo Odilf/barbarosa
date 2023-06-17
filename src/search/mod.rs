@@ -46,9 +46,10 @@ where
 {
 }
 
+/// Returns every possible state reached by making a move on the given cube.
 pub fn successors<M, T>(cube: &T) -> Vec<T>
 where
-    M: Move + Debug,
+    M: Move,
     T: Movable<M> + Clone,
 {
     M::iter().map(|m| cube.clone().moved(&m)).collect()

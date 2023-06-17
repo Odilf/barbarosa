@@ -1,3 +1,5 @@
+//! 2x2x2 cube
+
 use rand::seq::SliceRandom;
 
 use crate::generic::{self, Alg};
