@@ -4,7 +4,7 @@ use std::collections::HashSet;
 
 use nalgebra::Vector3;
 
-use crate::generic::{Cube, Piece};
+use crate::generic::Cube;
 
 use super::*;
 

@@ -3,10 +3,9 @@
 use crate::{
     cube_n::{
         moves::{perms, Amount},
-        space::{Axis, Direction, Face},
-        AxisMove,
+        space::Face,
     },
-    generic::{Cube, Movable, Parsable},
+    generic::{Cube, Movable},
 };
 
 use super::*;
