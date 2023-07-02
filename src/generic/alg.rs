@@ -5,9 +5,11 @@ use std::{fmt::Debug, marker::PhantomData};
 use itertools::Itertools;
 use once_cell::sync::Lazy;
 use rand::{distributions::Standard, prelude::Distribution, Rng};
+use strum::IntoEnumIterator;
 use thiserror::Error;
 
 use super::{parse, Movable, Move, Parsable};
+use crate::generic;
 
 /// An alg. A sequence of moves.
 ///
@@ -55,7 +57,7 @@ where
     }
 }
 
-impl<M: Move + Debug, T: Movable<M> + Eq + Clone> TryFrom<Vec<T>> for Alg<M> {
+impl<M: Move + Debug + IntoEnumIterator, T: Movable<M> + Eq + Clone> TryFrom<Vec<T>> for Alg<M> {
     type Error = TryFromStatesError<M, T>;
 
     fn try_from(value: Vec<T>) -> Result<Self, Self::Error> {
@@ -63,7 +65,7 @@ impl<M: Move + Debug, T: Movable<M> + Eq + Clone> TryFrom<Vec<T>> for Alg<M> {
     }
 }
 
-impl<M: Move + Debug> Alg<M> {
+impl<M: Move + Debug + IntoEnumIterator> Alg<M> {
     /// Simple implementation to understand where the trait bounds fail, if that happens.
     /// Otherwise you can just use `TryFrom<Vec<T>>` directly.
     pub fn try_from_states<T: Movable<M> + Eq + Clone>(
@@ -76,12 +78,11 @@ impl<M: Move + Debug> Alg<M> {
                     unreachable!("windows(2) always returns slices of length 2")
                 };
 
-                M::connect(from, to).ok_or_else(|| {
+                generic::moves::connect(from, to).ok_or_else(|| {
                     TryFromStatesError::NotConnected(from.to_owned(), to.to_owned(), PhantomData)
                 })
-                // M::connect(from, to).ok_or(())
             })
-            .collect::<Result<Vec<_>, _>>()?;
+            .collect::<Result<Vec<M>, _>>()?;
 
         Ok(Self::new(alg))
     }
@@ -126,6 +127,14 @@ impl<M: Move, T: Movable<M>> Movable<[M]> for T {
 impl<M: Move, T: Movable<M>> Movable<Alg<M>> for T {
     fn apply(&mut self, m: &Alg<M>) {
         <T as Movable<[M]>>::apply(self, &m.moves);
+    }
+}
+
+impl<M: generic::Move> FromIterator<M> for Alg<M> {
+    fn from_iter<T: IntoIterator<Item = M>>(iter: T) -> Self {
+        // TODO: Revise if this is how you properly do collecting
+        let moves: Vec<_> = iter.into_iter().collect();
+        Self::new(moves)
     }
 }
 

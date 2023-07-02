@@ -7,11 +7,11 @@ pub mod heuristics;
 pub mod mus;
 mod test;
 
-use rand::seq::SliceRandom;
+use rand::{distributions::Standard, prelude::Distribution, seq::SliceRandom};
 
 use crate::{
     cube_n::{pieces, space::Axis},
-    generic::{self, Alg},
+    generic::{self, Alg, Cube},
 };
 
 use super::invariants::{fix_corner_multiplicity, fix_edge_flip_parity, fix_swap_parity};
@@ -48,8 +48,20 @@ impl generic::Cube for Cube3 {
         &SOLVED_CUBE
     }
 
-    fn random_with_rng(rng: &mut impl rand::Rng) -> Self {
-        let mut cube = Self::new_solved();
+    type Move = AxisMove;
+    type Alg = Alg<AxisMove>;
+}
+
+impl generic::Movable<AxisMove> for Cube3 {
+    fn apply(&mut self, m: &AxisMove) {
+        self.corners.apply(m);
+        self.edges.apply(m);
+    }
+}
+
+impl Distribution<Cube3> for Standard {
+    fn sample<R: rand::Rng + ?Sized>(&self, rng: &mut R) -> Cube3 {
+        let mut cube = Cube3::new_solved();
 
         // Move pieces
         cube.edges.shuffle(rng);
@@ -69,15 +81,5 @@ impl generic::Cube for Cube3 {
         fix_corner_multiplicity(&mut cube.corners);
 
         cube
-    }
-
-    type Move = AxisMove;
-    type Alg = Alg<AxisMove>;
-}
-
-impl generic::Movable<AxisMove> for Cube3 {
-    fn apply(&mut self, m: &AxisMove) {
-        self.corners.apply(m);
-        self.edges.apply(m);
     }
 }

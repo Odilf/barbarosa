@@ -21,7 +21,7 @@ fn two_ts_solves() {
 }
 
 #[test]
-fn four_sexies() {
+fn six_sexies() {
     let mut cube = Cube2::new_solved();
 
     for _ in 0..6 {

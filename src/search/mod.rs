@@ -2,6 +2,8 @@
 
 use std::{fmt::Debug, hash::Hash};
 
+use strum::IntoEnumIterator;
+
 use crate::generic::{alg::Alg, Cube, Movable, Move};
 
 mod test;
@@ -9,7 +11,7 @@ mod test;
 /// Something that can be searched.
 ///
 /// This trait is auto-implemented for all cubes that can be moved and hashed.
-pub trait Searchable<M: Move + Debug>: Cube + Hash + Movable<M> {
+pub trait Searchable<M: Move + Debug + IntoEnumIterator>: Cube + Hash + Movable<M> {
     /// Solves the cube using A* with the given heuristic.
     ///
     /// Currently it can solve 5 moves in ~2.5s.
@@ -41,7 +43,7 @@ pub trait Searchable<M: Move + Debug>: Cube + Hash + Movable<M> {
 
 impl<M, C> Searchable<M> for C
 where
-    M: Move + Debug,
+    M: Move + Debug + IntoEnumIterator,
     C: Cube + Hash + Movable<M>,
 {
 }
@@ -49,7 +51,7 @@ where
 /// Returns every possible state reached by making a move on the given cube.
 pub fn successors<M, T>(cube: &T) -> Vec<T>
 where
-    M: Move,
+    M: Move + IntoEnumIterator,
     T: Movable<M> + Clone,
 {
     M::iter().map(|m| cube.clone().moved(&m)).collect()

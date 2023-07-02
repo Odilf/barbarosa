@@ -51,5 +51,5 @@ fn solved_cube_has_pieces_in_all_coordinates() {
 
 #[test]
 fn random_cube() {
-    let _random = Cube3::random();
+    let _random: Cube3 = rand::random();
 }

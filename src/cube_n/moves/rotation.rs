@@ -1,11 +1,11 @@
-use nalgebra::{vector, Vector2};
+use nalgebra::{vector, Vector2, Vector3};
 
 use crate::cube_n::{
     space::{Axis, Direction, Face},
     Corner, Edge,
 };
 
-use super::Amount;
+use super::{Amount, AxisMove};
 
 /// A rotation around an axis. This is similar to an [AxisMove](super::AxisMove), but it doesn't
 /// specify the face. Mainly, this is used because L and R' are the same rotation,
@@ -18,9 +18,14 @@ pub struct AxisRotation {
     pub amount: Amount,
 }
 
+impl AxisRotation {
+    /// Creates a new [AxisRotation]
+    pub fn new(axis: Axis, amount: Amount) -> Self {
+        Self { axis, amount }
+    }
+}
+
 /// Things that can be rotated.
-///
-/// Any type that implements [Rotatable] automatically implements [`crate::generic::Movable<AxisMove>`]
 pub trait Rotatable: Clone {
     /// Rotates a piece according to an [AxisRotation]
     fn rotate(&mut self, rotation: &AxisRotation);
@@ -48,19 +53,28 @@ impl Rotatable for Face {
     }
 }
 
+impl Rotatable for Vector3<Direction> {
+    fn rotate(&mut self, rotation: &AxisRotation) {
+        *self = rotation
+            .axis
+            .map_on_slice(*self, |vec| rotate_vec2d(&rotation.amount, vec));
+    }
+}
+
+impl Rotatable for Axis {
+    fn rotate(&mut self, rotation: &AxisRotation) {
+        if rotation.amount != Amount::Double {
+            if let Some(other_axis) = Axis::other(&self, &rotation.axis) {
+                *self = other_axis;
+            }
+        }
+    }
+}
+
 impl Rotatable for Corner {
     fn rotate(&mut self, rotation: &AxisRotation) {
-        self.position = rotation
-            .axis
-            .map_on_slice(self.position, |vec| rotate_vec2d(&rotation.amount, vec));
-        match (
-            rotation.amount,
-            Axis::other(&self.orientation_axis, &rotation.axis),
-        ) {
-            (Amount::Double, _) => (),
-            (_, Some(other_axis)) => self.orientation_axis = other_axis,
-            _ => (),
-        }
+        self.position.rotate(rotation);
+        self.orientation_axis.rotate(rotation);
     }
 }
 
@@ -83,10 +97,12 @@ impl Rotatable for Edge {
     }
 }
 
-impl AxisRotation {
-    /// Creates a new [AxisRotation]
-    pub fn new(axis: Axis, amount: Amount) -> Self {
-        Self { axis, amount }
+impl From<&AxisMove> for AxisRotation {
+    fn from(mov: &AxisMove) -> Self {
+        AxisRotation {
+            axis: mov.face.axis,
+            amount: mov.amount,
+        }
     }
 }
 

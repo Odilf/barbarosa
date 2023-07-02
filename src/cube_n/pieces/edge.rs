@@ -1,10 +1,18 @@
+//! Edge piece of the cube.
+
 use nalgebra::{vector, Vector2, Vector3};
 use thiserror::Error;
 
 use crate::{
-    cube_n::space::{Axis, Direction, Face},
+    cube_n::{
+        moves::rotation::{AxisRotation, Rotatable},
+        space::{Axis, Direction, Face},
+        AxisMove,
+    },
     generic,
 };
+
+// use super::{ContainedInMove, Corner};
 
 /// An edge piece of the cube.
 #[derive(PartialEq, Eq, Hash, Clone)]
@@ -21,13 +29,29 @@ pub struct Edge {
     pub oriented: bool,
 }
 
-impl generic::Piece for Edge {
-    fn coordinates(&self) -> nalgebra::Vector3<f32> {
-        self.normal_axis.map_on_slice(Vector3::zeros(), |_| {
-            self.slice_position.map(|dir| dir.scalar() as f32)
-        })
+impl generic::Piece for Edge {}
+
+impl generic::Movable<AxisMove> for Edge {
+    fn apply(&mut self, m: &AxisMove) {
+        if m.face.contains_edge(&self) {
+            let rotation = AxisRotation::from(m);
+            self.rotate(&rotation);
+        }
     }
 }
+
+// impl ContainedInMove<AxisMove> for Edge {
+//     fn is_contained_in(&self, face: &Face) -> bool {
+//         let offset = self.normal_axis.offset(&face.axis);
+
+//         match offset {
+//             0 => false,
+//             1 => self.slice_position[0] == face.direction,
+//             2 => self.slice_position[1] == face.direction,
+//             _ => unreachable!("Offset should be in the range 0..3"),
+//         }
+//     }
+// }
 
 impl Edge {
     /// Creates a new oriented edge
@@ -53,7 +77,7 @@ impl Edge {
     /// Returns the edge with the opposite orientation.
     ///
     /// See also [Edge::flip()] for mutating instead of owning.
-    pub fn flipped(mut self) -> Self {
+    pub const fn flipped(mut self) -> Self {
         self.oriented = !self.oriented;
         self
     }
@@ -86,6 +110,12 @@ impl Edge {
         };
 
         Ok((normal_axis, position))
+    }
+
+    pub fn coordinates(&self) -> nalgebra::Vector3<f32> {
+        self.normal_axis.map_on_slice(Vector3::zeros(), |_| {
+            self.slice_position.map(|dir| dir.scalar() as f32)
+        })
     }
 }
 
@@ -124,7 +154,8 @@ pub enum EdgeFromFacesError {
 ///
 /// Edges are set up this way so that an X2 rotation increases the index by 6.
 /// That is, `SOLVED[n]` and `SOLVED[n + 6]` differ by an X2 rotation. This is
-/// useful for indexing into the HalfEdges permutation table.
+/// useful for indexing into the HalfEdges permutation table with the second half
+/// of the edges.
 ///
 /// See [crate::cube_n::cube3::mus] for more information.
 pub const SOLVED: [Edge; 12] = {

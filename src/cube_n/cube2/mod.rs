@@ -1,8 +1,8 @@
 //! 2x2x2 cube
 
-use rand::seq::SliceRandom;
+use rand::{distributions::Standard, prelude::Distribution, seq::SliceRandom};
 
-use crate::generic::{self, Alg};
+use crate::generic::{self, Alg, Cube};
 
 use super::{invariants::fix_corner_multiplicity, pieces, AxisMove, Corner};
 
@@ -24,16 +24,6 @@ impl generic::Cube for Cube2 {
         &SOLVED_CUBE
     }
 
-    fn random_with_rng(rng: &mut impl rand::Rng) -> Self {
-        let mut cube = Self::new_solved();
-
-        cube.corners.shuffle(rng);
-
-        fix_corner_multiplicity(&mut cube.corners);
-
-        cube
-    }
-
     type Move = AxisMove;
     type Alg = Alg<AxisMove>;
 }
@@ -41,5 +31,17 @@ impl generic::Cube for Cube2 {
 impl generic::Movable<AxisMove> for Cube2 {
     fn apply(&mut self, m: &AxisMove) {
         self.corners.apply(m);
+    }
+}
+
+impl Distribution<Cube2> for Standard {
+    fn sample<R: rand::Rng + ?Sized>(&self, rng: &mut R) -> Cube2 {
+        let mut cube = Cube2::new_solved();
+
+        cube.corners.shuffle(rng);
+
+        fix_corner_multiplicity(&mut cube.corners);
+
+        cube
     }
 }

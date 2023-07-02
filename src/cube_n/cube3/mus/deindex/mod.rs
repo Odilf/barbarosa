@@ -8,7 +8,10 @@ mod test;
 use crate::{
     cube3::Cube3,
     cube_n::{
-        moves::{Amount, AxisRotation, Rotatable},
+        moves::{
+            rotation::{AxisRotation, Rotatable},
+            Amount,
+        },
         space::Axis,
     },
 };

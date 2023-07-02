@@ -9,9 +9,9 @@ pub use self::{
 };
 
 pub mod alg;
+pub mod moves;
 pub mod parse;
 
-mod moves;
 mod pieces;
 mod scramble;
 
@@ -62,22 +62,5 @@ pub trait Cube: Sized + Clone + PartialEq + Eq + std::fmt::Debug {
         Self: 'static,
     {
         self == Self::solved()
-    }
-
-    /// Same as [Cube::random], but allows specifying an RNG
-    fn random_with_rng(rng: &mut impl rand::Rng) -> Self;
-
-    /// Generates a random, solvable cube.
-    ///
-    /// An implementation of this method that generates a cube that is unsolvable
-    /// is considered a mistake.
-    ///
-    /// See also [Cube::random_with_rng] for specifying an RNG
-    fn random() -> Self
-    where
-        Self: 'static,
-    {
-        let mut rng = rand::thread_rng();
-        Self::random_with_rng(&mut rng)
     }
 }

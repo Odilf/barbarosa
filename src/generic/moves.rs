@@ -1,33 +1,13 @@
+//! Generic moves and generic move implementations
+
+use strum::IntoEnumIterator;
+
 use super::Piece;
 
 /// A generic move.
 pub trait Move: Sized + Clone {
     /// The inverse of this move, such that `m * m.inverse() == Self::identity()`
     fn inverse(&self) -> Self;
-
-    /// The iterator type that [Self::iter()] returns
-    type Iter: Iterator<Item = Self>;
-
-    /// Iterator over all possible moves
-    fn iter() -> Self::Iter;
-
-    /// Returns the move that connects `from` to `to`, if it exists
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// use barbarosa::generic::*;
-    /// use barbarosa::cube_n::{moves::AxisMove, Cube3};
-    ///
-    /// let cube = Cube3::solved();
-    /// let mov = AxisMove::parse("B'").unwrap();
-    /// let moved = cube.clone().moved(&mov);
-    ///
-    /// assert_eq!(AxisMove::connect(cube, &moved), Some(mov));
-    /// ```
-    fn connect<T: Movable<Self> + Eq + Clone>(from: &T, to: &T) -> Option<Self> {
-        Self::iter().find(|m| from.clone().moved(&m.clone()) == *to)
-    }
 }
 
 /// Something that can be moved.
@@ -59,4 +39,25 @@ where
             p.apply(m);
         }
     }
+}
+
+/// Returns the move that connects `from` to `to`, if it exists
+///
+/// # Example
+///
+/// ```rust
+/// use barbarosa::generic::*;
+/// use barbarosa::cube_n::{moves::AxisMove, Cube3};
+///
+/// let cube = Cube3::solved();
+/// let mov = AxisMove::parse("B'").unwrap();
+/// let moved = cube.clone().moved(&mov);
+///
+/// assert_eq!(moves::connect::<AxisMove, _>(cube, &moved), Some(mov));
+/// ```
+pub fn connect<M: Move + IntoEnumIterator, T: Movable<M> + Eq + Clone>(
+    from: &T,
+    to: &T,
+) -> Option<M> {
+    M::iter().find(|m| from.clone().moved(&m.clone()) == *to)
 }

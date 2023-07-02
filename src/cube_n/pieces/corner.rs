@@ -1,11 +1,17 @@
-//! 
+//!
 
 use nalgebra::{vector, Vector3};
 
 use crate::{
-    cube_n::space::{Axis, Direction, Face},
+    cube_n::{
+        moves::rotation::{AxisRotation, Rotatable},
+        space::{Axis, Direction, Face},
+        AxisMove,
+    },
     generic,
 };
+
+// use super::ContainedInMove;
 
 /// A corner piece of the cube.
 #[derive(PartialEq, Eq, Clone, Hash)]
@@ -18,13 +24,37 @@ pub struct Corner {
     pub orientation_axis: Axis,
 }
 
-impl generic::Piece for Corner {
-    fn coordinates(&self) -> Vector3<f32> {
-        self.position.map(|dir| dir.scalar() as f32)
+impl generic::Piece for Corner {}
+
+impl generic::Movable<AxisMove> for Corner {
+    fn apply(&mut self, m: &AxisMove) {
+        if m.face.contains_vector(&self.position) {
+            let rotation = AxisRotation::from(m);
+            self.rotate(&rotation);
+        }
     }
 }
 
+// impl ContainedInMove<AxisMove> for Vector3<Direction> {
+//     fn is_contained_in(&self, mov: &AxisMove) -> bool {
+//         self[mov.face.axis] == mov.face.direction
+//     }
+// }
+
+// impl ContainedInMove<AxisMove> for Corner {
+//     fn is_contained_in(&self, mov: &AxisMove) -> bool {
+//         self.position.is_contained_in(mov.face)
+//     }
+// }
+
 impl Corner {
+    pub const fn new(position: Vector3<Direction>, orientation_axis: Axis) -> Self {
+        Self {
+            position,
+            orientation_axis,
+        }
+    }
+
     /// Creates a new [Corner] with the given position and correct orientation.
     pub const fn oriented(position: Vector3<Direction>) -> Self {
         Self {
@@ -81,6 +111,10 @@ impl Corner {
         } else {
             self.orientation_axis.prev()
         };
+    }
+
+    pub fn coordinates(&self) -> Vector3<f32> {
+        self.position.map(|dir| dir.scalar() as f32)
     }
 }
 

@@ -4,7 +4,10 @@
 
 use crate::{
     cube3::{Axis, Cube3},
-    cube_n::moves::{Amount, AxisRotation, Rotatable},
+    cube_n::moves::{
+        rotation::{AxisRotation, Rotatable},
+        Amount,
+    },
 };
 
 use super::HalfEdges;

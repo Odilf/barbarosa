@@ -1,6 +1,6 @@
 #![cfg(test)]
 
-use rand::{rngs::StdRng, SeedableRng};
+use rand::{rngs::StdRng, Rng, SeedableRng};
 
 use super::*;
 
@@ -57,7 +57,7 @@ fn index_deindex_corners() {
 
 #[test]
 fn random_indexes_deindexes() {
-    let original = Cube3::random_with_rng(&mut StdRng::seed_from_u64(69420));
+    let original = StdRng::seed_from_u64(69420).gen::<Cube3>();
     let deindexed = Cube3::from_indices(original.indices());
 
     dbg!(&original.corners, &deindexed.corners);

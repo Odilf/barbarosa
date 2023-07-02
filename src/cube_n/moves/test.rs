@@ -11,7 +11,10 @@ use crate::{
     generic::{alg::Alg, Cube, Movable, Parsable},
 };
 
-use super::*;
+use super::{
+    rotation::{AxisRotation, Rotatable},
+    *,
+};
 
 fn assert_rotations<T: Rotatable + Eq + Debug>(initial: T, expectations: &[(AxisRotation, T)]) {
     for (rotation, expected_face) in expectations {
@@ -127,7 +130,6 @@ fn six_sexy_moves_solves_cube() {
 
     for _ in 0..6 {
         cube.apply(&perms::SEXY_MOVE);
-        // cube.apply(&Alg::<AxisMove>::parse("R U R' U' R' F R2 U' R' U' R U R' F'").unwrap());
     }
 
     assert_eq!(cube, *Cube3::solved());

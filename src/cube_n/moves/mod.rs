@@ -2,33 +2,38 @@
 
 use std::mem::{self, MaybeUninit};
 
-use crate::generic::{self, parse, Parsable};
-
-mod amount;
-mod rotation;
-mod test;
-
-pub mod perms;
-
-pub use amount::Amount;
-use rand_derive2::RandGen;
-pub use rotation::{AxisRotation, Rotatable};
-
 use itertools::iproduct;
+use rand_derive2::RandGen;
 use strum::IntoEnumIterator;
 
-use super::{
-    space::{Axis, Direction, Face},
-    Corner, Edge,
-};
+use super::space::{Axis, Direction, Face};
+use crate::generic::{self, parse, Parsable};
+
+pub mod perms;
+pub mod rotation;
+
+mod amount;
+mod test;
+mod wide;
+
+pub use amount::Amount;
+pub use wide::WideAxisMove;
 
 /// A move on the 3x3x3 cube
+///
+/// todo!()
 #[derive(Debug, PartialEq, Eq, Clone, RandGen)]
 pub struct AxisMove {
     /// The face that is being rotated
     pub face: Face,
     /// The amount of rotation
     pub amount: Amount,
+}
+
+impl AxisMove {
+    pub fn new(face: Face, amount: Amount) -> Self {
+        Self { face, amount }
+    }
 }
 
 impl generic::Move for AxisMove {
@@ -38,20 +43,9 @@ impl generic::Move for AxisMove {
             amount: self.amount * Direction::Negative,
         }
     }
-
-    type Iter = std::array::IntoIter<AxisMove, 18>;
-
-    fn iter() -> Self::Iter {
-        Self::all().into_iter()
-    }
 }
 
 impl AxisMove {
-    /// Creates a new [AxisMove]
-    pub fn new(face: Face, amount: Amount) -> Self {
-        Self { face, amount }
-    }
-
     const DISTINCT_MOVES: usize = 3 * 2 * 3;
 
     /// Returns an array of all moves
@@ -72,35 +66,10 @@ impl AxisMove {
             )
         }
     }
-}
 
-impl generic::Movable<AxisMove> for Edge {
-    fn apply(&mut self, mov: &AxisMove) {
-        if !mov.face.contains_edge(self) {
-            return;
-        }
-
-        let rotation = AxisRotation {
-            axis: mov.face.axis,
-            amount: mov.amount * mov.face.direction,
-        };
-
-        self.rotate(&rotation);
-    }
-}
-
-impl generic::Movable<AxisMove> for Corner {
-    fn apply(&mut self, mov: &AxisMove) {
-        if !mov.face.contains_corner(self) {
-            return;
-        }
-
-        let rotation = AxisRotation {
-            axis: mov.face.axis,
-            amount: mov.amount * mov.face.direction,
-        };
-
-        self.rotate(&rotation);
+    /// Returns the wide version of this move at the specified depth
+    pub fn widen<const N: u32>(self, depth: u32) -> Option<WideAxisMove<N>> {
+        WideAxisMove::new(self.face, self.amount, depth)
     }
 }
 
@@ -117,12 +86,20 @@ impl Parsable for AxisMove {
         let face = Face::parse(face)?;
         let amount = Amount::parse(amount)?;
 
-        Ok(AxisMove { face, amount })
+        Ok(AxisMove::new(face, amount))
     }
 }
 
 impl std::fmt::Display for AxisMove {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}{}", self.face, self.amount)
+    }
+}
+
+impl IntoEnumIterator for AxisMove {
+    type Iterator = core::array::IntoIter<Self, { Self::DISTINCT_MOVES }>;
+
+    fn iter() -> Self::Iterator {
+        Self::all().into_iter()
     }
 }

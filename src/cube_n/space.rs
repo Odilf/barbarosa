@@ -11,7 +11,7 @@ use strum::EnumIter;
 
 use crate::generic::parse;
 
-use super::{Corner, Edge};
+use super::Edge;
 
 /// The three axes in space.
 ///
@@ -217,23 +217,6 @@ impl Face {
     /// The back face
     pub const B: Face = Face::new(Axis::Z, Direction::Negative);
 
-    /// Whether the face contains the given corner
-    pub fn contains_corner(&self, corner: &Corner) -> bool {
-        corner.position[self.axis] == self.direction
-    }
-
-    /// Whether the face contains the given edge
-    pub fn contains_edge(&self, edge: &Edge) -> bool {
-        let offset = edge.normal_axis.offset(&self.axis);
-
-        match offset {
-            0 => false,
-            1 => edge.slice_position[0] == self.direction,
-            2 => edge.slice_position[1] == self.direction,
-            _ => unreachable!("Offset should be in the range 0..3"),
-        }
-    }
-
     /// Gets the opposite face
     pub fn opposite(&self) -> Face {
         Face {
@@ -313,6 +296,21 @@ impl Face {
             'F' => Ok(Face::F),
             'B' => Ok(Face::B),
             other => Err(parse::Error::InvalidChar(other)),
+        }
+    }
+
+    pub fn contains_vector(&self, vec: &Vector3<Direction>) -> bool {
+        vec[self.axis] == self.direction
+    }
+
+    pub fn contains_edge(&self, edge: &Edge) -> bool {
+        let offset = edge.normal_axis.offset(&self.axis);
+
+        match offset {
+            0 => false,
+            1 => edge.slice_position[0] == self.direction,
+            2 => edge.slice_position[1] == self.direction,
+            _ => unreachable!("Offset should be in the range 0..3"),
         }
     }
 }
