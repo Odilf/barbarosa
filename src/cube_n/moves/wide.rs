@@ -46,3 +46,15 @@ impl<const N: u32> WideAxisMove<N> {
         self.depth
     }
 }
+
+impl<const N: u32> std::fmt::Display for WideAxisMove<N> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let wide = match self.depth {
+            0 => "".to_string(),
+            1 => "w".to_string(),
+            _ => format!("w{}", self.depth()),
+        };
+
+        write!(f, "{}{}", self.axis_move, wide)
+    }
+}
