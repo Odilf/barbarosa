@@ -183,7 +183,6 @@ fn two_wide_ts() {
         cube.apply(m);
 
         match i {
-            // 12 => expect_wing(&cube, ([R, U], Positive), ([R, U], Negative)),
             12 => expect_wing(&cube, ([R, F], Negative), ([R, U], Negative)),
             13 => expect_wing(&cube, ([U, F], Positive), ([R, U], Negative)),
             _ => (),

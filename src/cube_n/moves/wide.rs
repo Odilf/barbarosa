@@ -53,7 +53,7 @@ impl<const N: u32> WideAxisMove<N> {
 #[derive(Debug, Error)]
 pub enum WideMoveCreationError {
     #[error("Exceded maximum depth (given: {0}, max: {1})")]
-    ExcededDepth(u32, u32)
+    ExcededDepth(u32, u32),
 }
 
 impl<const N: u32> std::fmt::Display for WideAxisMove<N> {
