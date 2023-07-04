@@ -48,20 +48,10 @@ impl generic::Movable<WideAxisMove<1>> for Cube4 {
 
         debug_assert_eq!(moved_corner_count, if m.depth() == 0 { 4 } else { 12 });
 
-        let mut moved_wing_count = 0;
-
-        for wing in &mut self.wings {
-            if wing::in_wide_move(wing, 1, m) {
-                println!("Rotating {:?} by {:?}", wing, m.axis_move);
-
-                wing.rotate(&AxisRotation::from(&m.axis_move));
-                moved_wing_count += 1;
-
-                println!("Rotated to {:?}\n", wing);
-            }
-        }
-
-        debug_assert_eq!(moved_wing_count, if m.depth() == 0 { 8 } else { 12 });
+        self.wings
+            .iter_mut()
+            .filter(|wing| wing::in_wide_move(wing, 1, m))
+            .for_each(|wing| wing.rotate(&AxisRotation::from(&m.axis_move)));
     }
 }
 

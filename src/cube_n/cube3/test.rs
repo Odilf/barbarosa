@@ -3,9 +3,12 @@
 use std::collections::HashSet;
 
 use itertools::iproduct;
-use nalgebra::{Vector3, vector};
+use nalgebra::{vector, Vector3};
 
-use crate::{generic::{Cube, Movable, Parsable}, cube_n::space::Direction};
+use crate::{
+    cube_n::space::Direction,
+    generic::{Cube, Movable, Parsable},
+};
 
 use super::*;
 
@@ -54,14 +57,21 @@ fn random_cube() {
 #[test]
 fn test_f() {
     let mut cube = Cube3::new_solved();
-    
+
     let target = Edge::oriented(Axis::Y, vector![Direction::Positive, Direction::Positive]);
-    let target_index = cube.edges.iter().position(|current| current == &target).unwrap();
+    let target_index = cube
+        .edges
+        .iter()
+        .position(|current| current == &target)
+        .unwrap();
 
     cube.apply(&AxisMove::parse("F").unwrap());
 
     let rotated = &cube.edges[target_index];
 
     assert_eq!(rotated.normal_axis, Axis::X);
-    assert_eq!(rotated.slice_position, vector![Direction::Negative, Direction::Positive]);
+    assert_eq!(
+        rotated.slice_position,
+        vector![Direction::Negative, Direction::Positive]
+    );
 }
