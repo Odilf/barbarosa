@@ -1,6 +1,5 @@
 #![cfg(test)]
 
-use pathfinding::prelude::directions::NE;
 use pretty_assertions::assert_eq;
 use rand::{rngs::StdRng, SeedableRng};
 
@@ -28,7 +27,7 @@ fn expect_wing(cube: &Cube4, position: ([Face; 2], Direction), expected: ([Face;
 
     assert_eq!(
         found, &expected,
-        "\nExpected {:#?} \n  at     {:#?}, \n  found  {:#?}. \nExpected is actually at {:#?}",
+        "Expected {:#?} at {:#?}, found {:#?}. Expected is actually at {:#?}",
         expected, position, found, position_of_expected
     );
 }
