@@ -10,6 +10,10 @@ pub trait Move: Sized + Clone {
     fn inverse(&self) -> Self;
 }
 
+pub trait IntoMove {
+    type Move: Move;
+}
+
 /// Something that can be moved.
 ///
 /// A single type can be moved by multiple different types of moves. For example, a 4x4 can be moved
@@ -39,6 +43,10 @@ where
             p.apply(m);
         }
     }
+}
+
+impl<M: Move> IntoMove for M {
+    type Move = Self;
 }
 
 /// Returns the move that connects `from` to `to`, if it exists

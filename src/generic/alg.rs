@@ -8,7 +8,7 @@ use rand::{distributions::Standard, prelude::Distribution, Rng};
 use strum::IntoEnumIterator;
 use thiserror::Error;
 
-use super::{parse, Movable, Move, Parsable};
+use super::{moves::IntoMove, parse, Movable, Move, Parsable};
 use crate::generic;
 
 /// An alg. A sequence of moves.
@@ -17,13 +17,13 @@ use crate::generic;
 /// However, that's the name it's used in the cubing community so I'm using it here.
 #[allow(missing_docs)]
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Alg<M: Move> {
-    pub moves: Vec<M>,
+pub struct Alg<T: IntoMove> {
+    pub moves: Vec<T::Move>,
 }
 
-impl<M: Move> Alg<M> {
+impl<T: IntoMove> Alg<T> {
     /// Creates a new alg from a vector of moves
-    pub fn new(moves: Vec<M>) -> Self {
+    pub fn new(moves: Vec<T::Move>) -> Self {
         Self { moves }
     }
 
@@ -33,18 +33,21 @@ impl<M: Move> Alg<M> {
     }
 }
 
-impl<M: Move + Parsable> Parsable for Alg<M> {
+impl<T: IntoMove> Parsable for Alg<T>
+where
+    T::Move: Parsable,
+{
     fn parse(s: &str) -> parse::Result<Self> {
-        let moves: parse::Result<Vec<_>> = s.split_whitespace().map(M::parse).collect();
+        let moves: parse::Result<Vec<_>> = s.split_whitespace().map(T::Move::parse).collect();
         Ok(Self::new(moves?))
     }
 }
 
 // Alg::random()
-impl<M> Alg<M>
+impl<T> Alg<T>
 where
-    M: Move,
-    Standard: Distribution<M>,
+    T: IntoMove,
+    Standard: Distribution<T::Move>,
 {
     /// Creates a random algorithm of the given length
     pub fn random(length: usize) -> Self {
@@ -57,20 +60,15 @@ where
     }
 }
 
-impl<M: Move + Debug + IntoEnumIterator, T: Movable<M> + Eq + Clone> TryFrom<Vec<T>> for Alg<M> {
-    type Error = TryFromStatesError<M, T>;
-
-    fn try_from(value: Vec<T>) -> Result<Self, Self::Error> {
-        Self::try_from_states(value)
-    }
-}
-
-impl<M: Move + Debug + IntoEnumIterator> Alg<M> {
+impl<T: IntoMove> Alg<T>
+where
+    T::Move: Debug + IntoEnumIterator,
+{
     /// Simple implementation to understand where the trait bounds fail, if that happens.
     /// Otherwise you can just use `TryFrom<Vec<T>>` directly.
-    pub fn try_from_states<T: Movable<M> + Eq + Clone>(
-        states: Vec<T>,
-    ) -> Result<Self, TryFromStatesError<M, T>> {
+    pub fn try_from_states<C: Movable<T::Move> + Eq + Clone>(
+        states: Vec<C>,
+    ) -> Result<Self, TryFromStatesError<T::Move, C>> {
         let alg = states
             .windows(2)
             .map(|window| {
@@ -82,9 +80,18 @@ impl<M: Move + Debug + IntoEnumIterator> Alg<M> {
                     TryFromStatesError::NotConnected(from.to_owned(), to.to_owned(), PhantomData)
                 })
             })
-            .collect::<Result<Vec<M>, _>>()?;
+            .collect::<Result<Vec<T::Move>, _>>()?;
 
         Ok(Self::new(alg))
+    }
+}
+
+// TODO: Change this implementation
+impl<M: Move + Debug + IntoEnumIterator, T: Movable<M> + Eq + Clone> TryFrom<Vec<T>> for Alg<M> {
+    type Error = TryFromStatesError<M, T>;
+
+    fn try_from(value: Vec<T>) -> Result<Self, Self::Error> {
+        Self::try_from_states(value)
     }
 }
 
@@ -96,7 +103,11 @@ pub enum TryFromStatesError<M: Move, T: Movable<M> + Eq + Clone> {
     NotConnected(T, T, PhantomData<M>),
 }
 
-impl<M: Move + Parsable> TryFrom<&str> for Alg<M> {
+// Parsing using `TryFrom`
+impl<T: IntoMove> TryFrom<&str> for Alg<T>
+where
+    T::Move: Parsable,
+{
     type Error = parse::Error;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
@@ -104,19 +115,18 @@ impl<M: Move + Parsable> TryFrom<&str> for Alg<M> {
     }
 }
 
-impl<M: Move + std::fmt::Display> std::fmt::Display for Alg<M> {
+// Display
+impl<T: IntoMove> std::fmt::Display for Alg<T>
+where
+    T::Move: std::fmt::Display,
+{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.moves.iter().map(|m| m.to_string()).join(" "))
     }
 }
 
-// impl<M: Move> From<M> for Alg<M> {
-//     fn from(value: M) -> Self {
-//         Self::new(vec![value])
-//     }
-// }
-
-impl<M: Move, T: Movable<M>> Movable<[M]> for T {
+// Make movable types able to be moved by slices of moves
+impl<M: Move, C: Movable<M>> Movable<[M]> for C {
     fn apply(&mut self, m: &[M]) {
         for m in m {
             self.apply(m);
@@ -124,14 +134,14 @@ impl<M: Move, T: Movable<M>> Movable<[M]> for T {
     }
 }
 
-impl<M: Move, T: Movable<M>> Movable<Alg<M>> for T {
-    fn apply(&mut self, m: &Alg<M>) {
-        <T as Movable<[M]>>::apply(self, &m.moves);
+impl<T: IntoMove, C: Movable<[T::Move]>> Movable<Alg<T>> for C {
+    fn apply(&mut self, m: &Alg<T>) {
+        self.apply(&m.moves);
     }
 }
 
-impl<M: generic::Move> FromIterator<M> for Alg<M> {
-    fn from_iter<T: IntoIterator<Item = M>>(iter: T) -> Self {
+impl<T: IntoMove> FromIterator<T::Move> for Alg<T> {
+    fn from_iter<I: IntoIterator<Item = T::Move>>(iter: I) -> Self {
         // TODO: Revise if this is how you properly do collecting
         let moves: Vec<_> = iter.into_iter().collect();
         Self::new(moves)

@@ -11,7 +11,7 @@ use rand::{distributions::Standard, prelude::Distribution, seq::SliceRandom};
 
 use crate::{
     cube_n::{pieces, space::Axis},
-    generic::{self, Alg, Cube},
+    generic::{self, moves::IntoMove, Cube},
 };
 
 use super::invariants::{fix_corner_multiplicity, fix_edge_flip_parity, fix_swap_parity};
@@ -47,9 +47,10 @@ impl generic::Cube for Cube3 {
     fn solved() -> &'static Self {
         &SOLVED_CUBE
     }
+}
 
+impl IntoMove for Cube3 {
     type Move = AxisMove;
-    type Alg = Alg<AxisMove>;
 }
 
 impl generic::Movable<AxisMove> for Cube3 {

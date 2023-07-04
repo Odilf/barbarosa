@@ -1,5 +1,6 @@
 //! Generic cube traits and implementations
 
+use self::moves::IntoMove;
 pub use self::{
     alg::Alg,
     moves::{Movable, Move},
@@ -33,20 +34,11 @@ mod scramble;
 ///
 /// Also the cubing community has plenty of other dubious names, like "algorithm" (as in a sequence
 /// of moves) and "permutations" (as in T perm). So I'm just going to call it a cube. suck it
-pub trait Cube: Sized + Clone + PartialEq + Eq + std::fmt::Debug {
+pub trait Cube: Sized + Clone + PartialEq + Eq + std::fmt::Debug + IntoMove {
     /// Returns a static reference to a solved cube.
     ///
     /// It's nice when implementing this to make the reference `const`, if possible.
     fn solved() -> &'static Self;
-
-    /// The main type of move used by this cube, mainly used for convinience.
-    type Move: Move;
-
-    /// The type of algorithm used by this cube, almost always `Alg<Self::Move>`
-    ///
-    /// The only reason this is not default implemented as `Alg<Self::Move>` is because [associated type defaults
-    /// are still unstable](https://github.com/rust-lang/rust/issues/29661)
-    type Alg;
 
     /// Creates a new solved cube
     fn new_solved() -> Self

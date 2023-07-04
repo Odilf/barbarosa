@@ -20,9 +20,7 @@ use super::{edge::EdgeFromFacesError, Edge};
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Wing {
-    // TODO: This is very bodgy lol
-    // TODO: Also make this private
-    pub corresponding_edge: Edge,
+    corresponding_edge: Edge,
 }
 
 impl generic::Piece for Wing {}
@@ -34,8 +32,6 @@ impl Rotatable for Wing {
         if rotation.axis == self.normal_axis() && rotation.amount != Amount::Double {
             self.corresponding_edge.oriented = !self.corresponding_edge.oriented;
         }
-
-        // println!("Rotated to {:#?}\n", self.corresponding_edge);
     }
 }
 

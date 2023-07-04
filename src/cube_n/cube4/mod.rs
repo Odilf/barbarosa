@@ -4,7 +4,7 @@ mod test;
 
 use nalgebra::Vector2;
 
-use crate::generic::{self, Alg, Cube};
+use crate::generic::{self, moves::IntoMove, Cube};
 
 use super::{
     moves::rotation::{AxisRotation, Rotatable},
@@ -42,10 +42,10 @@ impl generic::Cube for Cube4 {
 
         corners_solved && wings_solved && centers_solved
     }
+}
 
+impl IntoMove for Cube4 {
     type Move = WideAxisMove<1>;
-
-    type Alg = Alg<Self::Move>;
 }
 
 impl generic::Movable<WideAxisMove<1>> for Cube4 {

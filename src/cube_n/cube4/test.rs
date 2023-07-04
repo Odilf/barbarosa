@@ -8,7 +8,7 @@ use crate::{
         moves::{perms, Amount},
         space::{faces::*, Direction::*, Face},
     },
-    generic::{Cube, Movable, Parsable},
+    generic::{Alg, Cube, Movable},
 };
 
 use super::*;
@@ -169,7 +169,7 @@ fn six_wide_sexies() {
 #[test]
 fn two_wide_ts() {
     let mut cube = Cube4::new_solved();
-    let wide_t: <Cube4 as Cube>::Alg = perms::T
+    let wide_t: Alg<Cube4> = perms::T
         .clone()
         .moves
         .into_iter()
@@ -198,7 +198,7 @@ fn two_wide_ts() {
 #[test]
 fn two_wide_js() {
     let mut cube = Cube4::new_solved();
-    let wide_j: <Cube4 as Cube>::Alg = perms::J
+    let wide_j: Alg<Cube4> = perms::J
         .clone()
         .moves
         .into_iter()
@@ -235,14 +235,14 @@ fn two_wide_js() {
 #[test]
 fn random_amount_of_wide_u_perms() {
     let mut cube = Cube4::new_solved();
-    let wide_u: <Cube4 as Cube>::Alg = perms::U
+    let wide_u: Alg<Cube4> = perms::U
         .clone()
         .moves
         .into_iter()
         .map(|mov| mov.widen(1).unwrap())
         .collect();
 
-    for _ in 0..3 {
+    for _ in 0..5 {
         cube.apply(&wide_u);
     }
 
