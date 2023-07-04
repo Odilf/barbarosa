@@ -1,4 +1,5 @@
 use rand::prelude::Distribution;
+use thiserror::Error;
 
 use crate::cube_n::space::Face;
 pub use crate::generic::{
@@ -25,9 +26,9 @@ impl<const N: u32> generic::Move for WideAxisMove<N> {
 }
 
 impl<const N: u32> WideAxisMove<N> {
-    pub fn new(face: Face, amount: Amount, depth: u32) -> Result<Self, ()> {
+    pub fn new(face: Face, amount: Amount, depth: u32) -> Result<Self, WideMoveCreationError> {
         if depth > N {
-            return Err(());
+            return Err(WideMoveCreationError::ExcededDepth(depth, N));
         }
 
         Ok(Self {
@@ -47,6 +48,12 @@ impl<const N: u32> WideAxisMove<N> {
     pub fn depth(&self) -> u32 {
         self.depth
     }
+}
+
+#[derive(Debug, Error)]
+pub enum WideMoveCreationError {
+    #[error("Exceded maximum depth (given: {0}, max: {1})")]
+    ExcededDepth(u32, u32)
 }
 
 impl<const N: u32> std::fmt::Display for WideAxisMove<N> {

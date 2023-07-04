@@ -29,16 +29,6 @@ impl generic::Piece for Wing {}
 
 impl Rotatable for Wing {
     fn rotate(&mut self, rotation: &AxisRotation) {
-        // println!("Rotating {:#?}", self.corresponding_edge);
-
-        // if rotation.axis == Axis::Z {
-        //     let mut rotation = rotation.clone();
-        //     rotation.amount = rotation.amount * Direction::Negative;
-
-        //     self.corresponding_edge.rotate(&rotation);
-        // } else {
-        //     self.corresponding_edge.rotate(rotation);
-        // }
         self.corresponding_edge.rotate(rotation);
 
         if rotation.axis == self.normal_axis() && rotation.amount != Amount::Double {

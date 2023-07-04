@@ -6,6 +6,8 @@ use itertools::iproduct;
 use rand_derive2::RandGen;
 use strum::IntoEnumIterator;
 
+use self::wide::WideMoveCreationError;
+
 use super::space::{Axis, Direction, Face};
 use crate::generic::{self, parse, Parsable};
 
@@ -68,7 +70,7 @@ impl AxisMove {
     }
 
     /// Returns the wide version of this move at the specified depth
-    pub fn widen<const N: u32>(self, depth: u32) -> Result<WideAxisMove<N>, ()> {
+    pub fn widen<const N: u32>(self, depth: u32) -> Result<WideAxisMove<N>, WideMoveCreationError> {
         WideAxisMove::new(self.face, self.amount, depth)
     }
 }
