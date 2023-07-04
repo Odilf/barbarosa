@@ -125,6 +125,14 @@ fn errors_completely_when_parsing_invalid_move_in_alg() {
 }
 
 #[test]
+fn prints_moves() {
+    // Why is this necessary? (says it's ambigous otherwise)
+    let mov = WideAxisMove::<3>::new(Face::R, Amount::Double, 2).unwrap();
+
+    assert_eq!(mov.to_string(), "3Rw2");
+}
+
+#[test]
 fn six_sexy_moves_solves_cube() {
     let mut cube = Cube3::new_solved();
 

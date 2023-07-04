@@ -2,7 +2,7 @@
 
 mod test;
 
-use crate::generic::{self, Alg};
+use crate::generic::{self, Alg, Cube};
 
 use super::{
     moves::rotation::{AxisRotation, Rotatable},
@@ -34,16 +34,39 @@ impl generic::Movable<WideAxisMove<1>> for Cube4 {
     fn apply(&mut self, m: &WideAxisMove<1>) {
         self.corners.apply(&m.axis_move);
 
-        for wing in &mut self.wings {
-            if wing::in_wide_move(wing, 1, &m) {
-                wing.rotate(&AxisRotation::from(&m.axis_move));
-            }
-        }
+        let mut moved_corner_count = 0;
 
         for center in &mut self.centers {
             if center::corner_in_wide_move(center, 1, m) {
+                moved_corner_count += 1;
                 center.rotate(&AxisRotation::from(&m.axis_move));
             }
+        }
+
+        debug_assert_eq!(moved_corner_count, if m.depth() == 0 { 4 } else { 12 });
+
+        let mut moved_wing_count = 0;
+
+        for wing in &mut self.wings {
+            if wing::in_wide_move(wing, 1, m) {
+                wing.rotate(&AxisRotation::from(&m.axis_move));
+                moved_wing_count += 1;
+            }
+        }
+
+        debug_assert_eq!(moved_wing_count, if m.depth() == 0 { 8 } else { 12 });
+    }
+}
+
+impl Cube4 {
+    /// Assert that the 4x4 cube is in a consistent state. Right now it only checks that it contains all wings
+    pub fn assert_consistent(&self) {
+        for solved_wing in &Cube4::solved().wings {
+            assert!(
+                self.wings.contains(solved_wing),
+                "{:#?} is missing",
+                solved_wing
+            )
         }
     }
 }

@@ -26,6 +26,13 @@ pub struct Corner {
 
 impl generic::Piece for Corner {}
 
+impl Rotatable for Corner {
+    fn rotate(&mut self, rotation: &AxisRotation) {
+        self.position.rotate(rotation);
+        self.orientation_axis.rotate(rotation);
+    }
+}
+
 impl generic::Movable<AxisMove> for Corner {
     fn apply(&mut self, m: &AxisMove) {
         if m.face.contains_vector(&self.position) {

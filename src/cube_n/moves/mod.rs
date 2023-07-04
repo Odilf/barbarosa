@@ -68,7 +68,7 @@ impl AxisMove {
     }
 
     /// Returns the wide version of this move at the specified depth
-    pub fn widen<const N: u32>(self, depth: u32) -> Option<WideAxisMove<N>> {
+    pub fn widen<const N: u32>(self, depth: u32) -> Result<WideAxisMove<N>, ()> {
         WideAxisMove::new(self.face, self.amount, depth)
     }
 }

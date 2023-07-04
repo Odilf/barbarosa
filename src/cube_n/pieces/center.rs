@@ -19,22 +19,24 @@ impl<T: Rotatable> Rotatable for Center<T> {
 
 pub(crate) fn corner_in_wide_move<const N: u32>(
     center: &Center<Corner>,
-    depth: u32,
+    piece_depth: u32,
     m: &WideAxisMove<N>,
 ) -> bool {
     let corner = &center.0;
 
-    // todo!();
-
+    // TODO: This might be wrong
     // If on the same direction
     if corner.position[m.face().axis] == m.face().direction {
-        // If on the right depth
-        if depth <= m.depth() {
+        if corner.orientation_axis == m.face().axis {
+            return true;
+        }
+
+        if piece_depth <= m.depth() {
             return true;
         }
     }
 
-    return false;
+    false
 }
 
 pub const SOLVED_CORNERS: [Center<Corner>; 24] = {

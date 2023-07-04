@@ -5,7 +5,10 @@ use thiserror::Error;
 
 use crate::{
     cube_n::{
-        moves::rotation::{AxisRotation, Rotatable},
+        moves::{
+            rotation::{rotate_vec2, AxisRotation, Rotatable},
+            Amount,
+        },
         space::{Axis, Direction, Face},
         AxisMove,
     },
@@ -20,38 +23,60 @@ pub struct Edge {
     /// The axis of the normal of the face the edge is on (i.e. the axis where the coordinate is 0)
     pub normal_axis: Axis,
 
-    /// The position of the edge on the slice
+    /// The position of the edge on the slice. It uses as basis the positive diriection of the other two axes from the normal,
+    /// in contiguous order (e.g.: if normal is Y, then basis is Z, X).
     pub slice_position: Vector2<Direction>,
 
     /// Whether the edge is oriented or not.
     ///
-    /// See [Edge::oriented()] for more information.
+    /// An edge need to be oriented to be solved.
+    ///
+    /// The orientation of the edges only changes when doing a non double move on the X axis. In other words: R, R', L, L'.
+    ///
+    /// The geometric interpretation is a bit more involved:
+    ///
+    /// Each edge has two stickers. One of this stickers is the "orientation sticker". For edges on the B and F faces it's the sticker on
+    /// the B and F face, for the other ones it's the sticker on the R or L face (whichever is applicable). Then, an edge is oriented if
+    /// it has the orientation sticker in the place where the original piece would have it's orientation sticker.
+    ///
+    /// Even though this definition seems convoluted, it is very useful for two reasons:
+    /// 1. The sum of the orientations of the edges in a cube has to always be even.
+    /// 2. It is very easy and cheap to implement.
     pub oriented: bool,
 }
 
 impl generic::Piece for Edge {}
 
+impl Rotatable for Edge {
+    fn rotate(&mut self, rotation: &AxisRotation) {
+        // Orientation changes whenever there's a not double move on the X axis
+        if rotation.axis == Axis::X
+            && rotation.amount != Amount::Double
+            && self.normal_axis != Axis::X
+        {
+            self.oriented = !self.oriented;
+        }
+
+        // Position
+        let faces = self.faces().map(|face| face.rotated(rotation));
+        let Ok((new_normal, new_slice_position)) = Edge::position_from_faces(faces) else {
+			self.slice_position = rotate_vec2(&rotation.amount, self.slice_position);
+			return;
+		};
+
+        self.normal_axis = new_normal;
+        self.slice_position = new_slice_position;
+    }
+}
+
 impl generic::Movable<AxisMove> for Edge {
     fn apply(&mut self, m: &AxisMove) {
-        if m.face.contains_edge(&self) {
+        if m.face.contains_edge(self) {
             let rotation = AxisRotation::from(m);
             self.rotate(&rotation);
         }
     }
 }
-
-// impl ContainedInMove<AxisMove> for Edge {
-//     fn is_contained_in(&self, face: &Face) -> bool {
-//         let offset = self.normal_axis.offset(&face.axis);
-
-//         match offset {
-//             0 => false,
-//             1 => self.slice_position[0] == face.direction,
-//             2 => self.slice_position[1] == face.direction,
-//             _ => unreachable!("Offset should be in the range 0..3"),
-//         }
-//     }
-// }
 
 impl Edge {
     /// Creates a new oriented edge
