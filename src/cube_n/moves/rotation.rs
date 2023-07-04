@@ -7,7 +7,7 @@ use super::{Amount, AxisMove};
 /// A rotation around an axis. This is similar to an [AxisMove](super::AxisMove), but it doesn't
 /// specify the face. Mainly, this is used because L and R' are the same rotation,
 /// the only difference is the pieces selected in the rotation.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AxisRotation {
     /// The axis that is being rotated around
     pub axis: Axis,

@@ -1,17 +1,37 @@
 #![cfg(test)]
 
+use pathfinding::prelude::directions::NE;
 use pretty_assertions::assert_eq;
 use rand::{rngs::StdRng, SeedableRng};
 
 use crate::{
     cube_n::{
         moves::{perms, Amount},
-        space::Face,
+        space::{faces::*, Direction::*, Face},
     },
     generic::{Cube, Movable},
 };
 
 use super::*;
+
+fn expect_wing(cube: &Cube4, position: ([Face; 2], Direction), expected: ([Face; 2], Direction)) {
+    let position = Wing::from_faces(position.0, position.1).unwrap();
+    let expected = Wing::from_faces(expected.0, expected.1).unwrap();
+
+    let found = cube.wing_at(
+        position.normal_axis(),
+        position.slice_position(),
+        position.direction_along_normal(),
+    );
+
+    let position_of_expected = cube.position_of_wing(&expected);
+
+    assert_eq!(
+        found, &expected,
+        "\nExpected {:#?} \n  at     {:#?}, \n  found  {:#?}. \nExpected is actually at {:#?}",
+        expected, position, found, position_of_expected
+    );
+}
 
 #[test]
 fn just_solved() {
@@ -58,9 +78,14 @@ fn four_wide_fs() {
     let mut cube = Cube4::new_solved();
     let mov = WideAxisMove::<1>::new(Face::F, Amount::Single, 1).unwrap();
 
-    for _ in 0..4 {
+    for i in 0..4 {
         cube.apply(&mov);
         cube.assert_consistent();
+
+        match i {
+            0 => expect_wing(&cube, ([R, F], Positive), ([U, F], Negative)),
+            _ => (),
+        }
     }
 
     assert!(cube.is_solved());
@@ -83,7 +108,7 @@ fn four_wide_rs() {
 fn four_of_every_single_move() {
     for m in AxisMove::all() {
         let m_wide = m.clone().widen::<1>(1).unwrap();
-        
+
         let mut cube = Cube4::new_solved();
 
         for _ in 0..4 {
@@ -152,99 +177,23 @@ fn two_wide_ts() {
         .map(|mov| mov.widen(1).unwrap())
         .collect();
 
-    println!("Alg: {wide_t}");
+    println!("Excecuting {}", wide_t);
 
-    cube.apply(&wide_t.moves[0]);
-    cube.apply(&wide_t.moves[1]);
-    cube.apply(&wide_t.moves[2]);
-    cube.apply(&wide_t.moves[3]);
+    for (i, m) in wide_t.moves.iter().enumerate() {
+        println!("Appling move {i} ({m})");
+        cube.apply(m);
 
-    cube.apply(&wide_t.moves[4]);
-
-    assert_eq!(
-        cube.wing_at_faces([Face::L, Face::D], Direction::Positive).unwrap(),
-        &Wing::from_faces([Face::L, Face::D], Direction::Positive).unwrap(),
-    );
-
-    cube.apply(&wide_t.moves[5]);
-
-    println!("{}", &wide_t.moves[5]);
-
-    assert_eq!(
-        cube.wing_at_faces([Face::L, Face::U], Direction::Positive).unwrap(),
-        &Wing::from_faces([Face::L, Face::D], Direction::Positive).unwrap(),
-        "Cube: {:#?}, LD is at {:#?}", cube.wings, cube.position_of_wing(&Wing::from_faces([Face::L, Face::D], Direction::Positive).unwrap()),
-    );
-
-    cube.apply(&wide_t.moves[6]);
-
-    assert_eq!(
-        cube.wing_at_faces([Face::U, Face::F], Direction::Positive).unwrap(),
-        &Wing::from_faces([Face::R, Face::F], Direction::Positive).unwrap(),
-    );
-
-    assert_eq!(
-        cube.wing_at_faces([Face::L, Face::U], Direction::Positive).unwrap(),
-        &Wing::from_faces([Face::L, Face::D], Direction::Positive).unwrap(),
-    );
-
-    cube.apply(&wide_t.moves[7]);
-
-    assert_eq!(
-        cube.wing_at_faces([Face::F, Face::U], Direction::Positive).unwrap(),
-        &Wing::from_faces([Face::L, Face::D], Direction::Positive).unwrap(),
-        "Cube: {:#?}, LD is at {:#?}", cube.wings, cube.position_of_wing(&Wing::from_faces([Face::L, Face::D], Direction::Positive).unwrap()),
-    );
-
-    cube.apply(&wide_t.moves[8]);
-
-    assert_eq!(
-        cube.wing_at_faces([Face::U, Face::F], Direction::Positive).unwrap(),
-        &Wing::from_faces([Face::U, Face::F], Direction::Positive).unwrap(),
-    );
-
-    assert_eq!(
-        cube.wing_at_faces([Face::F, Face::D], Direction::Positive).unwrap(),
-        &Wing::from_faces([Face::L, Face::D], Direction::Positive).unwrap(),
-    );
-
-    cube.apply(&wide_t.moves[9]);
-
-    assert_eq!(
-        cube.wing_at_faces([Face::U, Face::F], Direction::Positive).unwrap(),
-        &Wing::from_faces([Face::R, Face::U], Direction::Negative).unwrap(),
-    );
-
-    assert_eq!(
-        cube.wing_at_faces([Face::F, Face::D], Direction::Positive).unwrap(),
-        &Wing::from_faces([Face::L, Face::D], Direction::Positive).unwrap(),
-    );
-
-    cube.apply(&wide_t.moves[10]);
-
-    assert_eq!(
-        cube.wing_at_faces([Face::U, Face::F], Direction::Positive).unwrap(),
-        &Wing::from_faces([Face::L, Face::D], Direction::Positive).unwrap(),
-    );
-
-    cube.apply(&wide_t.moves[11]);
-    cube.apply(&wide_t.moves[12]);
-    cube.apply(&wide_t.moves[13]);
+        match i {
+            // 12 => expect_wing(&cube, ([R, U], Positive), ([R, U], Negative)),
+            12 => expect_wing(&cube, ([R, F], Negative), ([R, U], Negative)),
+            13 => expect_wing(&cube, ([U, F], Positive), ([R, U], Negative)),
+            _ => (),
+        }
+    }
 
     cube.apply(&wide_t);
 
-    cube.assert_consistent();
-
-    assert_eq!(
-        Cube4::solved().wings,
-        cube.wings,
-        "Solved: {:#?} got: {:#?}",
-        Cube4::solved().wings,
-        cube.wings
-    );
-    assert_eq!(Cube4::solved().corners, cube.corners);
-    assert_eq!(Cube4::solved().centers, cube.centers);
-
+    assert_eq!(cube.wings, Cube4::solved().wings);
     assert!(cube.is_solved());
 }
 
@@ -262,7 +211,7 @@ fn two_wide_js() {
 
     for i in 0..2 {
         println!("Iteration {i}");
-        
+
         for m in &wide_j.moves {
             cube.apply(m);
             cube.assert_consistent();
@@ -271,7 +220,6 @@ fn two_wide_js() {
 
     cube.assert_consistent();
 
-    
     assert_eq!(Cube4::solved().corners, cube.corners);
     assert_eq!(Cube4::solved().centers, cube.centers);
 

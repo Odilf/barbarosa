@@ -1,7 +1,6 @@
 #![cfg(test)]
 
 use nalgebra::vector;
-use pathfinding::prelude::directions::NE;
 
 use crate::cube_n::{
     moves::{

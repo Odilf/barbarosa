@@ -50,18 +50,12 @@ impl generic::Piece for Edge {}
 impl Rotatable for Edge {
     fn rotate(&mut self, rotation: &AxisRotation) {
         if rotation.axis == self.normal_axis {
-            println!("Rotating on slice from {:?}", self.slice_position);
             self.slice_position = rotate_vec2(&rotation.amount, self.slice_position);
-            println!("Rotated on slice to {:?}", self.slice_position);
-
             return;
         }
 
         // Orientation changes whenever there's a not double move on the X axis
-        if rotation.axis == Axis::X
-            && rotation.amount != Amount::Double
-            && self.normal_axis != Axis::X // TODO: Porbably can remove this line altogether
-        {
+        if rotation.axis == Axis::X && rotation.amount != Amount::Double {
             self.oriented = !self.oriented;
         }
 
@@ -71,10 +65,10 @@ impl Rotatable for Edge {
             Ok((new_normal, new_slice_position)) => {
                 self.normal_axis = new_normal;
                 self.slice_position = new_slice_position;
-            },
+            }
 
             Err(_) => unreachable!(),
-		}
+        }
     }
 }
 

@@ -198,6 +198,24 @@ impl Display for Face {
     }
 }
 
+/// Module that re-exports all faces in order to be able to do `use faces::*`.
+pub mod faces {
+    use super::Face;
+
+    /// The right face
+    pub const R: Face = Face::R;
+    /// The left face
+    pub const L: Face = Face::L;
+    /// The "up" face
+    pub const U: Face = Face::U;
+    /// The "down" face
+    pub const D: Face = Face::D;
+    /// The front face
+    pub const F: Face = Face::F;
+    /// The back face
+    pub const B: Face = Face::B;
+}
+
 impl Face {
     /// Creates a new face with the specified axis and direction
     pub const fn new(axis: Axis, direction: Direction) -> Face {
@@ -245,10 +263,10 @@ impl Face {
             },
 
             Axis::Z => match self {
-                Face::R => Face::U,
-                Face::U => Face::L,
-                Face::L => Face::D,
-                Face::D => Face::R,
+                Face::R => Face::D,
+                Face::D => Face::L,
+                Face::L => Face::U,
+                Face::U => Face::R,
                 _ => self,
             },
         }
@@ -274,10 +292,10 @@ impl Face {
             },
 
             Axis::Z => match self {
-                Face::R => Face::D,
-                Face::D => Face::L,
-                Face::L => Face::U,
-                Face::U => Face::R,
+                Face::R => Face::U,
+                Face::U => Face::L,
+                Face::L => Face::D,
+                Face::D => Face::R,
                 _ => self,
             },
         }

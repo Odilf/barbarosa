@@ -2,9 +2,10 @@
 
 use std::collections::HashSet;
 
-use nalgebra::Vector3;
+use itertools::iproduct;
+use nalgebra::{Vector3, vector};
 
-use crate::generic::Cube;
+use crate::{generic::{Cube, Movable, Parsable}, cube_n::space::Direction};
 
 use super::*;
 
@@ -32,19 +33,15 @@ fn solved_cube_has_pieces_in_all_coordinates() {
     );
 
     // Should have a piece at every position with zero or one non-zero coordinates
-    for x in -1..=1 {
-        for y in -1..=1 {
-            for z in -1..=1 {
-                if [x, y, z].iter().filter(|&coord| *coord == 0).count() < 2 {
-                    assert!(
-                        positions.contains(&Vector3::new(x, y, z)),
-                        "Expected position ({}, {}, {}) to be visited",
-                        x,
-                        y,
-                        z
-                    );
-                }
-            }
+    for (x, y, z) in iproduct!(-1..=1, -1..=1, -1..=1) {
+        if [x, y, z].iter().filter(|&coord| *coord == 0).count() < 2 {
+            assert!(
+                positions.contains(&Vector3::new(x, y, z)),
+                "Expected position ({}, {}, {}) to be visited",
+                x,
+                y,
+                z
+            );
         }
     }
 }
@@ -52,4 +49,19 @@ fn solved_cube_has_pieces_in_all_coordinates() {
 #[test]
 fn random_cube() {
     let _random: Cube3 = rand::random();
+}
+
+#[test]
+fn test_f() {
+    let mut cube = Cube3::new_solved();
+    
+    let target = Edge::oriented(Axis::Y, vector![Direction::Positive, Direction::Positive]);
+    let target_index = cube.edges.iter().position(|current| current == &target).unwrap();
+
+    cube.apply(&AxisMove::parse("F").unwrap());
+
+    let rotated = &cube.edges[target_index];
+
+    assert_eq!(rotated.normal_axis, Axis::X);
+    assert_eq!(rotated.slice_position, vector![Direction::Negative, Direction::Positive]);
 }

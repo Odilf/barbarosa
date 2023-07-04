@@ -16,7 +16,7 @@ use crate::{
     generic,
 };
 
-use super::{Edge, edge::EdgeFromFacesError};
+use super::{edge::EdgeFromFacesError, Edge};
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Wing {
@@ -29,15 +29,23 @@ impl generic::Piece for Wing {}
 
 impl Rotatable for Wing {
     fn rotate(&mut self, rotation: &AxisRotation) {
-        println!("Rotating {:#?}", self.corresponding_edge);
+        // println!("Rotating {:#?}", self.corresponding_edge);
 
+        // if rotation.axis == Axis::Z {
+        //     let mut rotation = rotation.clone();
+        //     rotation.amount = rotation.amount * Direction::Negative;
+
+        //     self.corresponding_edge.rotate(&rotation);
+        // } else {
+        //     self.corresponding_edge.rotate(rotation);
+        // }
         self.corresponding_edge.rotate(rotation);
 
         if rotation.axis == self.normal_axis() && rotation.amount != Amount::Double {
             self.corresponding_edge.oriented = !self.corresponding_edge.oriented;
         }
 
-        println!("Rotated to {:#?}", self.corresponding_edge);
+        // println!("Rotated to {:#?}\n", self.corresponding_edge);
     }
 }
 
@@ -104,7 +112,10 @@ impl Wing {
         output
     }
 
-    pub fn from_faces(faces: [Face; 2], normal_direction: Direction) -> Result<Self, EdgeFromFacesError> {
+    pub fn from_faces(
+        faces: [Face; 2],
+        normal_direction: Direction,
+    ) -> Result<Self, EdgeFromFacesError> {
         let (normal_axis, slice_position) = Edge::position_from_faces(faces)?;
         Ok(Wing::new(normal_axis, slice_position, normal_direction))
     }

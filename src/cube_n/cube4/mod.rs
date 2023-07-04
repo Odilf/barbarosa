@@ -12,7 +12,8 @@ use super::{
         center::{self, Center},
         corner, wing,
     },
-    AxisMove, Corner, WideAxisMove, Wing, space::{Direction, Face, Axis}, Edge,
+    space::{Axis, Direction, Face},
+    AxisMove, Corner, Edge, WideAxisMove, Wing,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -52,7 +53,7 @@ impl generic::Movable<WideAxisMove<1>> for Cube4 {
         for wing in &mut self.wings {
             if wing::in_wide_move(wing, 1, m) {
                 println!("Rotating {:?} by {:?}", wing, m.axis_move);
-                
+
                 wing.rotate(&AxisRotation::from(&m.axis_move));
                 moved_wing_count += 1;
 
@@ -76,16 +77,25 @@ impl Cube4 {
         }
     }
 
-    pub fn wing_at(&self, normal_axis: Axis, slice_position: Vector2<Direction>, normal_direction: Direction) -> &Wing {
+    pub fn wing_at(
+        &self,
+        normal_axis: Axis,
+        slice_position: Vector2<Direction>,
+        normal_direction: Direction,
+    ) -> &Wing {
         let target = Wing::new(normal_axis, slice_position, normal_direction);
 
-        self.wings.iter().zip(Self::solved().wings.iter()).find_map(|(current, original)| {
-            if current == &target {
-                Some(original)
-            } else {
-                None
-            }
-        }).unwrap()
+        self.wings
+            .iter()
+            .zip(Self::solved().wings.iter())
+            .find_map(|(current, original)| {
+                if current == &target {
+                    Some(original)
+                } else {
+                    None
+                }
+            })
+            .unwrap()
     }
 
     pub fn wing_at_faces(&self, faces: [Face; 2], normal_direction: Direction) -> Option<&Wing> {
@@ -95,13 +105,17 @@ impl Cube4 {
     }
 
     pub fn position_of_wing(&self, target: &Wing) -> &Wing {
-        self.wings.iter().zip(Self::solved().wings.iter()).find_map(|(current, original)| {
-            if original == target {
-                Some(current)
-            } else {
-                None
-            }
-        }).unwrap()
+        self.wings
+            .iter()
+            .zip(Self::solved().wings.iter())
+            .find_map(|(current, original)| {
+                if original == target {
+                    Some(current)
+                } else {
+                    None
+                }
+            })
+            .unwrap()
     }
 }
 
