@@ -8,7 +8,7 @@ use crate::{
         moves::{perms, Amount},
         space::{faces::*, Direction::*, Face},
     },
-    generic::{Cube, Movable},
+    generic::{Cube, Movable, Parsable},
 };
 
 use super::*;
@@ -245,6 +245,17 @@ fn random_amount_of_wide_u_perms() {
 
     for _ in 0..3 {
         cube.apply(&wide_u);
+    }
+
+    assert!(cube.is_solved());
+}
+
+#[test]
+fn regular_ass_t_perm_lol() {
+    let mut cube = Cube4::new_solved();
+
+    for _ in 0..2 {
+        cube.apply(&perms::T);
     }
 
     assert!(cube.is_solved());

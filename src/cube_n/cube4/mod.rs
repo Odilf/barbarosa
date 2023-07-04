@@ -27,6 +27,16 @@ impl generic::Cube for Cube4 {
     fn solved() -> &'static Self {
         &SOLVED
     }
+    
+    fn is_solved(&self) -> bool
+        where
+            Self: 'static, {
+        let corners_solved = self.corners == Self::solved().corners;
+        let wings_solved = self.wings == Self::solved().wings;
+        let centers_solved = self.centers.iter().zip(Self::solved().centers.iter()).all(|(current, original)| current.is_solved(original));
+
+        corners_solved && wings_solved && centers_solved
+    }
 
     type Move = WideAxisMove<1>;
 

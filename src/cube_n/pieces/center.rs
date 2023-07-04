@@ -24,19 +24,24 @@ pub(crate) fn corner_in_wide_move<const N: u32>(
 ) -> bool {
     let corner = &center.0;
 
-    // TODO: This might be wrong
     // If on the same direction
     if corner.position[m.face().axis] == m.face().direction {
-        if corner.orientation_axis == m.face().axis {
+        if piece_depth <= m.depth() {
             return true;
         }
 
-        if piece_depth <= m.depth() {
+        if corner.orientation_axis == m.face().axis {
             return true;
         }
     }
 
     false
+}
+
+impl Center<Corner> {
+    pub fn is_solved(&self, original: &Center<Corner>) -> bool {
+        self.0.position[self.0.orientation_axis] == original.0.position[original.0.orientation_axis]
+    }
 }
 
 pub const SOLVED_CORNERS: [Center<Corner>; 24] = {
