@@ -82,9 +82,15 @@ fn four_wide_rs() {
 #[test]
 fn four_of_every_single_move() {
     for m in AxisMove::all() {
-        let m = m.widen::<1>(1).unwrap();
+        let m_wide = m.clone().widen::<1>(1).unwrap();
         
         let mut cube = Cube4::new_solved();
+
+        for _ in 0..4 {
+            cube.apply(&m_wide);
+        }
+
+        assert!(cube.is_solved());
 
         for _ in 0..4 {
             cube.apply(&m);
@@ -148,12 +154,84 @@ fn two_wide_ts() {
 
     println!("Alg: {wide_t}");
 
-    for _ in 0..2 {
-        for m in &wide_t.moves {
-            cube.apply(m);
-            cube.assert_consistent();
-        }
-    }
+    cube.apply(&wide_t.moves[0]);
+    cube.apply(&wide_t.moves[1]);
+    cube.apply(&wide_t.moves[2]);
+    cube.apply(&wide_t.moves[3]);
+
+    cube.apply(&wide_t.moves[4]);
+
+    assert_eq!(
+        cube.wing_at_faces([Face::L, Face::D], Direction::Positive).unwrap(),
+        &Wing::from_faces([Face::L, Face::D], Direction::Positive).unwrap(),
+    );
+
+    cube.apply(&wide_t.moves[5]);
+
+    println!("{}", &wide_t.moves[5]);
+
+    assert_eq!(
+        cube.wing_at_faces([Face::L, Face::U], Direction::Positive).unwrap(),
+        &Wing::from_faces([Face::L, Face::D], Direction::Positive).unwrap(),
+        "Cube: {:#?}, LD is at {:#?}", cube.wings, cube.position_of_wing(&Wing::from_faces([Face::L, Face::D], Direction::Positive).unwrap()),
+    );
+
+    cube.apply(&wide_t.moves[6]);
+
+    assert_eq!(
+        cube.wing_at_faces([Face::U, Face::F], Direction::Positive).unwrap(),
+        &Wing::from_faces([Face::R, Face::F], Direction::Positive).unwrap(),
+    );
+
+    assert_eq!(
+        cube.wing_at_faces([Face::L, Face::U], Direction::Positive).unwrap(),
+        &Wing::from_faces([Face::L, Face::D], Direction::Positive).unwrap(),
+    );
+
+    cube.apply(&wide_t.moves[7]);
+
+    assert_eq!(
+        cube.wing_at_faces([Face::F, Face::U], Direction::Positive).unwrap(),
+        &Wing::from_faces([Face::L, Face::D], Direction::Positive).unwrap(),
+        "Cube: {:#?}, LD is at {:#?}", cube.wings, cube.position_of_wing(&Wing::from_faces([Face::L, Face::D], Direction::Positive).unwrap()),
+    );
+
+    cube.apply(&wide_t.moves[8]);
+
+    assert_eq!(
+        cube.wing_at_faces([Face::U, Face::F], Direction::Positive).unwrap(),
+        &Wing::from_faces([Face::U, Face::F], Direction::Positive).unwrap(),
+    );
+
+    assert_eq!(
+        cube.wing_at_faces([Face::F, Face::D], Direction::Positive).unwrap(),
+        &Wing::from_faces([Face::L, Face::D], Direction::Positive).unwrap(),
+    );
+
+    cube.apply(&wide_t.moves[9]);
+
+    assert_eq!(
+        cube.wing_at_faces([Face::U, Face::F], Direction::Positive).unwrap(),
+        &Wing::from_faces([Face::R, Face::U], Direction::Negative).unwrap(),
+    );
+
+    assert_eq!(
+        cube.wing_at_faces([Face::F, Face::D], Direction::Positive).unwrap(),
+        &Wing::from_faces([Face::L, Face::D], Direction::Positive).unwrap(),
+    );
+
+    cube.apply(&wide_t.moves[10]);
+
+    assert_eq!(
+        cube.wing_at_faces([Face::U, Face::F], Direction::Positive).unwrap(),
+        &Wing::from_faces([Face::L, Face::D], Direction::Positive).unwrap(),
+    );
+
+    cube.apply(&wide_t.moves[11]);
+    cube.apply(&wide_t.moves[12]);
+    cube.apply(&wide_t.moves[13]);
+
+    cube.apply(&wide_t);
 
     cube.assert_consistent();
 

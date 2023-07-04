@@ -1,11 +1,14 @@
 #![cfg(test)]
 
+use nalgebra::vector;
+use pathfinding::prelude::directions::NE;
+
 use crate::cube_n::{
     moves::{
         rotation::{AxisRotation, Rotatable},
-        Amount,
+        Amount::*,
     },
-    space::{Axis, Direction, Face},
+    space::{Axis::*, Direction::*, Face},
     Edge,
 };
 
@@ -29,71 +32,101 @@ fn has_correct_direction() {
     let wing2 = wing_at(Face::F, Face::R, true);
     let wing3 = wing_at(Face::F, Face::U, true);
 
-    assert_eq!(wing1.direction_along_normal(), Direction::Positive);
-    assert_eq!(wing2.direction_along_normal(), Direction::Positive);
-    assert_eq!(wing3.direction_along_normal(), Direction::Negative);
+    assert_eq!(wing1.direction_along_normal(), Positive);
+    assert_eq!(wing2.direction_along_normal(), Positive);
+    assert_eq!(wing3.direction_along_normal(), Negative);
 }
 
 #[test]
 fn turning_on_u_face() {
-    let mut wing = wing_at(Face::U, Face::R, true);
+    let mut wing = Wing::from_faces([Face::R, Face::U], Positive).unwrap();
+    let mut wing_side = Wing::from_faces([Face::R, Face::F], Positive).unwrap();
 
-    wing.rotate(&AxisRotation::new(Axis::Y, Amount::Single));
+    assert_eq!(wing_side.normal_axis(), Y);
+    assert_eq!(wing_side.direction_along_normal(), Positive);
+    assert_eq!(wing_side.slice_position(), vector![Positive, Positive]);
 
-    assert_eq!(wing.normal_axis(), Axis::X);
-    assert_eq!(wing.direction_along_normal(), Direction::Negative);
+    wing.rotate(&AxisRotation::new(Y, Single));
+    wing_side.rotate(&AxisRotation::new(Y, Single));
 
-    wing.rotate(&AxisRotation::new(Axis::Y, Amount::Single));
+    assert_eq!(wing.normal_axis(), X);
+    assert_eq!(wing.direction_along_normal(), Negative);
+    assert_eq!(wing.slice_position(), vector![Positive, Positive]);
 
-    assert_eq!(wing.normal_axis(), Axis::Z);
-    assert_eq!(wing.direction_along_normal(), Direction::Negative);
+    assert_eq!(wing_side.normal_axis(), Y);
+    assert_eq!(wing_side.direction_along_normal(), Positive);
+    assert_eq!(wing_side.slice_position(), vector![Positive, Negative]);
 
-    wing.rotate(&AxisRotation::new(Axis::Y, Amount::Single));
+    wing.rotate(&AxisRotation::new(Y, Single));
 
-    assert_eq!(wing.normal_axis(), Axis::X);
-    assert_eq!(wing.direction_along_normal(), Direction::Positive);
+    assert_eq!(wing.normal_axis(), Z);
+    assert_eq!(wing.direction_along_normal(), Negative);
+    assert_eq!(wing.slice_position(), vector![Negative, Positive]);
+
+    wing.rotate(&AxisRotation::new(Y, Single));
+
+    assert_eq!(wing.normal_axis(), X);
+    assert_eq!(wing.direction_along_normal(), Positive);
+    assert_eq!(wing.slice_position(), vector![Positive, Negative]);
 }
 
 #[test]
 fn turning_on_r_face() {
     let mut wing = wing_at(Face::U, Face::R, true);
+    let mut wing_inside = wing_at(Face::U, Face::F, true);
 
-    wing.rotate(&AxisRotation::new(Axis::X, Amount::Single));
+    assert_eq!(wing_inside.slice_position(), vector![Positive, Positive]);
 
-    assert_eq!(wing.normal_axis(), Axis::Y);
-    assert_eq!(wing.direction_along_normal(), Direction::Positive);
+    wing.rotate(&AxisRotation::new(X, Single));
+    wing_inside.rotate(&AxisRotation::new(X, Single));
 
-    wing.rotate(&AxisRotation::new(Axis::X, Amount::Single));
+    assert_eq!(wing.normal_axis(), Y);
+    assert_eq!(wing.direction_along_normal(), Positive);
 
-    assert_eq!(wing.normal_axis(), Axis::Z);
-    assert_eq!(wing.direction_along_normal(), Direction::Negative);
+    assert_eq!(wing_inside.slice_position(), vector![Positive, Negative]);
 
-    wing.rotate(&AxisRotation::new(Axis::X, Amount::Single));
+    wing.rotate(&AxisRotation::new(X, Single));
+    wing_inside.rotate(&AxisRotation::new(X, Single));
 
-    assert_eq!(wing.normal_axis(), Axis::Y);
-    assert_eq!(wing.direction_along_normal(), Direction::Negative);
+    assert_eq!(wing.normal_axis(), Z);
+    assert_eq!(wing.direction_along_normal(), Negative);
+
+    assert_eq!(wing_inside.slice_position(), vector![Negative, Negative]);
+
+    wing.rotate(&AxisRotation::new(X, Single));
+    wing_inside.rotate(&AxisRotation::new(X, Single));
+
+    assert_eq!(wing.normal_axis(), Y);
+    assert_eq!(wing.direction_along_normal(), Negative);
+
+    assert_eq!(wing_inside.slice_position(), vector![Negative, Positive]);
 }
 
 #[test]
 fn turning_on_f_face_inside_wings() {
-    let mut wing = wing_at(Face::U, Face::R, true);
+    let mut wing = Wing::from_faces([Face::U, Face::R], Positive).unwrap();
 
-    wing.rotate(&AxisRotation::new(Axis::Z, Amount::Single));
+    assert_eq!(wing.slice_position(), vector![Positive, Positive]);
 
-    assert_eq!(wing.normal_axis(), Axis::Z);
-    assert_eq!(wing.direction_along_normal(), Direction::Positive);
+    wing.rotate(&AxisRotation::new(Z, Single));
 
-    wing.rotate(&AxisRotation::new(Axis::Z, Amount::Single));
+    assert_eq!(wing.normal_axis(), Z);
+    assert_eq!(wing.direction_along_normal(), Positive);
+    assert_eq!(wing.slice_position(), vector![Positive, Negative]);
 
-    assert_eq!(wing.normal_axis(), Axis::Z);
-    assert_eq!(wing.direction_along_normal(), Direction::Positive);
+    wing.rotate(&AxisRotation::new(Z, Single));
 
-    wing.rotate(&AxisRotation::new(Axis::Z, Amount::Single));
+    assert_eq!(wing.normal_axis(), Z);
+    assert_eq!(wing.direction_along_normal(), Positive);
+    assert_eq!(wing.slice_position(), vector![Negative, Negative]);
 
-    assert_eq!(wing.normal_axis(), Axis::Z);
-    assert_eq!(wing.direction_along_normal(), Direction::Positive);
+    wing.rotate(&AxisRotation::new(Z, Single));
 
-    wing.rotate(&AxisRotation::new(Axis::Z, Amount::Single));
+    assert_eq!(wing.normal_axis(), Z);
+    assert_eq!(wing.direction_along_normal(), Positive);
+    assert_eq!(wing.slice_position(), vector![Negative, Positive]);
+
+    wing.rotate(&AxisRotation::new(Z, Single));
 
     assert_eq!(wing, wing_at(Face::U, Face::R, true))
 }
