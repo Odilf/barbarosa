@@ -1,21 +1,59 @@
 use crate::cube_n::{
-    moves::rotation::{AxisRotation, Rotatable},
+    moves::rotation::Rotatable,
     pieces::edge::ParallelAxesError,
-    space::{faces, Face},
+    space::{faces, Direction, Face},
     WideAxisMove,
 };
 
-// Invariant to be upheld: `main_face` and `side_face` must be perpendicular
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct EdgeCenter {
     main_face: Face,
-    side_face: Face,
+    handedness: Direction,
+    side_direction: Direction,
 }
 
 impl Rotatable for EdgeCenter {
-    fn rotate(&mut self, rotation: &AxisRotation) {
+    fn rotate(&mut self, rotation: &crate::cube_n::moves::rotation::AxisRotation) {
+        let side_face = self.side_face().rotated(rotation);
+
+        // Very important to rotate face only *after* getting the side face. 
         self.main_face.rotate(rotation);
-        self.side_face.rotate(rotation);
+
+        self.handedness = self
+            .main_face
+            .axis
+            .get_handedness(&side_face.axis)
+            .expect("Side face should be perpendicular to main face");
+
+        self.side_direction = side_face.direction;
+    }
+}
+
+impl EdgeCenter {
+    pub const fn new(main_face: Face, handedness: Direction, side_direction: Direction) -> Self {
+        Self {
+            main_face,
+            handedness,
+            side_direction,
+        }
+    }
+
+    pub fn try_from_faces(main_face: Face, side_face: Face) -> Result<Self, ParallelAxesError> {
+        let handedness = main_face.axis.get_handedness(&side_face.axis)?;
+
+        Ok(EdgeCenter {
+            main_face,
+            handedness,
+            side_direction: side_face.direction,
+        })
+    }
+
+    pub fn side_face(&self) -> Face {
+        let side_axis = self.main_face.axis.next_with_handedness(self.handedness);
+
+        debug_assert_ne!(side_axis, self.main_face.axis);
+
+        Face::new(side_axis, self.side_direction)
     }
 }
 
@@ -28,67 +66,41 @@ pub fn in_wide_move<const N: u32>(
         return true;
     }
 
-    if m.face() == &center.side_face && piece_depth <= N {
+    if m.face() == &center.side_face() && piece_depth <= N {
         return true;
     }
 
     false
 }
 
-impl EdgeCenter {
-    pub fn new(main_face: Face, side_face: Face) -> Result<Self, ParallelAxesError> {
-        if main_face.axis == side_face.axis {
-            return Err(ParallelAxesError::SameAxes([
-                main_face.axis,
-                side_face.axis,
-            ]));
-        }
-
-        Ok(Self {
-            main_face,
-            side_face,
-        })
-    }
-
-    pub const fn new_unchecked(main_face: Face, side_face: Face) -> Self {
-        Self {
-            main_face,
-            side_face,
-        }
-    }
-
-    pub fn is_solved(&self, original: &EdgeCenter) -> bool {
-        self.main_face == original.main_face
-    }
-}
-
 pub const SOLVED: [EdgeCenter; 24] = {
     use faces::*;
+    use Direction::*;
 
     [
-        EdgeCenter::new_unchecked(R, U),
-        EdgeCenter::new_unchecked(R, F),
-        EdgeCenter::new_unchecked(R, D),
-        EdgeCenter::new_unchecked(R, B),
-        EdgeCenter::new_unchecked(U, R),
-        EdgeCenter::new_unchecked(U, F),
-        EdgeCenter::new_unchecked(U, L),
-        EdgeCenter::new_unchecked(U, B),
-        EdgeCenter::new_unchecked(F, U),
-        EdgeCenter::new_unchecked(F, R),
-        EdgeCenter::new_unchecked(F, D),
-        EdgeCenter::new_unchecked(F, L),
-        EdgeCenter::new_unchecked(L, U),
-        EdgeCenter::new_unchecked(L, F),
-        EdgeCenter::new_unchecked(L, D),
-        EdgeCenter::new_unchecked(L, B),
-        EdgeCenter::new_unchecked(D, R),
-        EdgeCenter::new_unchecked(D, F),
-        EdgeCenter::new_unchecked(D, L),
-        EdgeCenter::new_unchecked(D, B),
-        EdgeCenter::new_unchecked(B, U),
-        EdgeCenter::new_unchecked(B, R),
-        EdgeCenter::new_unchecked(B, D),
-        EdgeCenter::new_unchecked(B, L),
+        EdgeCenter::new(R, Positive, Positive),
+        EdgeCenter::new(R, Positive, Negative),
+        EdgeCenter::new(R, Negative, Negative),
+        EdgeCenter::new(R, Negative, Positive),
+        EdgeCenter::new(U, Positive, Positive),
+        EdgeCenter::new(U, Positive, Positive),
+        EdgeCenter::new(U, Positive, Negative),
+        EdgeCenter::new(U, Positive, Negative),
+        EdgeCenter::new(F, Negative, Negative),
+        EdgeCenter::new(F, Negative, Negative),
+        EdgeCenter::new(F, Negative, Positive),
+        EdgeCenter::new(F, Negative, Positive),
+        EdgeCenter::new(L, Positive, Positive),
+        EdgeCenter::new(L, Positive, Negative),
+        EdgeCenter::new(L, Negative, Negative),
+        EdgeCenter::new(L, Negative, Positive),
+        EdgeCenter::new(D, Positive, Positive),
+        EdgeCenter::new(D, Positive, Positive),
+        EdgeCenter::new(D, Positive, Negative),
+        EdgeCenter::new(D, Positive, Negative),
+        EdgeCenter::new(B, Negative, Negative),
+        EdgeCenter::new(B, Negative, Negative),
+        EdgeCenter::new(B, Negative, Positive),
+        EdgeCenter::new(B, Negative, Positive),
     ]
 };

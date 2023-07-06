@@ -11,7 +11,7 @@ use strum::EnumIter;
 
 use crate::generic::parse;
 
-use super::Edge;
+use super::{pieces::edge::ParallelAxesError, Edge};
 
 /// The three axes in space.
 ///
@@ -112,6 +112,22 @@ impl Axis {
             Axis::X => Axis::Z,
             Axis::Y => Axis::X,
             Axis::Z => Axis::Y,
+        }
+    }
+
+    pub fn next_with_handedness(&self, handedness: Direction) -> Axis {
+        match handedness {
+            Direction::Positive => self.next(),
+            Direction::Negative => self.prev(),
+        }
+    }
+
+    pub fn get_handedness(&self, other: &Axis) -> Result<Direction, ParallelAxesError> {
+        match self.offset(&other) {
+            0 => Err(ParallelAxesError::SameAxes([*self, *other])),
+            1 => Ok(Direction::Positive),
+            2 => Ok(Direction::Negative),
+            _ => unreachable!(),
         }
     }
 
