@@ -7,6 +7,8 @@ pub use crate::generic::{
     parse::{self, Parsable},
 };
 
+use self::generic::Alg;
+
 use super::{Amount, AxisMove};
 
 // A wide move of at most depth `N`.
@@ -78,5 +80,17 @@ impl<const N: u32> Distribution<WideAxisMove<N>> for rand::distributions::Standa
         let amount = rng.gen();
         let depth = rng.gen_range(0..=N);
         WideAxisMove::new(face, amount, depth).unwrap()
+    }
+}
+
+impl Alg<AxisMove> {
+    pub fn widen<const N: u32>(
+        self,
+        depth: u32,
+    ) -> Result<Alg<WideAxisMove<N>>, WideMoveCreationError> {
+        self.moves
+            .into_iter()
+            .map(|axis_move| axis_move.widen(depth))
+            .collect()
     }
 }

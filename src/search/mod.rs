@@ -27,7 +27,7 @@ pub trait Searchable<M: Move + Debug + IntoEnumIterator>: Cube + Hash + Movable<
         let (states, _cost) = pathfinding::directed::astar::astar(
             self,
             |cube| {
-                successors(cube)
+                successors::<M, Self>(cube)
                     .into_iter()
                     .map(|cube| (cube, 1))
                     .collect::<Vec<_>>()

@@ -9,7 +9,7 @@ use crate::generic::{self, moves::IntoMove, Cube};
 use super::{
     moves::rotation::{AxisRotation, Rotatable},
     pieces::{
-        center::{self, Center},
+        center::{self, corner::CornerCenter},
         corner, wing,
     },
     space::{Axis, Direction, Face},
@@ -20,7 +20,7 @@ use super::{
 pub struct Cube4 {
     corners: [Corner; 8],
     wings: [Wing; 24],
-    centers: [Center<Corner>; 24],
+    centers: [CornerCenter; 24],
 }
 
 impl generic::Cube for Cube4 {
@@ -55,7 +55,7 @@ impl generic::Movable<WideAxisMove<1>> for Cube4 {
         let mut moved_corner_count = 0;
 
         for center in &mut self.centers {
-            if center::corner_in_wide_move(center, 1, m) {
+            if center::corner::in_wide_move(center, 1, m) {
                 moved_corner_count += 1;
                 center.rotate(&AxisRotation::from(&m.axis_move));
             }
@@ -134,5 +134,5 @@ impl generic::Movable<AxisMove> for Cube4 {
 const SOLVED: Cube4 = Cube4 {
     corners: corner::SOLVED,
     wings: wing::SOLVED,
-    centers: center::SOLVED_CORNERS,
+    centers: center::corner::SOLVED,
 };

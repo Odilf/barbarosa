@@ -5,7 +5,10 @@ use rand::{rngs::StdRng, SeedableRng};
 
 use crate::{
     cube_n::{
-        moves::{perms, Amount},
+        moves::{
+            perms::{self, pll},
+            Amount,
+        },
         space::{faces::*, Direction::*, Face},
     },
     generic::{Alg, Cube, Movable},
@@ -169,7 +172,7 @@ fn six_wide_sexies() {
 #[test]
 fn two_wide_ts() {
     let mut cube = Cube4::new_solved();
-    let wide_t: Alg<Cube4> = perms::T
+    let wide_t: Alg<Cube4> = pll::T
         .clone()
         .moves
         .into_iter()
@@ -198,7 +201,7 @@ fn two_wide_ts() {
 #[test]
 fn two_wide_js() {
     let mut cube = Cube4::new_solved();
-    let wide_j: Alg<Cube4> = perms::J
+    let wide_j: Alg<Cube4> = pll::J
         .clone()
         .moves
         .into_iter()
@@ -235,7 +238,7 @@ fn two_wide_js() {
 #[test]
 fn random_amount_of_wide_u_perms() {
     let mut cube = Cube4::new_solved();
-    let wide_u: Alg<Cube4> = perms::U
+    let wide_u: Alg<Cube4> = pll::U
         .clone()
         .moves
         .into_iter()
@@ -254,7 +257,7 @@ fn regular_ass_t_perm_lol() {
     let mut cube = Cube4::new_solved();
 
     for _ in 0..2 {
-        cube.apply(&perms::T);
+        cube.apply(&pll::T);
     }
 
     assert!(cube.is_solved());

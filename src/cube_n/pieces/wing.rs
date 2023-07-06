@@ -16,7 +16,7 @@ use crate::{
     generic,
 };
 
-use super::{edge::EdgeFromFacesError, Edge};
+use super::{edge::ParallelAxesError, Edge};
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Wing {
@@ -101,7 +101,7 @@ impl Wing {
     pub fn from_faces(
         faces: [Face; 2],
         normal_direction: Direction,
-    ) -> Result<Self, EdgeFromFacesError> {
+    ) -> Result<Self, ParallelAxesError> {
         let (normal_axis, slice_position) = Edge::position_from_faces(faces)?;
         Ok(Wing::new(normal_axis, slice_position, normal_direction))
     }

@@ -5,15 +5,16 @@ use std::fmt::Debug;
 use crate::{
     cube3::Cube3,
     cube_n::{
+        moves::perms::{self, pll},
         space::{Axis, Face},
-        Edge,
+        AxisMove, Edge, WideAxisMove,
     },
     generic::{alg::Alg, Cube, Movable, Parsable},
 };
 
 use super::{
     rotation::{AxisRotation, Rotatable},
-    *,
+    Amount,
 };
 
 fn assert_rotations<T: Rotatable + Eq + Debug>(initial: T, expectations: &[(AxisRotation, T)]) {
@@ -126,7 +127,6 @@ fn errors_completely_when_parsing_invalid_move_in_alg() {
 
 #[test]
 fn prints_moves() {
-    // Why is this necessary? (says it's ambigous otherwise)
     let mov = WideAxisMove::<3>::new(Face::R, Amount::Double, 2).unwrap();
 
     assert_eq!(mov.to_string(), "3Rw2");
@@ -148,7 +148,7 @@ fn two_t_perms_solve_cube() {
     let mut cube = Cube3::new_solved();
 
     for _ in 0..2 {
-        cube.apply(&perms::T);
+        cube.apply(&pll::T);
     }
 
     assert!(cube.is_solved());

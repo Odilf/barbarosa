@@ -9,13 +9,21 @@ use super::AxisMove;
 /// R U R' U'. Yeee
 pub static SEXY_MOVE: Lazy<Alg<AxisMove>> = Lazy::new(|| "R U R' U'".try_into().unwrap());
 
-/// The [T perm](http://algdb.net/puzzle/333/pll/t). Swaps RUF-RUB and RU-LU
-pub static T: Lazy<Alg<AxisMove>> =
-    Lazy::new(|| "R U R' U' R' F R2 U' R' U' R U R' F'".try_into().unwrap());
+// pub static OLL_PARITY: Lazy<Alg<WideAxisMove<1>>> =
+//     Lazy::new(|| "Rw2 B2 U2 Rw2 U2 F2 Rw2 F2 U2 Rw2 B2 Rw2".try_into().unwrap());
 
-/// The [U perm](http://algdb.net/puzzle/333/pll/ua) (specifically Ua). Cycles RUF->RUB->RUL
-pub static U: Lazy<Alg<AxisMove>> = Lazy::new(|| "R2 U' R' U' R U R U R U' R".try_into().unwrap());
+pub mod pll {
+    use super::*;
 
-/// The [J perm](http://algdb.net/puzzle/333/pll/jb) (specifically Jb). Swaps RU-UF and RUF-RUB
-pub static J: Lazy<Alg<AxisMove>> =
-    Lazy::new(|| "R U R' F' R U R' U' R' F R2 U' R' U'".try_into().unwrap());
+    /// The [T perm](http://algdb.net/puzzle/333/pll/t). Swaps RUF-RUB and RU-LU
+    pub static T: Lazy<Alg<AxisMove>> =
+        Lazy::new(|| "R U R' U' R' F R2 U' R' U' R U R' F'".try_into().unwrap());
+
+    /// The [U perm](http://algdb.net/puzzle/333/pll/ua) (specifically Ua). Cycles RUF->RUB->RUL
+    pub static U: Lazy<Alg<AxisMove>> =
+        Lazy::new(|| "R2 U' R' U' R U R U R U' R".try_into().unwrap());
+
+    /// The [J perm](http://algdb.net/puzzle/333/pll/jb) (specifically Jb). Swaps RU-UF and RUF-RUB
+    pub static J: Lazy<Alg<AxisMove>> =
+        Lazy::new(|| "R U R' F' R U R' U' R' F R2 U' R' U'".try_into().unwrap());
+}

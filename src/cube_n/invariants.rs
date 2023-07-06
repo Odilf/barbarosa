@@ -2,7 +2,7 @@
 //!
 //! TODO: This docs are written for a 3x3x3 cube, but they should be valid for any NxNxN cube.
 //!
-//! Mainly used for [Cube::random()](crate::generic::Cube::random())
+//! Mainly used for [Cube::random()](rand::random::<Cube3>())
 //!
 //! There are thre invariants we need to uphold in a 3x3x3 Rubik's cube. We can deduce them by analizing what
 //! a single move does in terms of swaps and changes of orientation.

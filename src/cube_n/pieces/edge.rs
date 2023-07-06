@@ -122,9 +122,9 @@ impl Edge {
     /// Errors if the faces are not perpendicular
     pub fn position_from_faces(
         [a, b]: [Face; 2],
-    ) -> Result<(Axis, Vector2<Direction>), EdgeFromFacesError> {
+    ) -> Result<(Axis, Vector2<Direction>), ParallelAxesError> {
         let normal_axis =
-            Axis::other(&a.axis, &b.axis).ok_or(EdgeFromFacesError::SameAxes([a.axis, b.axis]))?;
+            Axis::other(&a.axis, &b.axis).ok_or(ParallelAxesError::SameAxes([a.axis, b.axis]))?;
 
         let x = normal_axis.next();
         let y = x.next();
@@ -157,7 +157,7 @@ impl std::fmt::Debug for Edge {
 }
 
 impl TryFrom<[Face; 2]> for Edge {
-    type Error = EdgeFromFacesError;
+    type Error = ParallelAxesError;
 
     fn try_from(value: [Face; 2]) -> Result<Self, Self::Error> {
         let (normal_axis, slice_position) = Self::position_from_faces(value)?;
@@ -173,7 +173,7 @@ impl TryFrom<[Face; 2]> for Edge {
 /// An error that can occur when creating an edge from faces
 #[allow(missing_docs)]
 #[derive(Debug, Error)]
-pub enum EdgeFromFacesError {
+pub enum ParallelAxesError {
     #[error("Faces must be on different axes")]
     SameAxes([Axis; 2]),
 }

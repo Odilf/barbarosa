@@ -164,7 +164,7 @@ impl Neg for Direction {
 }
 
 /// One of the 6 faces of a cube
-#[derive(Clone, PartialEq, Eq, RandGen)]
+#[derive(Clone, PartialEq, Eq, RandGen, Hash)]
 pub struct Face {
     /// The axis of the face
     pub axis: Axis,
