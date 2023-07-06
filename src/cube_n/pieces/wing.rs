@@ -93,10 +93,21 @@ impl Wing {
         slice_position: Vector2<Direction>,
         normal_direction: Direction,
     ) -> Self {
-        let orientation = wing_direction_along_normal(normal_axis, slice_position, true) == normal_direction;
+        let orientation =
+            wing_direction_along_normal(normal_axis, slice_position, true) == normal_direction;
 
         Self {
             corresponding_edge: Edge::new(normal_axis, slice_position, orientation),
+        }
+    }
+
+    const fn new_with_orientation(
+        normal_axis: Axis,
+        slice_position: Vector2<Direction>,
+        oriented: bool,
+    ) -> Self {
+        Self {
+            corresponding_edge: Edge::new(normal_axis, slice_position, oriented),
         }
     }
 
@@ -112,12 +123,6 @@ impl Wing {
 impl std::fmt::Debug for Wing {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let [f1, f2] = self.corresponding_edge.faces();
-        // let face_string = format!("{}{}", faces[0], faces[1]);
-
-        // f.debug_struct("Wing")
-        //     .field("faces", &face_string)
-        //     .field("direction_along_normal", &self.direction_along_normal())
-        //     .finish()
 
         write!(
             f,
@@ -132,77 +137,29 @@ pub const SOLVED: [Wing; 24] = {
     use Direction::*;
 
     [
-        Wing {
-            corresponding_edge: Edge::oriented(X, vector![Positive, Positive]),
-        },
-        Wing {
-            corresponding_edge: Edge::oriented(X, vector![Positive, Negative]),
-        },
-        Wing {
-            corresponding_edge: Edge::oriented(Y, vector![Positive, Positive]),
-        },
-        Wing {
-            corresponding_edge: Edge::oriented(Y, vector![Positive, Negative]),
-        },
-        Wing {
-            corresponding_edge: Edge::oriented(Z, vector![Positive, Positive]),
-        },
-        Wing {
-            corresponding_edge: Edge::oriented(Z, vector![Negative, Positive]),
-        },
-        Wing {
-            corresponding_edge: Edge::oriented(X, vector![Negative, Negative]),
-        },
-        Wing {
-            corresponding_edge: Edge::oriented(X, vector![Negative, Positive]),
-        },
-        Wing {
-            corresponding_edge: Edge::oriented(Y, vector![Negative, Positive]),
-        },
-        Wing {
-            corresponding_edge: Edge::oriented(Y, vector![Negative, Negative]),
-        },
-        Wing {
-            corresponding_edge: Edge::oriented(Z, vector![Positive, Negative]),
-        },
-        Wing {
-            corresponding_edge: Edge::oriented(Z, vector![Negative, Negative]),
-        },
-        Wing {
-            corresponding_edge: Edge::oriented(X, vector![Positive, Positive]).flipped(),
-        },
-        Wing {
-            corresponding_edge: Edge::oriented(X, vector![Positive, Negative]).flipped(),
-        },
-        Wing {
-            corresponding_edge: Edge::oriented(Y, vector![Positive, Positive]).flipped(),
-        },
-        Wing {
-            corresponding_edge: Edge::oriented(Y, vector![Positive, Negative]).flipped(),
-        },
-        Wing {
-            corresponding_edge: Edge::oriented(Z, vector![Positive, Positive]).flipped(),
-        },
-        Wing {
-            corresponding_edge: Edge::oriented(Z, vector![Negative, Positive]).flipped(),
-        },
-        Wing {
-            corresponding_edge: Edge::oriented(X, vector![Negative, Negative]).flipped(),
-        },
-        Wing {
-            corresponding_edge: Edge::oriented(X, vector![Negative, Positive]).flipped(),
-        },
-        Wing {
-            corresponding_edge: Edge::oriented(Y, vector![Negative, Positive]).flipped(),
-        },
-        Wing {
-            corresponding_edge: Edge::oriented(Y, vector![Negative, Negative]).flipped(),
-        },
-        Wing {
-            corresponding_edge: Edge::oriented(Z, vector![Positive, Negative]).flipped(),
-        },
-        Wing {
-            corresponding_edge: Edge::oriented(Z, vector![Negative, Negative]).flipped(),
-        },
+        Wing::new_with_orientation(X, vector![Positive, Positive], true),
+        Wing::new_with_orientation(X, vector![Positive, Negative], true),
+        Wing::new_with_orientation(X, vector![Negative, Negative], true),
+        Wing::new_with_orientation(X, vector![Negative, Positive], true),
+        Wing::new_with_orientation(Y, vector![Positive, Positive], true),
+        Wing::new_with_orientation(Y, vector![Positive, Negative], true),
+        Wing::new_with_orientation(Y, vector![Negative, Negative], true),
+        Wing::new_with_orientation(Y, vector![Negative, Positive], true),
+        Wing::new_with_orientation(Z, vector![Positive, Positive], true),
+        Wing::new_with_orientation(Z, vector![Positive, Negative], true),
+        Wing::new_with_orientation(Z, vector![Negative, Negative], true),
+        Wing::new_with_orientation(Z, vector![Negative, Positive], true),
+        Wing::new_with_orientation(X, vector![Positive, Positive], false),
+        Wing::new_with_orientation(X, vector![Positive, Negative], false),
+        Wing::new_with_orientation(X, vector![Negative, Negative], false),
+        Wing::new_with_orientation(X, vector![Negative, Positive], false),
+        Wing::new_with_orientation(Y, vector![Positive, Positive], false),
+        Wing::new_with_orientation(Y, vector![Positive, Negative], false),
+        Wing::new_with_orientation(Y, vector![Negative, Negative], false),
+        Wing::new_with_orientation(Y, vector![Negative, Positive], false),
+        Wing::new_with_orientation(Z, vector![Positive, Positive], false),
+        Wing::new_with_orientation(Z, vector![Positive, Negative], false),
+        Wing::new_with_orientation(Z, vector![Negative, Negative], false),
+        Wing::new_with_orientation(Z, vector![Negative, Positive], false),
     ]
 };
