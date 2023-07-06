@@ -45,15 +45,27 @@ impl Wing {
     }
 
     pub fn direction_along_normal(&self) -> Direction {
-        let is_x_axis = self.corresponding_edge.normal_axis == Axis::X;
-        let is_even_position_parity =
-            self.corresponding_edge.slice_position.x == self.corresponding_edge.slice_position.y;
+        wing_direction_along_normal(
+            self.normal_axis(),
+            self.corresponding_edge.slice_position,
+            self.corresponding_edge.oriented,
+        )
+    }
+}
 
-        if is_x_axis ^ is_even_position_parity ^ self.corresponding_edge.oriented {
-            Direction::Negative
-        } else {
-            Direction::Positive
-        }
+pub fn wing_direction_along_normal(
+    normal_axis: Axis,
+    slice_position: Vector2<Direction>,
+    oriented: bool,
+) -> Direction {
+    let is_x_axis = normal_axis == Axis::X;
+
+    let is_even_position_parity = slice_position.x == slice_position.y;
+
+    if is_x_axis ^ is_even_position_parity ^ oriented {
+        Direction::Negative
+    } else {
+        Direction::Positive
     }
 }
 
@@ -81,21 +93,11 @@ impl Wing {
         slice_position: Vector2<Direction>,
         normal_direction: Direction,
     ) -> Self {
-        let corresponding_edge = Edge {
-            normal_axis,
-            slice_position,
-            oriented: true,
-        };
+        let orientation = wing_direction_along_normal(normal_axis, slice_position, true) == normal_direction;
 
-        let mut output = Self { corresponding_edge };
-
-        // Flip edge if it's not in the right direction.
-        // TODO: Should refactor this logic to make use of it "directly"
-        if output.direction_along_normal() != normal_direction {
-            output.corresponding_edge = output.corresponding_edge.flipped();
+        Self {
+            corresponding_edge: Edge::new(normal_axis, slice_position, orientation),
         }
-
-        output
     }
 
     pub fn from_faces(

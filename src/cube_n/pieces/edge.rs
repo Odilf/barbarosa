@@ -82,13 +82,21 @@ impl generic::Movable<AxisMove> for Edge {
 }
 
 impl Edge {
-    /// Creates a new oriented edge
-    pub const fn oriented(normal_axis: Axis, slice_position: Vector2<Direction>) -> Self {
+    pub const fn new(
+        normal_axis: Axis,
+        slice_position: Vector2<Direction>,
+        oriented: bool,
+    ) -> Self {
         Self {
             normal_axis,
             slice_position,
-            oriented: true,
+            oriented,
         }
+    }
+
+    /// Creates a new oriented edge
+    pub const fn oriented(normal_axis: Axis, slice_position: Vector2<Direction>) -> Self {
+        Self::new(normal_axis, slice_position, true)
     }
 
     /// Gets the faces of the edge
