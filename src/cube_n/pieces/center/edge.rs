@@ -60,6 +60,10 @@ impl EdgeCenter {
 
         Face::new(side_axis, self.side_direction)
     }
+
+    pub fn is_solved(&self, original: &Self) -> bool {
+        self.main_face == original.main_face
+    }
 }
 
 pub fn in_wide_move<const N: u32>(

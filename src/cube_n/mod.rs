@@ -5,6 +5,7 @@ pub mod cube3;
 pub mod cube4;
 pub mod cube5;
 pub mod cube6;
+pub mod cube7;
 
 pub mod invariants;
 pub mod moves;
