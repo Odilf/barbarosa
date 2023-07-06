@@ -17,7 +17,10 @@ use super::{
     Amount,
 };
 
-fn assert_rotations<T: Rotatable + Clone + Eq + Debug>(initial: T, expectations: &[(AxisRotation, T)]) {
+fn assert_rotations<T: Rotatable + Clone + Eq + Debug>(
+    initial: T,
+    expectations: &[(AxisRotation, T)],
+) {
     for (rotation, expected_face) in expectations {
         let rotated = initial.clone().rotated(&rotation);
         assert_eq!(&rotated, expected_face, "Rotation: {:?}", rotation);

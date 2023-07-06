@@ -44,8 +44,8 @@ impl Wing {
         self.corresponding_edge.slice_position
     }
 
-    pub fn direction_along_normal(&self) -> Direction {
-        wing_direction_along_normal(
+    pub fn normal_direction(&self) -> Direction {
+        wing_normal_direction(
             self.normal_axis(),
             self.corresponding_edge.slice_position,
             self.corresponding_edge.oriented,
@@ -53,7 +53,7 @@ impl Wing {
     }
 }
 
-pub fn wing_direction_along_normal(
+pub fn wing_normal_direction(
     normal_axis: Axis,
     slice_position: Vector2<Direction>,
     oriented: bool,
@@ -69,24 +69,6 @@ pub fn wing_direction_along_normal(
     }
 }
 
-pub fn in_wide_move<const N: u32>(wing: &Wing, wing_depth: u32, m: &WideAxisMove<N>) -> bool {
-    let wing_edge = &wing.corresponding_edge;
-    // If just on the same face
-    if m.axis_move.face.contains_edge(&wing.corresponding_edge) {
-        return true;
-    }
-
-    // If on parallel slices (so, same normal)
-    if wing_edge.normal_axis == m.face().axis {
-        // If it's on the right depth
-        if wing_depth <= m.depth() && m.face().direction == wing.direction_along_normal() {
-            return true;
-        }
-    }
-
-    false
-}
-
 impl Wing {
     pub fn new(
         normal_axis: Axis,
@@ -94,7 +76,7 @@ impl Wing {
         normal_direction: Direction,
     ) -> Self {
         let orientation =
-            wing_direction_along_normal(normal_axis, slice_position, true) == normal_direction;
+            wing_normal_direction(normal_axis, slice_position, true) == normal_direction;
 
         Self {
             corresponding_edge: Edge::new(normal_axis, slice_position, orientation),
@@ -118,6 +100,24 @@ impl Wing {
         let (normal_axis, slice_position) = Edge::position_from_faces(faces)?;
         Ok(Wing::new(normal_axis, slice_position, normal_direction))
     }
+
+    pub fn in_wide_move<const N: u32>(&self, wing_depth: u32, m: &WideAxisMove<N>) -> bool {
+        let wing_edge = &self.corresponding_edge;
+        // If just on the same face
+        if m.axis_move.face.contains_edge(&self.corresponding_edge) {
+            return true;
+        }
+
+        // If on parallel slices (so, same normal)
+        if wing_edge.normal_axis == m.face().axis {
+            // If it's on the right depth
+            if wing_depth <= m.depth() && m.face().direction == self.normal_direction() {
+                return true;
+            }
+        }
+
+        false
+    }
 }
 
 impl std::fmt::Debug for Wing {
@@ -126,8 +126,8 @@ impl std::fmt::Debug for Wing {
 
         write!(
             f,
-            "Wing {{ faces: {f1}{f2}, direction_along_normal: {:?} }}",
-            self.direction_along_normal()
+            "Wing {{ faces: {f1}{f2}, normal_direction: {:?} }}",
+            self.normal_direction()
         )
     }
 }

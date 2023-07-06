@@ -64,22 +64,18 @@ impl EdgeCenter {
     pub fn is_solved(&self, original: &Self) -> bool {
         self.main_face == original.main_face
     }
-}
 
-pub fn in_wide_move<const N: u32>(
-    center: &EdgeCenter,
-    piece_depth: u32,
-    m: &WideAxisMove<N>,
-) -> bool {
-    if m.face() == &center.main_face {
-        return true;
+    pub fn in_wide_move<const N: u32>(&self, piece_depth: u32, m: &WideAxisMove<N>) -> bool {
+        if m.face() == &self.main_face {
+            return true;
+        }
+
+        if m.face() == &self.side_face() && piece_depth <= N {
+            return true;
+        }
+
+        false
     }
-
-    if m.face() == &center.side_face() && piece_depth <= N {
-        return true;
-    }
-
-    false
 }
 
 pub const SOLVED: [EdgeCenter; 24] = {

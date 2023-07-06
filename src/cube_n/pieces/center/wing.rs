@@ -3,7 +3,7 @@ use nalgebra::vector;
 use crate::{
     cube_n::{
         moves::{rotation::Rotatable, Amount},
-        pieces::wing::wing_direction_along_normal,
+        pieces::wing::wing_normal_direction,
         space::{faces, Axis, Direction, Face},
         WideAxisMove,
     },
@@ -69,8 +69,8 @@ impl WingCenter {
             .next_with_handedness(-self.corresponding_edge_center.handedness)
     }
 
-    pub fn direction_along_normal(&self) -> Direction {
-        wing_direction_along_normal(
+    pub fn normal_direction(&self) -> Direction {
+        wing_normal_direction(
             self.normal_axis(),
             vector![
                 self.corresponding_edge_center.side_direction,

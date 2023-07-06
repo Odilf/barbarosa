@@ -23,7 +23,7 @@ fn expect_wing(cube: &Cube4, position: ([Face; 2], Direction), expected: ([Face;
     let found = cube.wing_at(
         position.normal_axis(),
         position.slice_position(),
-        position.direction_along_normal(),
+        position.normal_direction(),
     );
 
     let position_of_expected = cube.position_of_wing(&expected);

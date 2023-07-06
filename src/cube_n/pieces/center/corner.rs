@@ -24,25 +24,6 @@ impl Rotatable for CornerCenter {
     }
 }
 
-pub fn in_wide_move<const N: u32>(
-    center: &CornerCenter,
-    piece_depth: u32,
-    m: &WideAxisMove<N>,
-) -> bool {
-    // If on the same direction
-    if center.position[m.face().axis] == m.face().direction {
-        if piece_depth <= m.depth() {
-            return true;
-        }
-
-        if center.axis == m.face().axis {
-            return true;
-        }
-    }
-
-    false
-}
-
 impl CornerCenter {
     const fn new(position: Vector3<Direction>, axis: Axis) -> Self {
         Self { position, axis }
@@ -50,6 +31,21 @@ impl CornerCenter {
 
     pub fn is_solved(&self, original: &CornerCenter) -> bool {
         self.position[self.axis] == original.position[original.axis]
+    }
+
+    pub fn in_wide_move<const N: u32>(&self, piece_depth: u32, m: &WideAxisMove<N>) -> bool {
+        // If on the same direction
+        if self.position[m.face().axis] == m.face().direction {
+            if piece_depth <= m.depth() {
+                return true;
+            }
+
+            if self.axis == m.face().axis {
+                return true;
+            }
+        }
+
+        false
     }
 }
 

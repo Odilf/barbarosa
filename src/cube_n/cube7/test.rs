@@ -12,9 +12,9 @@ fn six_sexies() {
     let mut cube = Cube7::new_solved();
     let alg = perms::SEXY_MOVE.clone().widen::<2>(0).unwrap();
 
-	for _ in 0..6 {
-		cube.apply(&alg);
-	}
+    for _ in 0..6 {
+        cube.apply(&alg);
+    }
 
     assert!(cube.is_solved());
 }

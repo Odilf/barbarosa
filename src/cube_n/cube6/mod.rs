@@ -24,29 +24,33 @@ pub struct Cube6 {
 }
 
 impl Cube6 {
-	pub fn wing_iter(&self) -> impl Iterator<Item = (&Wing, u32)> {
-		self.wings_1.iter()
-			.map(|wing| (wing, 1))
-			.chain(self.wings_2.iter().map(|wing| (wing, 2)))
-	}
+    pub fn wing_iter(&self) -> impl Iterator<Item = (&Wing, u32)> {
+        self.wings_1
+            .iter()
+            .map(|wing| (wing, 1))
+            .chain(self.wings_2.iter().map(|wing| (wing, 2)))
+    }
 
-	pub fn wing_iter_mut(&mut self) -> impl Iterator<Item = (&mut Wing, u32)> {
-		self.wings_1.iter_mut()
-			.map(|wing| (wing, 1))
-			.chain(self.wings_2.iter_mut().map(|wing| (wing, 2)))
-	}
+    pub fn wing_iter_mut(&mut self) -> impl Iterator<Item = (&mut Wing, u32)> {
+        self.wings_1
+            .iter_mut()
+            .map(|wing| (wing, 1))
+            .chain(self.wings_2.iter_mut().map(|wing| (wing, 2)))
+    }
 
-	pub fn center_corner_iter(&self) -> impl Iterator<Item = (&CornerCenter, u32)> {
-		self.center_corners_1.iter()
-			.map(|wing| (wing, 1))
-			.chain(self.center_corners_2.iter().map(|wing| (wing, 2)))
-	}
+    pub fn center_corner_iter(&self) -> impl Iterator<Item = (&CornerCenter, u32)> {
+        self.center_corners_1
+            .iter()
+            .map(|wing| (wing, 1))
+            .chain(self.center_corners_2.iter().map(|wing| (wing, 2)))
+    }
 
-	pub fn center_corner_iter_mut(&mut self) -> impl Iterator<Item = (&mut CornerCenter, u32)> {
-		self.center_corners_1.iter_mut()
-			.map(|wing| (wing, 1))
-			.chain(self.center_corners_2.iter_mut().map(|wing| (wing, 2)))
-	}
+    pub fn center_corner_iter_mut(&mut self) -> impl Iterator<Item = (&mut CornerCenter, u32)> {
+        self.center_corners_1
+            .iter_mut()
+            .map(|wing| (wing, 1))
+            .chain(self.center_corners_2.iter_mut().map(|wing| (wing, 2)))
+    }
 }
 
 impl generic::Cube for Cube6 {
@@ -54,18 +58,26 @@ impl generic::Cube for Cube6 {
         &SOLVED
     }
 
-	fn is_solved(&self) -> bool
-		where
-			Self: 'static, {
-		let corners = self.corners == Self::solved().corners;
-		let wings_1 = self.wings_1 == Self::solved().wings_1;
-		let wings_2 = self.wings_2 == Self::solved().wings_2;
+    fn is_solved(&self) -> bool
+    where
+        Self: 'static,
+    {
+        let corners = self.corners == Self::solved().corners;
+        let wings_1 = self.wings_1 == Self::solved().wings_1;
+        let wings_2 = self.wings_2 == Self::solved().wings_2;
 
-		let center_corners = self.center_corner_iter().zip(Self::solved().center_corner_iter()).all(|((c, _), (o, _))| c.is_solved(o));
-		let center_wings = self.center_wings.iter().zip(Self::solved().center_wings.iter()).all(|(c, o)| c.is_solved(o));
+        let center_corners = self
+            .center_corner_iter()
+            .zip(Self::solved().center_corner_iter())
+            .all(|((c, _), (o, _))| c.is_solved(o));
+        let center_wings = self
+            .center_wings
+            .iter()
+            .zip(Self::solved().center_wings.iter())
+            .all(|(c, o)| c.is_solved(o));
 
-		corners && wings_1 && wings_2 && center_corners && center_wings
-	}
+        corners && wings_1 && wings_2 && center_corners && center_wings
+    }
 }
 
 impl IntoMove for Cube6 {
@@ -76,12 +88,12 @@ impl generic::Movable<WideAxisMove<2>> for Cube6 {
     fn apply(&mut self, m: &WideAxisMove<2>) {
         self.corners.apply(&m.axis_move);
 
-		self.wing_iter_mut()
-			.filter(|(wing, depth)| wing::in_wide_move(wing, *depth, m))
-			.for_each(|(wing, _depth)| wing.rotate(&AxisRotation::from(&m.axis_move)));	
+        self.wing_iter_mut()
+            .filter(|(wing, depth)| wing.in_wide_move(*depth, m))
+            .for_each(|(wing, _depth)| wing.rotate(&AxisRotation::from(&m.axis_move)));
 
         self.center_corner_iter_mut()
-            .filter(|(cc, depth)| center::corner::in_wide_move(cc, *depth, m))
+            .filter(|(cc, depth)| cc.in_wide_move(*depth, m))
             .for_each(|(cc, _)| cc.rotate(&AxisRotation::from(&m.axis_move)));
 
         self.center_wings

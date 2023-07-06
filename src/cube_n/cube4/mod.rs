@@ -52,20 +52,14 @@ impl generic::Movable<WideAxisMove<1>> for Cube4 {
     fn apply(&mut self, m: &WideAxisMove<1>) {
         self.corners.apply(&m.axis_move);
 
-        let mut moved_corner_count = 0;
-
-        for center in &mut self.centers {
-            if center::corner::in_wide_move(center, 1, m) {
-                moved_corner_count += 1;
-                center.rotate(&AxisRotation::from(&m.axis_move));
-            }
-        }
-
-        debug_assert_eq!(moved_corner_count, if m.depth() == 0 { 4 } else { 12 });
+        self.centers
+            .iter_mut()
+            .filter(|cc| cc.in_wide_move(1, m))
+            .for_each(|cc| cc.rotate(&AxisRotation::from(&m.axis_move)));
 
         self.wings
             .iter_mut()
-            .filter(|wing| wing::in_wide_move(wing, 1, m))
+            .filter(|wing| wing.in_wide_move(1, m))
             .for_each(|wing| wing.rotate(&AxisRotation::from(&m.axis_move)));
     }
 }

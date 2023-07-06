@@ -43,12 +43,12 @@ impl generic::Movable<WideAxisMove<1>> for Cube5 {
 
         self.corner_centers
             .iter_mut()
-            .filter(|cc| center::corner::in_wide_move(cc, 1, m))
+            .filter(|cc| cc.in_wide_move(1, m))
             .for_each(|cc| cc.rotate(&AxisRotation::from(&m.axis_move)));
 
         self.corner_edges
             .iter_mut()
-            .filter(|ce| center::edge::in_wide_move(ce, 1, m))
+            .filter(|ce| ce.in_wide_move(1, m))
             .for_each(|ce| ce.rotate(&AxisRotation::from(&m.axis_move)));
     }
 }
