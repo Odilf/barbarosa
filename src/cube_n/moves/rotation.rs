@@ -23,7 +23,7 @@ impl AxisRotation {
 }
 
 /// Things that can be rotated.
-pub trait Rotatable: Clone {
+pub trait Rotatable: Sized {
     /// Rotates a piece according to an [AxisRotation]
     fn rotate(&mut self, rotation: &AxisRotation);
 
