@@ -1,9 +1,12 @@
 use nalgebra::{vector, Vector3};
 
-use crate::cube_n::{
-    moves::rotation::{AxisRotation, Rotatable},
-    space::{Axis, Direction},
-    WideAxisMove,
+use crate::{
+    cube_n::{
+        moves::rotation::{AxisRotation, Rotatable},
+        space::{Axis, Direction},
+        WideAxisMove,
+    },
+    generic,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -11,6 +14,8 @@ pub struct CornerCenter {
     position: Vector3<Direction>,
     axis: Axis,
 }
+
+impl generic::Piece for CornerCenter {}
 
 impl Rotatable for CornerCenter {
     fn rotate(&mut self, rotation: &AxisRotation) {

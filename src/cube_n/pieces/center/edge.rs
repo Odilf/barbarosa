@@ -1,22 +1,27 @@
-use crate::cube_n::{
-    moves::rotation::Rotatable,
-    pieces::edge::ParallelAxesError,
-    space::{faces, Direction, Face},
-    WideAxisMove,
+use crate::{
+    cube_n::{
+        moves::rotation::Rotatable,
+        pieces::edge::ParallelAxesError,
+        space::{faces, Direction, Face},
+        WideAxisMove,
+    },
+    generic,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct EdgeCenter {
-    main_face: Face,
-    handedness: Direction,
-    side_direction: Direction,
+    pub main_face: Face,
+    pub handedness: Direction,
+    pub side_direction: Direction,
 }
+
+impl generic::Piece for EdgeCenter {}
 
 impl Rotatable for EdgeCenter {
     fn rotate(&mut self, rotation: &crate::cube_n::moves::rotation::AxisRotation) {
         let side_face = self.side_face().rotated(rotation);
 
-        // Very important to rotate face only *after* getting the side face. 
+        // Very important to rotate face only *after* getting the side face.
         self.main_face.rotate(rotation);
 
         self.handedness = self
