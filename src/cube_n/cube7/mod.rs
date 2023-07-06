@@ -5,8 +5,8 @@ use crate::generic::{self, moves::IntoMove};
 use super::{
     moves::rotation::{AxisRotation, Rotatable},
     pieces::{
-        center::{self, edge::EdgeCenter, wing::WingCenter},
-        corner, edge, wing, CornerCenter,
+        center::{self, edge::CenterEdge, wing::CenterWing},
+        corner, edge, wing, CenterCorner,
     },
     Corner, Edge, WideAxisMove, Wing,
 };
@@ -19,12 +19,12 @@ pub struct Cube7 {
     wings_1: [Wing; 24],
     wings_2: [Wing; 24],
 
-    center_corners_1: [CornerCenter; 24],
-    center_corners_2: [CornerCenter; 24],
-    center_wings: [WingCenter; 48],
+    center_corners_1: [CenterCorner; 24],
+    center_corners_2: [CenterCorner; 24],
+    center_wings: [CenterWing; 48],
 
-    center_edges_1: [EdgeCenter; 24],
-    center_edges_2: [EdgeCenter; 24],
+    center_edges_1: [CenterEdge; 24],
+    center_edges_2: [CenterEdge; 24],
 }
 
 impl Cube7 {
@@ -42,28 +42,28 @@ impl Cube7 {
             .chain(self.wings_2.iter_mut().map(|wing| (wing, 2)))
     }
 
-    pub fn center_corner_iter(&self) -> impl Iterator<Item = (&CornerCenter, u32)> {
+    pub fn center_corner_iter(&self) -> impl Iterator<Item = (&CenterCorner, u32)> {
         self.center_corners_1
             .iter()
             .map(|wing| (wing, 1))
             .chain(self.center_corners_2.iter().map(|wing| (wing, 2)))
     }
 
-    pub fn center_corner_iter_mut(&mut self) -> impl Iterator<Item = (&mut CornerCenter, u32)> {
+    pub fn center_corner_iter_mut(&mut self) -> impl Iterator<Item = (&mut CenterCorner, u32)> {
         self.center_corners_1
             .iter_mut()
             .map(|wing| (wing, 1))
             .chain(self.center_corners_2.iter_mut().map(|wing| (wing, 2)))
     }
 
-    pub fn center_edge_iter(&self) -> impl Iterator<Item = (&EdgeCenter, u32)> {
+    pub fn center_edge_iter(&self) -> impl Iterator<Item = (&CenterEdge, u32)> {
         self.center_edges_1
             .iter()
             .map(|wing| (wing, 1))
             .chain(self.center_edges_2.iter().map(|wing| (wing, 2)))
     }
 
-    pub fn center_edge_iter_mut(&mut self) -> impl Iterator<Item = (&mut EdgeCenter, u32)> {
+    pub fn center_edge_iter_mut(&mut self) -> impl Iterator<Item = (&mut CenterEdge, u32)> {
         self.center_edges_1
             .iter_mut()
             .map(|wing| (wing, 1))

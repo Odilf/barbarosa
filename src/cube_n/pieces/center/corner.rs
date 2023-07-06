@@ -10,26 +10,26 @@ use crate::{
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CornerCenter {
+pub struct CenterCorner {
     position: Vector3<Direction>,
     axis: Axis,
 }
 
-impl generic::Piece for CornerCenter {}
+impl generic::Piece for CenterCorner {}
 
-impl Rotatable for CornerCenter {
+impl Rotatable for CenterCorner {
     fn rotate(&mut self, rotation: &AxisRotation) {
         self.position.rotate(rotation);
         self.axis.rotate(rotation);
     }
 }
 
-impl CornerCenter {
+impl CenterCorner {
     const fn new(position: Vector3<Direction>, axis: Axis) -> Self {
         Self { position, axis }
     }
 
-    pub fn is_solved(&self, original: &CornerCenter) -> bool {
+    pub fn is_solved(&self, original: &CenterCorner) -> bool {
         self.position[self.axis] == original.position[original.axis]
     }
 
@@ -49,33 +49,33 @@ impl CornerCenter {
     }
 }
 
-pub const SOLVED: [CornerCenter; 24] = {
+pub const SOLVED: [CenterCorner; 24] = {
     use Direction::*;
 
     [
-        CornerCenter::new(vector![Positive, Positive, Positive], Axis::X),
-        CornerCenter::new(vector![Positive, Positive, Negative], Axis::X),
-        CornerCenter::new(vector![Positive, Negative, Positive], Axis::X),
-        CornerCenter::new(vector![Positive, Negative, Negative], Axis::X),
-        CornerCenter::new(vector![Negative, Positive, Positive], Axis::X),
-        CornerCenter::new(vector![Negative, Positive, Negative], Axis::X),
-        CornerCenter::new(vector![Negative, Negative, Positive], Axis::X),
-        CornerCenter::new(vector![Negative, Negative, Negative], Axis::X),
-        CornerCenter::new(vector![Positive, Positive, Positive], Axis::Y),
-        CornerCenter::new(vector![Positive, Positive, Negative], Axis::Y),
-        CornerCenter::new(vector![Positive, Negative, Positive], Axis::Y),
-        CornerCenter::new(vector![Positive, Negative, Negative], Axis::Y),
-        CornerCenter::new(vector![Negative, Positive, Positive], Axis::Y),
-        CornerCenter::new(vector![Negative, Positive, Negative], Axis::Y),
-        CornerCenter::new(vector![Negative, Negative, Positive], Axis::Y),
-        CornerCenter::new(vector![Negative, Negative, Negative], Axis::Y),
-        CornerCenter::new(vector![Positive, Positive, Positive], Axis::Z),
-        CornerCenter::new(vector![Positive, Positive, Negative], Axis::Z),
-        CornerCenter::new(vector![Positive, Negative, Positive], Axis::Z),
-        CornerCenter::new(vector![Positive, Negative, Negative], Axis::Z),
-        CornerCenter::new(vector![Negative, Positive, Positive], Axis::Z),
-        CornerCenter::new(vector![Negative, Positive, Negative], Axis::Z),
-        CornerCenter::new(vector![Negative, Negative, Positive], Axis::Z),
-        CornerCenter::new(vector![Negative, Negative, Negative], Axis::Z),
+        CenterCorner::new(vector![Positive, Positive, Positive], Axis::X),
+        CenterCorner::new(vector![Positive, Positive, Negative], Axis::X),
+        CenterCorner::new(vector![Positive, Negative, Positive], Axis::X),
+        CenterCorner::new(vector![Positive, Negative, Negative], Axis::X),
+        CenterCorner::new(vector![Negative, Positive, Positive], Axis::X),
+        CenterCorner::new(vector![Negative, Positive, Negative], Axis::X),
+        CenterCorner::new(vector![Negative, Negative, Positive], Axis::X),
+        CenterCorner::new(vector![Negative, Negative, Negative], Axis::X),
+        CenterCorner::new(vector![Positive, Positive, Positive], Axis::Y),
+        CenterCorner::new(vector![Positive, Positive, Negative], Axis::Y),
+        CenterCorner::new(vector![Positive, Negative, Positive], Axis::Y),
+        CenterCorner::new(vector![Positive, Negative, Negative], Axis::Y),
+        CenterCorner::new(vector![Negative, Positive, Positive], Axis::Y),
+        CenterCorner::new(vector![Negative, Positive, Negative], Axis::Y),
+        CenterCorner::new(vector![Negative, Negative, Positive], Axis::Y),
+        CenterCorner::new(vector![Negative, Negative, Negative], Axis::Y),
+        CenterCorner::new(vector![Positive, Positive, Positive], Axis::Z),
+        CenterCorner::new(vector![Positive, Positive, Negative], Axis::Z),
+        CenterCorner::new(vector![Positive, Negative, Positive], Axis::Z),
+        CenterCorner::new(vector![Positive, Negative, Negative], Axis::Z),
+        CenterCorner::new(vector![Negative, Positive, Positive], Axis::Z),
+        CenterCorner::new(vector![Negative, Positive, Negative], Axis::Z),
+        CenterCorner::new(vector![Negative, Negative, Positive], Axis::Z),
+        CenterCorner::new(vector![Negative, Negative, Negative], Axis::Z),
     ]
 };

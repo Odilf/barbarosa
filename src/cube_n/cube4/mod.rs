@@ -9,7 +9,7 @@ use crate::generic::{self, moves::IntoMove, Cube};
 use super::{
     moves::rotation::{AxisRotation, Rotatable},
     pieces::{
-        center::{self, corner::CornerCenter},
+        center::{self, corner::CenterCorner},
         corner, wing,
     },
     space::{Axis, Direction, Face},
@@ -20,7 +20,7 @@ use super::{
 pub struct Cube4 {
     corners: [Corner; 8],
     wings: [Wing; 24],
-    centers: [CornerCenter; 24],
+    centers: [CenterCorner; 24],
 }
 
 impl generic::Cube for Cube4 {

@@ -9,15 +9,15 @@ use crate::{
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct EdgeCenter {
+pub struct CenterEdge {
     pub main_face: Face,
     pub handedness: Direction,
     pub side_direction: Direction,
 }
 
-impl generic::Piece for EdgeCenter {}
+impl generic::Piece for CenterEdge {}
 
-impl Rotatable for EdgeCenter {
+impl Rotatable for CenterEdge {
     fn rotate(&mut self, rotation: &crate::cube_n::moves::rotation::AxisRotation) {
         let side_face = self.side_face().rotated(rotation);
 
@@ -34,7 +34,7 @@ impl Rotatable for EdgeCenter {
     }
 }
 
-impl EdgeCenter {
+impl CenterEdge {
     pub const fn new(main_face: Face, handedness: Direction, side_direction: Direction) -> Self {
         Self {
             main_face,
@@ -46,7 +46,7 @@ impl EdgeCenter {
     pub fn try_from_faces(main_face: Face, side_face: Face) -> Result<Self, ParallelAxesError> {
         let handedness = main_face.axis.get_handedness(&side_face.axis)?;
 
-        Ok(EdgeCenter {
+        Ok(CenterEdge {
             main_face,
             handedness,
             side_direction: side_face.direction,
@@ -78,34 +78,34 @@ impl EdgeCenter {
     }
 }
 
-pub const SOLVED: [EdgeCenter; 24] = {
+pub const SOLVED: [CenterEdge; 24] = {
     use faces::*;
     use Direction::*;
 
     [
-        EdgeCenter::new(R, Positive, Positive),
-        EdgeCenter::new(R, Positive, Negative),
-        EdgeCenter::new(R, Negative, Negative),
-        EdgeCenter::new(R, Negative, Positive),
-        EdgeCenter::new(U, Positive, Positive),
-        EdgeCenter::new(U, Positive, Positive),
-        EdgeCenter::new(U, Positive, Negative),
-        EdgeCenter::new(U, Positive, Negative),
-        EdgeCenter::new(F, Negative, Negative),
-        EdgeCenter::new(F, Negative, Negative),
-        EdgeCenter::new(F, Negative, Positive),
-        EdgeCenter::new(F, Negative, Positive),
-        EdgeCenter::new(L, Positive, Positive),
-        EdgeCenter::new(L, Positive, Negative),
-        EdgeCenter::new(L, Negative, Negative),
-        EdgeCenter::new(L, Negative, Positive),
-        EdgeCenter::new(D, Positive, Positive),
-        EdgeCenter::new(D, Positive, Positive),
-        EdgeCenter::new(D, Positive, Negative),
-        EdgeCenter::new(D, Positive, Negative),
-        EdgeCenter::new(B, Negative, Negative),
-        EdgeCenter::new(B, Negative, Negative),
-        EdgeCenter::new(B, Negative, Positive),
-        EdgeCenter::new(B, Negative, Positive),
+        CenterEdge::new(R, Positive, Positive),
+        CenterEdge::new(R, Positive, Negative),
+        CenterEdge::new(R, Negative, Negative),
+        CenterEdge::new(R, Negative, Positive),
+        CenterEdge::new(U, Positive, Positive),
+        CenterEdge::new(U, Positive, Positive),
+        CenterEdge::new(U, Positive, Negative),
+        CenterEdge::new(U, Positive, Negative),
+        CenterEdge::new(F, Negative, Negative),
+        CenterEdge::new(F, Negative, Negative),
+        CenterEdge::new(F, Negative, Positive),
+        CenterEdge::new(F, Negative, Positive),
+        CenterEdge::new(L, Positive, Positive),
+        CenterEdge::new(L, Positive, Negative),
+        CenterEdge::new(L, Negative, Negative),
+        CenterEdge::new(L, Negative, Positive),
+        CenterEdge::new(D, Positive, Positive),
+        CenterEdge::new(D, Positive, Positive),
+        CenterEdge::new(D, Positive, Negative),
+        CenterEdge::new(D, Positive, Negative),
+        CenterEdge::new(B, Negative, Negative),
+        CenterEdge::new(B, Negative, Negative),
+        CenterEdge::new(B, Negative, Positive),
+        CenterEdge::new(B, Negative, Positive),
     ]
 };

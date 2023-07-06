@@ -5,8 +5,8 @@ use crate::generic::{self, moves::IntoMove};
 use super::{
     moves::rotation::{AxisRotation, Rotatable},
     pieces::{
-        center::{self, wing::WingCenter},
-        corner, wing, CornerCenter,
+        center::{self, wing::CenterWing},
+        corner, wing, CenterCorner,
     },
     Corner, WideAxisMove, Wing,
 };
@@ -18,9 +18,9 @@ pub struct Cube6 {
     wings_1: [Wing; 24],
     wings_2: [Wing; 24],
 
-    center_corners_1: [CornerCenter; 24],
-    center_corners_2: [CornerCenter; 24],
-    center_wings: [WingCenter; 48],
+    center_corners_1: [CenterCorner; 24],
+    center_corners_2: [CenterCorner; 24],
+    center_wings: [CenterWing; 48],
 }
 
 impl Cube6 {
@@ -38,14 +38,14 @@ impl Cube6 {
             .chain(self.wings_2.iter_mut().map(|wing| (wing, 2)))
     }
 
-    pub fn center_corner_iter(&self) -> impl Iterator<Item = (&CornerCenter, u32)> {
+    pub fn center_corner_iter(&self) -> impl Iterator<Item = (&CenterCorner, u32)> {
         self.center_corners_1
             .iter()
             .map(|wing| (wing, 1))
             .chain(self.center_corners_2.iter().map(|wing| (wing, 2)))
     }
 
-    pub fn center_corner_iter_mut(&mut self) -> impl Iterator<Item = (&mut CornerCenter, u32)> {
+    pub fn center_corner_iter_mut(&mut self) -> impl Iterator<Item = (&mut CenterCorner, u32)> {
         self.center_corners_1
             .iter_mut()
             .map(|wing| (wing, 1))

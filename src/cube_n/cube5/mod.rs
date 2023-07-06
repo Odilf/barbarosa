@@ -5,8 +5,8 @@ use crate::generic::{self, moves::IntoMove};
 use super::{
     moves::rotation::{AxisRotation, Rotatable},
     pieces::{
-        center::{self, edge::EdgeCenter},
-        corner, edge, CornerCenter,
+        center::{self, edge::CenterEdge},
+        corner, edge, CenterCorner,
     },
     Corner, Edge, WideAxisMove,
 };
@@ -15,8 +15,8 @@ use super::{
 pub struct Cube5 {
     corners: [Corner; 8],
     edges: [Edge; 12],
-    corner_centers: [CornerCenter; 24],
-    corner_edges: [EdgeCenter; 24],
+    corner_centers: [CenterCorner; 24],
+    corner_edges: [CenterEdge; 24],
 }
 
 const SOLVED: Cube5 = Cube5 {
