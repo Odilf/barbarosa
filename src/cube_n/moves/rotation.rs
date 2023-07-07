@@ -5,7 +5,7 @@ use crate::cube_n::space::{Axis, Direction, Face};
 use super::{Amount, AxisMove};
 
 /// A rotation around an axis. This is similar to an [AxisMove](super::AxisMove), but it doesn't
-/// specify the face. Mainly, this is used because L and R' are the same rotation,
+/// specify the face. Mainly, this is used because, for example, L and R' are the same rotation and
 /// the only difference is the pieces selected in the rotation.
 #[derive(Debug, Clone)]
 pub struct AxisRotation {
@@ -19,6 +19,15 @@ impl AxisRotation {
     /// Creates a new [AxisRotation]
     pub fn new(axis: Axis, amount: Amount) -> Self {
         Self { axis, amount }
+    }
+
+    /// Whether a rotation flips the orientation of an edge.
+    /// 
+    /// todo!()
+    pub fn flips_edge_orientation(&self, normal_axis: Axis) -> bool {
+        self.amount != Amount::Double && (
+            (self.axis == Axis::X) || (self.axis == normal_axis)
+        )
     }
 }
 

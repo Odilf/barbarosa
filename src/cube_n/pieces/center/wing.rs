@@ -2,7 +2,7 @@ use nalgebra::vector;
 
 use crate::{
     cube_n::{
-        moves::{rotation::Rotatable, Amount},
+        moves::rotation::Rotatable,
         pieces::wing::wing_normal_direction,
         space::{faces, Axis, Direction, Face},
         WideAxisMove,
@@ -12,9 +12,13 @@ use crate::{
 
 use super::edge::CenterEdge;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+/// The center-wing piece. It's the center version of the [Wing](super::Wing) piece.
+///
+/// [CenterEdge]s have a tangent depth and [CenterCorner]s have a normal depth. A [CenterWing] need both to
+/// be identified.
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct CenterWing {
-    corresponding_edge_center: CenterEdge,
+    corresponding_center_edge: CenterEdge,
     hypothetically_oriented: bool,
 }
 
@@ -22,11 +26,9 @@ impl generic::Piece for CenterWing {}
 
 impl Rotatable for CenterWing {
     fn rotate(&mut self, rotation: &crate::cube_n::moves::rotation::AxisRotation) {
-        self.corresponding_edge_center.rotate(rotation);
+        self.corresponding_center_edge.rotate(rotation);
 
-        if rotation.axis == Axis::X && rotation.amount != Amount::Double {
-            self.hypothetically_oriented = !self.hypothetically_oriented;
-        }
+        self.hypothetically_oriented ^= rotation.flips_edge_orientation(self.normal_axis());
     }
 }
 
@@ -37,9 +39,19 @@ impl CenterWing {
         side_direction: Direction,
         normal_direction: Direction,
     ) -> Self {
+        let corresponding_edge_center = CenterEdge::new(main_face, handedness, side_direction);
+        let hypothetically_oriented = wing_normal_direction(
+            corresponding_edge_center.normal_axis(),
+            vector![
+                corresponding_edge_center.main_face.direction,
+                corresponding_edge_center.side_direction
+            ],
+            true,
+        ) == normal_direction;
+
         Self {
-            corresponding_edge_center: CenterEdge::new(main_face, handedness, side_direction),
-            hypothetically_oriented: normal_direction == Direction::Positive,
+            corresponding_center_edge: corresponding_edge_center,
+            hypothetically_oriented,
         }
     }
 
@@ -50,31 +62,29 @@ impl CenterWing {
         hypothetically_oriented: bool,
     ) -> Self {
         Self {
-            corresponding_edge_center: CenterEdge::new(main_face, handedness, side_direction),
+            corresponding_center_edge: CenterEdge::new(main_face, handedness, side_direction),
             hypothetically_oriented,
         }
     }
 
     pub fn main_face(&self) -> &Face {
-        &self.corresponding_edge_center.main_face
+        &self.corresponding_center_edge.main_face
     }
 
     pub fn side_face(&self) -> Face {
-        self.corresponding_edge_center.side_face()
+        self.corresponding_center_edge.side_face()
     }
 
     pub fn normal_axis(&self) -> Axis {
-        self.main_face()
-            .axis
-            .next_with_handedness(-self.corresponding_edge_center.handedness)
+        self.corresponding_center_edge.normal_axis()
     }
 
     pub fn normal_direction(&self) -> Direction {
         wing_normal_direction(
             self.normal_axis(),
             vector![
-                self.corresponding_edge_center.side_direction,
-                self.corresponding_edge_center.handedness
+                self.corresponding_center_edge.main_face.direction,
+                self.corresponding_center_edge.side_direction
             ],
             self.hypothetically_oriented,
         )
@@ -84,16 +94,57 @@ impl CenterWing {
         self.main_face() == original.main_face()
     }
 
-    pub fn in_wide_move<const N: u32>(&self, piece_depth: u32, m: &WideAxisMove<N>) -> bool {
-        if self.main_face() == m.face() {
-            return true;
-        };
+    // TODO: check this, might be wrong
+    pub fn in_wide_move<const N: u32>(
+        &self,
+        normal_depth: u32,
+        tangent_depth: u32,
+        m: &WideAxisMove<N>,
+    ) -> bool {
+        let (main, side, mov) = (self.main_face(), &self.side_face(), m.face());
 
-        if &self.side_face() == m.face() && piece_depth <= N {
+        // If directly on face
+        if main == mov {
             return true;
-        };
+        }
 
-        false
+        // If it's to the side, check the normal depth
+        if side == mov {
+            return normal_depth <= m.depth();
+        }
+
+        // If neither of the two sides is the same as the move, then having the same axis on
+        // either of them means it's the opposite face. We can discard those.
+        // if main.axis == mov.axis || side.axis == mov.axis {
+        //     return false;
+        // }
+        if main == &mov.opposite() || side == &mov.opposite() {
+            return false;
+        }
+
+        // Here we know that if neither of the two faces are on the axis of the move that said axis is the normal.
+        debug_assert_eq!(self.normal_axis(), m.face().axis);
+
+        let output = self.normal_direction() == m.face().direction && tangent_depth <= m.depth();
+
+        if m.face() == &Face::U {
+            // dbg!(self, self.side_face(), self.normal_direction(), m.face(), tangent_depth, m.depth(), output);
+        }
+
+        output
+        // true
+        // tangent_depth <= m.depth()
+    }
+}
+
+impl std::fmt::Debug for CenterWing {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("CenterWing")
+            .field("main_face", &self.corresponding_center_edge.main_face)
+            .field("side_face", &self.side_face())
+            .field("normal_direction", &self.normal_direction())
+            .field("hypo_orient", &self.hypothetically_oriented)
+            .finish()
     }
 }
 
@@ -103,52 +154,52 @@ pub const SOLVED: [CenterWing; 48] = {
 
     [
         CenterWing::new_with_orientation(R, Positive, Positive, true),
-        CenterWing::new_with_orientation(R, Positive, Positive, true),
         CenterWing::new_with_orientation(R, Positive, Negative, true),
         CenterWing::new_with_orientation(R, Negative, Negative, true),
-        CenterWing::new_with_orientation(U, Positive, Positive, true),
+        CenterWing::new_with_orientation(R, Negative, Positive, true),
         CenterWing::new_with_orientation(U, Positive, Positive, true),
         CenterWing::new_with_orientation(U, Positive, Negative, true),
-        CenterWing::new_with_orientation(U, Positive, Negative, true),
-        CenterWing::new_with_orientation(F, Negative, Negative, true),
+        CenterWing::new_with_orientation(U, Negative, Negative, true),
+        CenterWing::new_with_orientation(U, Negative, Positive, true),
+        CenterWing::new_with_orientation(F, Positive, Positive, true),
+        CenterWing::new_with_orientation(F, Positive, Negative, true),
         CenterWing::new_with_orientation(F, Negative, Negative, true),
         CenterWing::new_with_orientation(F, Negative, Positive, true),
-        CenterWing::new_with_orientation(F, Negative, Positive, true),
-        CenterWing::new_with_orientation(L, Positive, Positive, true),
         CenterWing::new_with_orientation(L, Positive, Positive, true),
         CenterWing::new_with_orientation(L, Positive, Negative, true),
         CenterWing::new_with_orientation(L, Negative, Negative, true),
-        CenterWing::new_with_orientation(D, Positive, Positive, true),
+        CenterWing::new_with_orientation(L, Negative, Positive, true),
         CenterWing::new_with_orientation(D, Positive, Positive, true),
         CenterWing::new_with_orientation(D, Positive, Negative, true),
-        CenterWing::new_with_orientation(D, Positive, Negative, true),
+        CenterWing::new_with_orientation(D, Negative, Negative, true),
+        CenterWing::new_with_orientation(D, Negative, Positive, true),
+        CenterWing::new_with_orientation(B, Positive, Positive, true),
+        CenterWing::new_with_orientation(B, Positive, Negative, true),
         CenterWing::new_with_orientation(B, Negative, Negative, true),
-        CenterWing::new_with_orientation(B, Negative, Negative, true),
-        CenterWing::new_with_orientation(B, Negative, Positive, true),
         CenterWing::new_with_orientation(B, Negative, Positive, true),
         CenterWing::new_with_orientation(R, Positive, Positive, false),
         CenterWing::new_with_orientation(R, Positive, Negative, false),
         CenterWing::new_with_orientation(R, Negative, Negative, false),
         CenterWing::new_with_orientation(R, Negative, Positive, false),
         CenterWing::new_with_orientation(U, Positive, Positive, false),
-        CenterWing::new_with_orientation(U, Positive, Positive, false),
         CenterWing::new_with_orientation(U, Positive, Negative, false),
-        CenterWing::new_with_orientation(U, Positive, Negative, false),
-        CenterWing::new_with_orientation(F, Negative, Negative, false),
+        CenterWing::new_with_orientation(U, Negative, Negative, false),
+        CenterWing::new_with_orientation(U, Negative, Positive, false),
+        CenterWing::new_with_orientation(F, Positive, Positive, false),
+        CenterWing::new_with_orientation(F, Positive, Negative, false),
         CenterWing::new_with_orientation(F, Negative, Negative, false),
         CenterWing::new_with_orientation(F, Negative, Positive, false),
-        CenterWing::new_with_orientation(F, Negative, Positive, false),
-        CenterWing::new_with_orientation(L, Positive, Positive, false),
         CenterWing::new_with_orientation(L, Positive, Positive, false),
         CenterWing::new_with_orientation(L, Positive, Negative, false),
         CenterWing::new_with_orientation(L, Negative, Negative, false),
-        CenterWing::new_with_orientation(D, Positive, Positive, false),
+        CenterWing::new_with_orientation(L, Negative, Positive, false),
         CenterWing::new_with_orientation(D, Positive, Positive, false),
         CenterWing::new_with_orientation(D, Positive, Negative, false),
-        CenterWing::new_with_orientation(D, Positive, Negative, false),
+        CenterWing::new_with_orientation(D, Negative, Negative, false),
+        CenterWing::new_with_orientation(D, Negative, Positive, false),
+        CenterWing::new_with_orientation(B, Positive, Positive, false),
+        CenterWing::new_with_orientation(B, Positive, Negative, false),
         CenterWing::new_with_orientation(B, Negative, Negative, false),
-        CenterWing::new_with_orientation(B, Negative, Negative, false),
-        CenterWing::new_with_orientation(B, Negative, Positive, false),
         CenterWing::new_with_orientation(B, Negative, Positive, false),
     ]
 };

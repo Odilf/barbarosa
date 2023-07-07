@@ -6,10 +6,7 @@ use nalgebra::{vector, Vector2};
 
 use crate::{
     cube_n::{
-        moves::{
-            rotation::{AxisRotation, Rotatable},
-            Amount,
-        },
+        moves::rotation::{AxisRotation, Rotatable},
         space::{Axis, Direction, Face},
         WideAxisMove,
     },
@@ -27,11 +24,12 @@ impl generic::Piece for Wing {}
 
 impl Rotatable for Wing {
     fn rotate(&mut self, rotation: &AxisRotation) {
+        println!("Rotating with rotation {:?} and normal {:?}", rotation, self.normal_axis());
         self.corresponding_edge.rotate(rotation);
 
-        if rotation.axis == self.normal_axis() && rotation.amount != Amount::Double {
-            self.corresponding_edge.oriented = !self.corresponding_edge.oriented;
-        }
+        // if rotation.axis == self.normal_axis() && rotation.amount != Amount::Double {
+        //     self.corresponding_edge.oriented = !self.corresponding_edge.oriented;
+        // }
     }
 }
 
@@ -50,6 +48,10 @@ impl Wing {
             self.corresponding_edge.slice_position,
             self.corresponding_edge.oriented,
         )
+    }
+
+    pub fn faces(&self) -> [Face; 2] {
+        self.corresponding_edge.faces()
     }
 }
 

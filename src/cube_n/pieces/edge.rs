@@ -7,7 +7,6 @@ use crate::{
     cube_n::{
         moves::{
             rotation::{rotate_vec2, AxisRotation, Rotatable},
-            Amount,
         },
         space::{Axis, Direction, Face},
         AxisMove,
@@ -49,14 +48,12 @@ impl generic::Piece for Edge {}
 
 impl Rotatable for Edge {
     fn rotate(&mut self, rotation: &AxisRotation) {
+        // Orientation changes whenever there's a not double move on the X axis
+        self.oriented ^= rotation.flips_edge_orientation(self.normal_axis);
+
         if rotation.axis == self.normal_axis {
             self.slice_position = rotate_vec2(&rotation.amount, self.slice_position);
             return;
-        }
-
-        // Orientation changes whenever there's a not double move on the X axis
-        if rotation.axis == Axis::X && rotation.amount != Amount::Double {
-            self.oriented = !self.oriented;
         }
 
         // Position

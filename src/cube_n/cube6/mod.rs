@@ -98,7 +98,7 @@ impl generic::Movable<WideAxisMove<2>> for Cube6 {
 
         self.center_wings
             .iter_mut()
-            .filter(|cw| cw.in_wide_move(2, m))
+            .filter(|cw| cw.in_wide_move(1, 2, m))
             .for_each(|cw| cw.rotate(&AxisRotation::from(&m.axis_move)));
     }
 }

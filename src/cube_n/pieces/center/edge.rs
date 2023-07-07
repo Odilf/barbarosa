@@ -1,8 +1,8 @@
 use crate::{
     cube_n::{
-        moves::rotation::Rotatable,
+        moves::rotation::{AxisRotation, Rotatable},
         pieces::edge::ParallelAxesError,
-        space::{faces, Direction, Face},
+        space::{faces, Axis, Direction, Face},
         WideAxisMove,
     },
     generic,
@@ -18,7 +18,7 @@ pub struct CenterEdge {
 impl generic::Piece for CenterEdge {}
 
 impl Rotatable for CenterEdge {
-    fn rotate(&mut self, rotation: &crate::cube_n::moves::rotation::AxisRotation) {
+    fn rotate(&mut self, rotation: &AxisRotation) {
         let side_face = self.side_face().rotated(rotation);
 
         // Very important to rotate face only *after* getting the side face.
@@ -75,6 +75,17 @@ impl CenterEdge {
         }
 
         false
+    }
+
+    pub fn normal_axis(&self) -> Axis {
+        let output = self.main_face.axis.next_with_handedness(-self.handedness);
+
+        assert_eq!(
+            Axis::other(&self.main_face.axis, &self.side_face().axis).unwrap(),
+            output
+        );
+
+        output
     }
 }
 
