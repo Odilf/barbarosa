@@ -9,29 +9,24 @@ use crate::{
             perms::{self, pll},
             Amount,
         },
-        space::{faces::*, Direction::*, Face},
+        space::{faces::*, Direction::{*, self}, Face},
     },
-    generic::{Alg, Cube, Movable},
+    generic::{Alg, Cube, Movable, utils},
 };
 
 use super::*;
 
-fn expect_wing(cube: &Cube4, position: ([Face; 2], Direction), expected: ([Face; 2], Direction)) {
-    let position = Wing::from_faces(position.0, position.1).unwrap();
+fn expect_wing(cube: &Cube4, target: ([Face; 2], Direction), expected: ([Face; 2], Direction)) {
+    let target = Wing::from_faces(target.0, target.1).unwrap();
     let expected = Wing::from_faces(expected.0, expected.1).unwrap();
+    let found = utils::item_at(&target, &cube.wings, &Cube4::solved().wings).unwrap();
+    let position_of_expected = utils::position_of_item(&expected, &cube.wings, &Cube4::solved().wings);
 
-    let found = cube.wing_at(
-        position.normal_axis(),
-        position.slice_position(),
-        position.normal_direction(),
-    );
-
-    let position_of_expected = cube.position_of_wing(&expected);
 
     assert_eq!(
         found, &expected,
         "Expected {:#?} at {:#?}, found {:#?}. Expected is actually at {:#?}",
-        expected, position, found, position_of_expected
+        expected, target, found, position_of_expected
     );
 }
 
@@ -85,7 +80,9 @@ fn four_wide_fs() {
         cube.assert_consistent();
 
         match i {
-            0 => expect_wing(&cube, ([R, F], Positive), ([U, F], Negative)),
+            0 => {
+                expect_wing(&cube, ([R, F], Positive), ([U, F], Negative));
+            }
             _ => (),
         }
     }

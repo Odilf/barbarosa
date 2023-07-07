@@ -2,9 +2,11 @@
 
 mod test;
 
-use nalgebra::Vector2;
-
-use crate::generic::{self, moves::IntoMove, Cube};
+use crate::generic::{
+    self,
+    moves::IntoMove,
+    Cube,
+};
 
 use super::{
     moves::rotation::{AxisRotation, Rotatable},
@@ -12,8 +14,7 @@ use super::{
         center::{self, corner::CenterCorner},
         corner, wing,
     },
-    space::{Axis, Direction, Face},
-    AxisMove, Corner, Edge, WideAxisMove, Wing,
+    AxisMove, Corner, WideAxisMove, Wing,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -74,47 +75,6 @@ impl Cube4 {
                 solved_wing
             )
         }
-    }
-
-    pub fn wing_at(
-        &self,
-        normal_axis: Axis,
-        slice_position: Vector2<Direction>,
-        normal_direction: Direction,
-    ) -> &Wing {
-        let target = Wing::new(normal_axis, slice_position, normal_direction);
-
-        self.wings
-            .iter()
-            .zip(Self::solved().wings.iter())
-            .find_map(|(current, original)| {
-                if current == &target {
-                    Some(original)
-                } else {
-                    None
-                }
-            })
-            .unwrap()
-    }
-
-    pub fn wing_at_faces(&self, faces: [Face; 2], normal_direction: Direction) -> Option<&Wing> {
-        let (normal_axis, slice_position) = Edge::position_from_faces(faces).ok()?;
-
-        Some(self.wing_at(normal_axis, slice_position, normal_direction))
-    }
-
-    pub fn position_of_wing(&self, target: &Wing) -> &Wing {
-        self.wings
-            .iter()
-            .zip(Self::solved().wings.iter())
-            .find_map(|(current, original)| {
-                if original == target {
-                    Some(current)
-                } else {
-                    None
-                }
-            })
-            .unwrap()
     }
 }
 
