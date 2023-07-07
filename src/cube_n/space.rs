@@ -123,7 +123,7 @@ impl Axis {
     }
 
     pub fn get_handedness(&self, other: &Axis) -> Result<Direction, ParallelAxesError> {
-        match self.offset(&other) {
+        match self.offset(other) {
             0 => Err(ParallelAxesError::SameAxes([*self, *other])),
             1 => Ok(Direction::Positive),
             2 => Ok(Direction::Negative),
