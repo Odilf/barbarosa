@@ -11,7 +11,6 @@ pub mod invariants;
 pub mod moves;
 pub mod pieces;
 pub mod space;
-mod arbitrary;
 
 pub use moves::{AxisMove, WideAxisMove};
 pub use pieces::{Corner, Edge, Wing};
