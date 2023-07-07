@@ -22,12 +22,10 @@ impl AxisRotation {
     }
 
     /// Whether a rotation flips the orientation of an edge.
-    /// 
+    ///
     /// todo!()
     pub fn flips_edge_orientation(&self, normal_axis: Axis) -> bool {
-        self.amount != Amount::Double && (
-            (self.axis == Axis::X) || (self.axis == normal_axis)
-        )
+        self.amount != Amount::Double && (self.axis == Axis::X || self.axis == normal_axis)
     }
 }
 

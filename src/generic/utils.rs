@@ -13,11 +13,7 @@
 /// ```
 ///
 /// See also [position_of_item]
-pub fn item_at<'b, T: PartialEq>(
-    target: &T,
-    current: &[T],
-    original: &'b [T],
-) -> Option<&'b T> {
+pub fn item_at<'b, T: PartialEq>(target: &T, current: &[T], original: &'b [T]) -> Option<&'b T> {
     current
         .iter()
         .zip(original.iter())

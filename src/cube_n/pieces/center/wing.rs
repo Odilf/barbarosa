@@ -115,25 +115,14 @@ impl CenterWing {
 
         // If neither of the two sides is the same as the move, then having the same axis on
         // either of them means it's the opposite face. We can discard those.
-        // if main.axis == mov.axis || side.axis == mov.axis {
-        //     return false;
-        // }
-        if main == &mov.opposite() || side == &mov.opposite() {
+        if main.axis == mov.axis || side.axis == mov.axis {
             return false;
         }
 
         // Here we know that if neither of the two faces are on the axis of the move that said axis is the normal.
         debug_assert_eq!(self.normal_axis(), m.face().axis);
 
-        let output = self.normal_direction() == m.face().direction && tangent_depth <= m.depth();
-
-        if m.face() == &Face::U {
-            // dbg!(self, self.side_face(), self.normal_direction(), m.face(), tangent_depth, m.depth(), output);
-        }
-
-        output
-        // true
-        // tangent_depth <= m.depth()
+        self.normal_direction() == m.face().direction && tangent_depth <= m.depth()
     }
 }
 

@@ -24,12 +24,7 @@ impl generic::Piece for Wing {}
 
 impl Rotatable for Wing {
     fn rotate(&mut self, rotation: &AxisRotation) {
-        println!("Rotating with rotation {:?} and normal {:?}", rotation, self.normal_axis());
         self.corresponding_edge.rotate(rotation);
-
-        // if rotation.axis == self.normal_axis() && rotation.amount != Amount::Double {
-        //     self.corresponding_edge.oriented = !self.corresponding_edge.oriented;
-        // }
     }
 }
 

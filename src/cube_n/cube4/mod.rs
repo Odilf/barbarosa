@@ -2,11 +2,7 @@
 
 mod test;
 
-use crate::generic::{
-    self,
-    moves::IntoMove,
-    Cube,
-};
+use crate::generic::{self, moves::IntoMove, Cube};
 
 use super::{
     moves::rotation::{AxisRotation, Rotatable},

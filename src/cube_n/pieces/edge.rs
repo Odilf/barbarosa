@@ -5,9 +5,7 @@ use thiserror::Error;
 
 use crate::{
     cube_n::{
-        moves::{
-            rotation::{rotate_vec2, AxisRotation, Rotatable},
-        },
+        moves::rotation::{rotate_vec2, AxisRotation, Rotatable},
         space::{Axis, Direction, Face},
         AxisMove,
     },
