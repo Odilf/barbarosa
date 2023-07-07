@@ -84,9 +84,7 @@ fn four_wide_fs() {
         cube.assert_consistent();
 
         match i {
-            0 => {
-                expect_wing(&cube, ([R, F], Positive), ([U, F], Negative));
-            }
+            0 => expect_wing(&cube, ([R, F], Positive), ([U, F], Negative)),
             _ => (),
         }
     }
