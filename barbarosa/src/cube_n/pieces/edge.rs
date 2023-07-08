@@ -9,7 +9,7 @@ use crate::{
         space::{Axis, Direction, Face},
         AxisMove,
     },
-    generic,
+    generic::{self, moves::impl_movable_array},
 };
 
 // use super::{ContainedInMove, Corner};
@@ -75,6 +75,8 @@ impl generic::Movable<AxisMove> for Edge {
         }
     }
 }
+
+impl_movable_array!(Edge, AxisMove);
 
 impl Edge {
     pub const fn new(

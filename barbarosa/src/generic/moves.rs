@@ -2,8 +2,6 @@
 
 use strum::IntoEnumIterator;
 
-use super::Piece;
-
 /// A generic move.
 pub trait Move: Sized + Clone {
     /// The inverse of this move, such that `m * m.inverse() == Self::identity()`
@@ -32,18 +30,19 @@ pub trait Movable<M: ?Sized>: Sized {
     }
 }
 
-// Auto implementation for arrays of pieces.
-impl<P, M, const N: usize> Movable<M> for [P; N]
-where
-    P: Piece + Movable<M>,
-    M: Move,
-{
-    fn apply(&mut self, m: &M) {
-        for p in self {
-            p.apply(m);
+macro_rules! impl_movable_array {
+    ($piece:ty, $mov:ty) => {
+        impl<const N: usize> crate::generic::Movable<$mov> for [$piece; N] {
+            fn apply(&mut self, m: &$mov) {
+                for piece in self {
+                    piece.apply(m);
+                }
+            }
         }
-    }
+    };
 }
+
+pub(crate) use impl_movable_array;
 
 impl<M: Move> IntoMove for M {
     type Move = Self;

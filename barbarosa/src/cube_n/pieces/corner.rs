@@ -8,7 +8,7 @@ use crate::{
         space::{Axis, Direction, Face},
         AxisMove,
     },
-    generic,
+    generic::{self, moves::impl_movable_array},
 };
 
 // use super::ContainedInMove;
@@ -42,17 +42,7 @@ impl generic::Movable<AxisMove> for Corner {
     }
 }
 
-// impl ContainedInMove<AxisMove> for Vector3<Direction> {
-//     fn is_contained_in(&self, mov: &AxisMove) -> bool {
-//         self[mov.face.axis] == mov.face.direction
-//     }
-// }
-
-// impl ContainedInMove<AxisMove> for Corner {
-//     fn is_contained_in(&self, mov: &AxisMove) -> bool {
-//         self.position.is_contained_in(mov.face)
-//     }
-// }
+impl_movable_array!(Corner, AxisMove);
 
 impl Corner {
     pub const fn new(position: Vector3<Direction>, orientation_axis: Axis) -> Self {

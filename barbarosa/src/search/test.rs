@@ -5,7 +5,7 @@ use rand::{rngs::StdRng, SeedableRng};
 use crate::{
     cube3::heuristics,
     cube_n::{AxisMove, Cube3},
-    generic::{parse::Parsable, Cube, Movable},
+    generic::{Cube, Movable},
 };
 
 use super::*;
