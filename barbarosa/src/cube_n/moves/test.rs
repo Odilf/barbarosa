@@ -2,10 +2,12 @@
 
 use std::fmt::Debug;
 
+use rand::{rngs::StdRng, SeedableRng};
+
 use crate::{
     cube3::Cube3,
     cube_n::{
-        moves::perms::{self, pll},
+        moves::{perms::{self, pll}, QuarterAxisMove},
         space::{Axis, Face},
         AxisMove, Edge, WideAxisMove,
     },
@@ -167,4 +169,18 @@ fn alg_and_inverse_solve_cube() {
     cube.apply(&alg.reversed());
 
     assert!(cube.is_solved());
+}
+
+#[test]
+fn quarter_moves() {
+    let alg: Alg<AxisMove> = Alg::random_with_rng(10, &mut StdRng::seed_from_u64(69420));
+
+    let quarter_move_alg: Alg<QuarterAxisMove> = alg.clone().into();
+
+    assert!(alg.moves.len() <= quarter_move_alg.moves.len());
+
+    assert_eq!(
+        Cube3::new_solved().moved(&alg), 
+        Cube3::new_solved().moved(&quarter_move_alg),
+    );
 }
