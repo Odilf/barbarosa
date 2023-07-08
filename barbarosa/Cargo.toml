@@ -12,16 +12,14 @@ keywords = ["rubik", "3x3", "cubing", "speedcubing", "twisty-puzzle"]
 
 [dependencies]
 strum = { version = "0.24", features = ["derive"] }
-nalgebra = "0.32.1"
+nalgebra = "0.32.2"
 once_cell = "1.17.1"
 thiserror = "1.0.40"
 enum_dispatch = "0.3.11"
 rand = "0.8.5"
 itertools = "0.10.5"
 pathfinding = "4.3.0"
-const_format = "0.2.31"
 chrono = "0.4.26"
-rayon = "1.7.0"
 clap = { version = "4.3.11", features = ["derive"] }
 rand_derive2 = "0.1.20"
 
