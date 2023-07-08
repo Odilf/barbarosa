@@ -5,7 +5,7 @@ use std::{
     ops::{Index, Neg},
 };
 
-use nalgebra::{vector, Vector2, Vector3};
+use nalgebra::{Vector2, Vector3};
 use rand_derive2::RandGen;
 use strum::EnumIter;
 
@@ -51,40 +51,23 @@ impl From<&Axis> for Vector3<i8> {
     }
 }
 
-// TODO: Maybe use actual error
-impl TryFrom<i32> for Axis {
-    type Error = ();
-
-    fn try_from(v: i32) -> Result<Self, Self::Error> {
-        match v {
-            0 => Ok(Axis::X),
-            1 => Ok(Axis::Y),
-            2 => Ok(Axis::Z),
-            _ => Err(()),
-        }
-    }
-}
-
 impl Axis {
     /// Maps vector on slice in the specified axis. That is, you look at the
     /// axis head on and just assign `x` and `y` accordingly.
     pub fn map_on_slice<T: Clone>(
         &self,
         mut vec: Vector3<T>,
-        f: impl FnOnce(Vector2<T>) -> Vector2<T>,
+        f: impl FnOnce([&T; 2]) -> Vector2<T>,
     ) -> Vector3<T> {
-        // Why tf doesn't dot syntax work on generic vectors??
-        // This should be a lot simpler :(
-        // TODO: Look into this
         let (x, y) = match self {
             Axis::X => (1, 2),
             Axis::Y => (2, 0),
             Axis::Z => (0, 1),
         };
 
-        let mapped = f(vector![vec[x].clone(), vec[y].clone()]);
-        vec[x] = mapped[0].clone();
-        vec[y] = mapped[1].clone();
+        let result = f([&vec[x], &vec[y]]);
+        vec[x] = result[0].clone();
+        vec[y] = result[1].clone();
 
         vec
     }

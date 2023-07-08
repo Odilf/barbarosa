@@ -50,7 +50,7 @@ impl Rotatable for Edge {
         self.oriented ^= rotation.flips_edge_orientation(self.normal_axis);
 
         if rotation.axis == self.normal_axis {
-            self.slice_position = rotate_vec2(&rotation.amount, self.slice_position);
+            self.slice_position = rotate_vec2(&rotation.amount, &self.slice_position);
             return;
         }
 

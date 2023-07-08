@@ -59,9 +59,9 @@ impl Rotatable for Face {
 
 impl Rotatable for Vector3<Direction> {
     fn rotate(&mut self, rotation: &AxisRotation) {
-        *self = rotation
-            .axis
-            .map_on_slice(*self, |vec| rotate_vec2(&rotation.amount, vec));
+        *self = rotation.axis.map_on_slice(*self, |[x, y]| {
+            rotate_vec2(&rotation.amount, &vector![*x, *y])
+        });
     }
 }
 
@@ -85,7 +85,7 @@ impl From<&AxisMove> for AxisRotation {
 }
 
 /// Rotates a [Vector2] clockwise
-pub fn rotate_vec2(amount: &Amount, vec: Vector2<Direction>) -> Vector2<Direction> {
+pub fn rotate_vec2(amount: &Amount, vec: &Vector2<Direction>) -> Vector2<Direction> {
     match amount {
         Amount::Single => vector![vec.y, -vec.x],
         Amount::Double => vector![-vec.x, -vec.y],
