@@ -13,7 +13,7 @@ use crate::{
             faces::*,
             Direction::{self, *},
             Face,
-        },
+        }, AxisMove,
     },
     generic::{utils, Alg, Cube, Movable},
 };
@@ -260,4 +260,15 @@ fn regular_ass_t_perm_lol() {
     }
 
     assert!(cube.is_solved());
+}
+
+#[test]
+fn moves_by_all_widenesses() {
+    let normal = AxisMove::new(Face::R, Amount::Single);
+    let w0 = WideAxisMove::<0>::new(Face::R, Amount::Single, 0).unwrap();
+    let w1 = WideAxisMove::<1>::new(Face::R, Amount::Single, 0).unwrap();
+
+    Cube4::new_solved().apply(&normal);
+    Cube4::new_solved().apply(&w0);
+    Cube4::new_solved().apply(&w1);
 }

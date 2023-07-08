@@ -3,7 +3,7 @@ mod test;
 use crate::generic::{self, moves::IntoMove};
 
 use super::{
-    moves::rotation::{AxisRotation, Rotatable},
+    moves::{rotation::{AxisRotation, Rotatable}, wide::impl_movable_wide_move_inductively},
     pieces::{
         center::{self, wing::CenterWing},
         corner, wing, CenterCorner,
@@ -102,6 +102,8 @@ impl generic::Movable<WideAxisMove<2>> for Cube6 {
             .for_each(|cw| cw.rotate(&AxisRotation::from(&m.axis_move)));
     }
 }
+
+impl_movable_wide_move_inductively!(Cube6, 2, [0, 1]);
 
 const SOLVED: Cube6 = Cube6 {
     corners: corner::SOLVED,

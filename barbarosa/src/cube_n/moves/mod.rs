@@ -13,10 +13,10 @@ use crate::generic::{self, parse, Parsable};
 
 pub mod perms;
 pub mod rotation;
+pub mod wide;
 
 mod amount;
 mod test;
-mod wide;
 mod quarter;
 
 pub use amount::Amount;

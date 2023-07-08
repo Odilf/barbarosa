@@ -1,7 +1,7 @@
 #![cfg(test)]
 
 use crate::{
-    cube_n::moves::perms::{self, pll},
+    cube_n::{moves::{perms::{self, pll}, Amount}, AxisMove, space::Face},
     generic::{Cube, Movable},
 };
 
@@ -31,4 +31,17 @@ fn two_t_perms_of_variyng_depths() {
         cube.apply(&alg(i));
         assert!(cube.is_solved());
     }
+}
+
+#[test]
+fn varying_type_of_wide_move() {
+    let axis_move = AxisMove::new(Face::R, Amount::Single);
+    let w0 = WideAxisMove::<0>::new(Face::R, Amount::Single, 0).unwrap();
+    let w1 = WideAxisMove::<1>::new(Face::R, Amount::Single, 0).unwrap();
+    let w2 = WideAxisMove::<2>::new(Face::R, Amount::Single, 0).unwrap();
+
+    Cube7::new_solved().apply(&axis_move);
+    Cube7::new_solved().apply(&w0);
+    Cube7::new_solved().apply(&w1);
+    Cube7::new_solved().apply(&w2);
 }

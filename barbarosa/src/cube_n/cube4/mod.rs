@@ -5,12 +5,11 @@ mod test;
 use crate::generic::{self, moves::IntoMove, Cube};
 
 use super::{
-    moves::rotation::{AxisRotation, Rotatable},
+    moves::{rotation::{AxisRotation, Rotatable}, wide::impl_movable_wide_move_inductively},
     pieces::{
         center::{self, corner::CenterCorner},
         corner, wing,
-    },
-    AxisMove, Corner, WideAxisMove, Wing,
+    }, Corner, WideAxisMove, Wing,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -61,6 +60,8 @@ impl generic::Movable<WideAxisMove<1>> for Cube4 {
     }
 }
 
+impl_movable_wide_move_inductively!(Cube4, 1, [0]);
+
 impl Cube4 {
     /// Assert that the 4x4 cube is in a consistent state. Right now it only checks that it contains all wings
     pub fn assert_consistent(&self) {
@@ -71,13 +72,6 @@ impl Cube4 {
                 solved_wing
             )
         }
-    }
-}
-
-impl generic::Movable<AxisMove> for Cube4 {
-    fn apply(&mut self, m: &AxisMove) {
-        let mov = m.clone().widen(0).unwrap();
-        self.apply(&mov)
     }
 }
 

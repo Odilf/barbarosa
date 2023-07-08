@@ -7,7 +7,7 @@ pub use crate::generic::{
     parse::{self, Parsable},
 };
 
-use self::generic::Alg;
+use self::generic::{Alg, Movable};
 
 use super::{Amount, AxisMove};
 
@@ -50,6 +50,16 @@ impl<const N: u32> WideAxisMove<N> {
     pub fn depth(&self) -> u32 {
         self.depth
     }
+
+    pub fn set_depth(&mut self, new_depth: u32) -> Result<(), WideMoveCreationError> {
+        if new_depth > N {
+            return Err(WideMoveCreationError::ExcededDepth(new_depth, N));
+        }
+
+        self.depth = new_depth;
+
+        Ok(())
+    }
 }
 
 #[derive(Debug, Error)]
@@ -73,6 +83,31 @@ impl<const N: u32> std::fmt::Display for WideAxisMove<N> {
         }
     }
 }
+
+impl<C: Movable<WideAxisMove<0>>> Movable<AxisMove> for C {
+    fn apply(&mut self, m: &AxisMove) {
+        self.apply(&m.clone().widen::<0>(0).unwrap());
+    }
+}
+
+macro_rules! impl_movable_wide_move_inductively {
+    ($cube:ty, $max_width:literal, [$($width:literal),*]) => {
+        $(
+            static_assertions::const_assert!($width < $max_width);
+            impl crate::generic::Movable<WideAxisMove<$width>> for $cube {
+                fn apply(&mut self, m: &WideAxisMove<$width>) {
+                    let wider = unsafe {
+                        std::mem::transmute::<&WideAxisMove<$width>, &WideAxisMove<$max_width>>(m)
+                    };
+
+                    self.apply(wider);
+                }
+            }
+        )*
+    };
+}
+
+pub(crate) use impl_movable_wide_move_inductively;
 
 impl<const N: u32> Distribution<WideAxisMove<N>> for rand::distributions::Standard {
     fn sample<R: rand::Rng + ?Sized>(&self, rng: &mut R) -> WideAxisMove<N> {
