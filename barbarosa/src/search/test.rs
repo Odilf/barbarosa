@@ -1,5 +1,7 @@
 #![cfg(test)]
 
+use rand::{rngs::StdRng, SeedableRng};
+
 use crate::{
     cube3::heuristics,
     cube_n::{AxisMove, Cube3},
@@ -16,19 +18,20 @@ fn test_solved() {
 }
 
 fn assert_solves_alg(alg: Alg<AxisMove>, heuristic: impl Fn(&Cube3) -> i8) {
+    println!("Solving {alg}");
     let cube = Cube3::new_solved().moved(&alg);
 
-    let solution = cube.solve_with_heuristic(heuristic);
+    let solution: Alg<AxisMove> = cube.solve_with_heuristic(heuristic);
 
-    assert_eq!(solution, alg.reversed());
+    assert!(cube.moved(&solution).is_solved());
 }
 
-// TODO: Make this test not uggo
 #[test]
 fn test_solves_manhattan() {
-    let algs = ["R2", "R", "R'", "R U", "R U R' U'", "R U R' U' F"];
+    let max_length = 5;
+    let alg = Alg::<Cube3>::random_with_rng(max_length, &mut StdRng::seed_from_u64(69420));
 
-    for alg in algs {
-        assert_solves_alg(<Alg<AxisMove>>::parse(alg).unwrap(), heuristics::manhattan);
+    for i in 0..max_length {
+        assert_solves_alg(Alg::new(alg.moves[0..i].to_vec()), heuristics::manhattan);
     }
 }

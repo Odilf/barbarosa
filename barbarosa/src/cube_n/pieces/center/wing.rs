@@ -94,7 +94,6 @@ impl CenterWing {
         self.main_face() == original.main_face()
     }
 
-    // TODO: check this, might be wrong
     pub fn in_wide_move<const N: u32>(
         &self,
         normal_depth: u32,

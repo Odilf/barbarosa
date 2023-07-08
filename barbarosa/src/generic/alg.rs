@@ -142,7 +142,6 @@ impl<T: IntoMove, C: Movable<[T::Move]>> Movable<Alg<T>> for C {
 
 impl<T: IntoMove> FromIterator<T::Move> for Alg<T> {
     fn from_iter<I: IntoIterator<Item = T::Move>>(iter: I) -> Self {
-        // TODO: Revise if this is how you properly do collecting
         let moves: Vec<_> = iter.into_iter().collect();
         Self::new(moves)
     }
