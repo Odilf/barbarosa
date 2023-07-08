@@ -37,7 +37,6 @@ pub struct Cube3 {
     pub corners: [Corner; 8],
 }
 
-// TODO: Would be cool if this was replaced with a macro
 const SOLVED_CUBE: Cube3 = Cube3 {
     edges: pieces::edge::SOLVED,
     corners: pieces::corner::SOLVED,

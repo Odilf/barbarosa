@@ -86,8 +86,11 @@ pub fn write_partial<T: DiskCacheable>(bytes: &[u8]) -> io::Result<()> {
     Ok(())
 }
 
-// TODO: Maybe only do this in debug mode?
 pub fn print_with_timestamp<T: DiskCacheable>(msg: &str) {
+    if !cfg!(debug_assertions) {
+        return;
+    }
+
     println!(
         "{}: {} ({})",
         Local::now().format("%H:%M:%S.%3f"),
