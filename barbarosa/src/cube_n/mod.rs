@@ -10,6 +10,7 @@ pub mod cube7;
 pub mod invariants;
 pub mod moves;
 pub mod pieces;
+pub mod search;
 pub mod space;
 
 pub use moves::{AxisMove, WideAxisMove};

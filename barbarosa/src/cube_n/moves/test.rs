@@ -7,7 +7,10 @@ use rand::{rngs::StdRng, SeedableRng};
 use crate::{
     cube3::Cube3,
     cube_n::{
-        moves::{perms::{self, pll}, QuarterAxisMove},
+        moves::{
+            perms::{self, pll},
+            QuarterAxisMove,
+        },
         space::{Axis, Face},
         AxisMove, Edge, WideAxisMove,
     },
@@ -180,7 +183,7 @@ fn quarter_moves() {
     assert!(alg.moves.len() <= quarter_move_alg.moves.len());
 
     assert_eq!(
-        Cube3::new_solved().moved(&alg), 
+        Cube3::new_solved().moved(&alg),
         Cube3::new_solved().moved(&quarter_move_alg),
     );
 }

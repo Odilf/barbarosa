@@ -2,7 +2,6 @@ use barbarosa::{
     cube3::heuristics,
     cube_n::{AxisMove, Cube3},
     generic::{alg::Alg, Cube, Movable},
-    search::Searchable,
 };
 use criterion::Criterion;
 use rand::{rngs::StdRng, SeedableRng};
@@ -26,7 +25,7 @@ pub fn bench(c: &mut Criterion) {
 
         for (name, heuristic) in &heuristics {
             group.bench_function(*name, |b| {
-                b.iter(|| -> Alg<AxisMove> { cube.solve_with_heuristic(heuristic) })
+                b.iter(|| -> Alg<AxisMove> { cube.solve_with_heuristic(heuristic).unwrap() })
             });
         }
 

@@ -16,12 +16,12 @@ pub mod rotation;
 pub mod wide;
 
 mod amount;
-mod test;
 mod quarter;
+mod test;
 
 pub use amount::Amount;
-pub use wide::WideAxisMove;
 pub use quarter::QuarterAxisMove;
+pub use wide::WideAxisMove;
 
 /// A move on the 3x3x3 cube
 ///

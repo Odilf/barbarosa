@@ -27,6 +27,11 @@ impl<T: IntoMove> Alg<T> {
         Self { moves }
     }
 
+    /// Creates an empty alg
+    pub fn empty() -> Self {
+        Self { moves: Vec::new() }
+    }
+
     /// Reverses the alg
     pub fn reversed(&self) -> Self {
         Self::new(self.moves.iter().rev().map(|m| m.inverse()).collect())
@@ -67,7 +72,7 @@ where
     /// Simple implementation to understand where the trait bounds fail, if that happens.
     /// Otherwise you can just use `TryFrom<Vec<T>>` directly.
     pub fn try_from_states<C: Movable<T::Move> + Eq + Clone>(
-        states: Vec<C>,
+        states: &[C],
     ) -> Result<Self, TryFromStatesError<T::Move, C>> {
         let alg = states
             .windows(2)
@@ -87,10 +92,10 @@ where
 }
 
 // TODO: Change this implementation
-impl<M: Move + Debug + IntoEnumIterator, T: Movable<M> + Eq + Clone> TryFrom<Vec<T>> for Alg<M> {
+impl<M: Move + Debug + IntoEnumIterator, T: Movable<M> + Eq + Clone> TryFrom<&[T]> for Alg<M> {
     type Error = TryFromStatesError<M, T>;
 
-    fn try_from(value: Vec<T>) -> Result<Self, Self::Error> {
+    fn try_from(value: &[T]) -> Result<Self, Self::Error> {
         Self::try_from_states(value)
     }
 }

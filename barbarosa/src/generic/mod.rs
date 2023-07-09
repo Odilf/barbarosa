@@ -12,6 +12,7 @@ pub use self::{
 pub mod alg;
 pub mod moves;
 pub mod parse;
+pub mod search;
 pub mod utils;
 
 mod pieces;

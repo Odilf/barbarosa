@@ -1,7 +1,14 @@
 #![cfg(test)]
 
 use crate::{
-    cube_n::{moves::{perms::{self, pll}, Amount}, AxisMove, space::Face},
+    cube_n::{
+        moves::{
+            perms::{self, pll},
+            Amount,
+        },
+        space::Face,
+        AxisMove,
+    },
     generic::{Cube, Movable},
 };
 

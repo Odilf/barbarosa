@@ -13,7 +13,8 @@ use crate::{
             faces::*,
             Direction::{self, *},
             Face,
-        }, AxisMove,
+        },
+        AxisMove,
     },
     generic::{utils, Alg, Cube, Movable},
 };

@@ -3,7 +3,10 @@ mod test;
 use crate::generic::{self, moves::IntoMove};
 
 use super::{
-    moves::{rotation::{AxisRotation, Rotatable}, wide::impl_movable_wide_move_inductively},
+    moves::{
+        rotation::{AxisRotation, Rotatable},
+        wide::impl_movable_wide_move_inductively,
+    },
     pieces::{
         center::{self, wing::CenterWing},
         corner, wing, CenterCorner,
