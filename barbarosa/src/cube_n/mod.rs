@@ -14,7 +14,7 @@ pub mod search;
 pub mod space;
 
 pub use moves::{AxisMove, WideAxisMove};
-pub use pieces::{Corner, Edge, Wing};
+pub use pieces::{center, Corner, Edge, Wing};
 
 pub use cube2::Cube2;
 pub use cube3::Cube3;
