@@ -39,11 +39,7 @@ where
         is_target: &impl Fn(&C) -> bool,
         current_cost: i8,
         bound: i8,
-    ) -> Option<Alg<M>>
-    where
-        C: Cube + Movable<M>,
-        M: Move,
-    {
+    ) -> Option<Alg<M>> {
         let f = current_cost + (self.heuristic)(cube);
 
         if f > bound {
@@ -76,11 +72,7 @@ where
     Successors: Fn(&C) -> Iter,
     Iter: IntoIterator<Item = (C, M)>,
 {
-    fn search(&self, cube: &C, is_target: impl Fn(&C) -> bool) -> Option<Alg<M>>
-    where
-        C: Cube + Movable<M>,
-        M: Move,
-    {
+    fn search(&self, cube: &C, is_target: impl Fn(&C) -> bool) -> Option<Alg<M>> {
         let mut bound = (self.heuristic)(cube);
         for _ in 0..=self.max_depth {
             let t = self.search_impl(cube, &is_target, 0, bound);
