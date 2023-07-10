@@ -98,8 +98,8 @@ impl NonRedundantAxisMove {
     /// // `moves` doesn't contain any move on the X axis (so no L or R moves)
     /// ```
     pub fn given_last_axis(last_axis: &Axis) -> impl Iterator<Item = NonRedundantAxisMove> + '_ {
-        Axis::iter()
-            .filter(move |axis| axis != last_axis)
+        Axis::basis(last_axis)
+			.into_iter()
             .flat_map(Self::of_axis)
     }
 

@@ -52,6 +52,14 @@ impl From<&Axis> for Vector3<i8> {
 }
 
 impl Axis {
+    pub fn basis(normal: &Axis) -> [Axis; 2] {
+        match *normal {
+            Axis::X => [Axis::Y, Axis::Z],
+            Axis::Y => [Axis::Z, Axis::X],
+            Axis::Z => [Axis::X, Axis::Y],
+        }
+    }
+    
     /// Maps vector on slice in the specified axis. That is, you look at the
     /// axis head on and just assign `x` and `y` accordingly.
     pub fn map_on_slice<T: Clone>(
@@ -59,15 +67,11 @@ impl Axis {
         mut vec: Vector3<T>,
         f: impl FnOnce([&T; 2]) -> Vector2<T>,
     ) -> Vector3<T> {
-        let (x, y) = match self {
-            Axis::X => (1, 2),
-            Axis::Y => (2, 0),
-            Axis::Z => (0, 1),
-        };
+        let [x, y] = Axis::basis(&self);
 
         let result = f([&vec[x], &vec[y]]);
-        vec[x] = result[0].clone();
-        vec[y] = result[1].clone();
+        vec[x as usize] = result[0].clone();
+        vec[y as usize] = result[1].clone();
 
         vec
     }
