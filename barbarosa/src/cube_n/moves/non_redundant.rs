@@ -89,7 +89,7 @@ impl NonRedundantAxisMove {
     /// # Example
     ///
     /// ```rust
-    /// use barbarosa::cube_n::moves::{NonRedundantAxisMove, Axis};
+    /// use barbarosa::cube_n::{moves::NonRedundantAxisMove, space::Axis};
     ///
     /// let moves: Vec<_> = NonRedundantAxisMove::given_last_axis(&Axis::X).collect();
     ///
@@ -106,6 +106,22 @@ impl NonRedundantAxisMove {
     pub fn all() -> impl Iterator<Item = Self> {
         Axis::iter().flat_map(Self::of_axis)
     }
+
+	pub fn absorve(&mut self, moves: impl Iterator<Item = AxisMove>) -> Option<()> {
+		todo!()
+		// let mut moves = moves.peekable();
+
+		// let first = moves.next()?;
+		// let second = moves.peek()?;
+
+		
+
+		// Some(NonRedundantAxisMove::Double {
+		// 	axis,
+		// 	amount_positive,
+		// 	amount_negative,
+		// })
+	}
 }
 
 impl Alg<AxisMove> {
