@@ -116,8 +116,11 @@ impl Alg<AxisMove> {
             let chosen = match moves.get(0) {
                 Some(mov) => NonRedundantAxisMove::given_last_axis(&mov.face.axis)
                     .choose(rng)
-                    .unwrap(),
-                None => NonRedundantAxisMove::all().choose(rng).unwrap(),
+                    .expect("`given_last_axis` always returns 30 elements"),
+					
+                None => NonRedundantAxisMove::all()
+                    .choose(rng)
+                    .expect("`all` always returns 45 elements"),
             };
 
             for mov in chosen.moves() {
