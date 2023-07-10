@@ -100,7 +100,7 @@ impl NonRedundantAxisMove {
     pub fn given_last_axis(last_axis: &Axis) -> impl Iterator<Item = NonRedundantAxisMove> + '_ {
         Axis::iter()
             .filter(move |axis| axis != last_axis)
-            .flat_map(|axis| Self::of_axis(axis))
+            .flat_map(Self::of_axis)
     }
 
     pub fn all() -> impl Iterator<Item = Self> {
