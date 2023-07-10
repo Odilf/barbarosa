@@ -7,9 +7,9 @@ use crate::{cube_n::space::Direction, generic::parse};
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter, RandGen)]
 #[allow(missing_docs)]
 pub enum Amount {
-    Single,
-    Double,
-    Inverse,
+    Single = 1,
+    Double = 2,
+    Inverse = 3,
 }
 
 impl std::fmt::Display for Amount {
@@ -37,6 +37,20 @@ impl std::ops::Mul<Direction> for Amount {
             (Single, Positive) | (Inverse, Negative) => Single,
             (Double, _) => Double,
             (Inverse, Positive) | (Single, Negative) => Inverse,
+        }
+    }
+}
+
+impl std::ops::Add<Amount> for Amount {
+    type Output = Option<Amount>;
+
+    fn add(self, rhs: Amount) -> Self::Output {
+        match (self as u32 + rhs as u32).rem_euclid(4) {
+            0 => None,
+            1 => Some(Amount::Single),
+            2 => Some(Amount::Double),
+            3 => Some(Amount::Inverse),
+            _ => unreachable!(),
         }
     }
 }
