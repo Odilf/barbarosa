@@ -117,7 +117,7 @@ impl Alg<AxisMove> {
                 Some(mov) => NonRedundantAxisMove::given_last_axis(&mov.face.axis)
                     .choose(rng)
                     .expect("`given_last_axis` always returns 30 elements"),
-					
+
                 None => NonRedundantAxisMove::all()
                     .choose(rng)
                     .expect("`all` always returns 45 elements"),
