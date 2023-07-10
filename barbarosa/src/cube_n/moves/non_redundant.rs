@@ -11,21 +11,21 @@ use crate::{
 
 use super::{Amount, AxisMove};
 
-/// A type of move used to prevent redundancies in [AxisMove]s. 
-/// 
+/// A type of move used to prevent redundancies in [AxisMove]s.
+///
 /// This redundancy arises
 /// because you can have something like `R R` or `R L R' L'` which can clearly be simplified.
-/// [NonRedundantAxisMove] implements this by encoding all possible types of move in one axis. 
+/// [NonRedundantAxisMove] implements this by encoding all possible types of move in one axis.
 /// This way you can check the axis of the previous move and select only moves from another axis
 /// on the next one (see [Self::of_axis] and [Self::given_last_axis] for more info).
-/// 
+///
 /// # Note
-/// 
+///
 /// Technically, this doesn't prevent all redundancies. For example, you could make six sexy moves or
 /// two T perms at any point and that's cleary simplifiable. Actually, every sequence of more than 20
 /// moves is always going to have some redundancy. However, finding this redundancies basically as
 /// hard as solving the cube, so it misses the point. [NonRedundantAxisMove] is just meant to reduce
-/// the very obvious and very common redundancies. 
+/// the very obvious and very common redundancies.
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum NonRedundantAxisMove {
     Single(AxisMove),
@@ -55,7 +55,7 @@ impl NonRedundantAxisMove {
         }
     }
 
-	/// Returns all possible combinations of moves that can be made with the given axis
+    /// Returns all possible combinations of moves that can be made with the given axis
     pub fn of_axis(axis: Axis) -> impl Iterator<Item = NonRedundantAxisMove> {
         let amounts_with_none = || iter::once(None).chain(Amount::iter().map(Some));
 
@@ -84,19 +84,19 @@ impl NonRedundantAxisMove {
         })
     }
 
-	/// Returns every non-redundant move given the axis of the last move. 
-	/// 
-	/// # Example
-	/// 
-	/// ```rust
-	/// use barbarosa::cube_n::moves::{NonRedundantAxisMove, Axis};
-	/// 
-	/// let moves: Vec<_> = NonRedundantAxisMove::given_last_axis(&Axis::X).collect();
-	/// 
-	/// assert_eq!(moves.len(), 30);
-	/// 
-	/// // `moves` doesn't contain any move on the X axis (so no L or R moves)
-	/// ```
+    /// Returns every non-redundant move given the axis of the last move.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use barbarosa::cube_n::moves::{NonRedundantAxisMove, Axis};
+    ///
+    /// let moves: Vec<_> = NonRedundantAxisMove::given_last_axis(&Axis::X).collect();
+    ///
+    /// assert_eq!(moves.len(), 30);
+    ///
+    /// // `moves` doesn't contain any move on the X axis (so no L or R moves)
+    /// ```
     pub fn given_last_axis(last_axis: &Axis) -> impl Iterator<Item = NonRedundantAxisMove> + '_ {
         Axis::iter()
             .filter(move |axis| axis != last_axis)
@@ -132,7 +132,6 @@ impl Alg<AxisMove> {
         Self::random_with_rng(length, &mut rand::thread_rng())
     }
 }
-
 
 impl From<AxisMove> for NonRedundantAxisMove {
     fn from(value: AxisMove) -> Self {

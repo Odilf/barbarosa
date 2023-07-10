@@ -21,9 +21,9 @@ mod quarter;
 mod test;
 
 pub use amount::Amount;
+pub use non_redundant::NonRedundantAxisMove;
 pub use quarter::QuarterAxisMove;
 pub use wide::WideAxisMove;
-pub use non_redundant::NonRedundantAxisMove;
 
 /// A move on the 3x3x3 cube
 ///

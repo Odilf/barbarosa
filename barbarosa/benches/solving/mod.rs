@@ -20,7 +20,7 @@ pub fn bench(c: &mut Criterion) {
     amounts.for_each(|move_amount: usize| {
         let alg = Alg::<AxisMove>::random_with_rng(move_amount, &mut rng);
         println!("alg: {}", alg);
-        
+
         let cube = Cube3::new_solved().moved(&alg);
 
         let mut group = c.benchmark_group(format!("solving/{} moves", move_amount));
