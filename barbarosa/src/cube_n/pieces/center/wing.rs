@@ -12,9 +12,9 @@ use crate::{
 
 use super::edge::CenterEdge;
 
-/// The center-wing piece. It's the center version of the [Wing](super::Wing) piece.
+/// The center-wing piece. It's the center version of the [Wing](crate::cube_n::Wing) piece.
 ///
-/// [CenterEdge]s have a tangent depth and [CenterCorner]s have a normal depth. A [CenterWing] need both to
+/// [CenterEdge]s have a tangent depth and [CenterCorner](super::corner::CenterCorner)s have a normal depth. A [CenterWing] need both to
 /// be identified.
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct CenterWing {

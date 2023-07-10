@@ -18,6 +18,7 @@ use crate::{
 };
 
 use super::{
+    non_redundant::NonRedundantAxisMove,
     rotation::{AxisRotation, Rotatable},
     Amount,
 };
@@ -186,4 +187,37 @@ fn quarter_moves() {
         Cube3::new_solved().moved(&alg),
         Cube3::new_solved().moved(&quarter_move_alg),
     );
+}
+
+#[test]
+fn non_redundant_of_axis() {
+    let moves = NonRedundantAxisMove::of_axis(Axis::X).collect::<Vec<_>>();
+
+    let expected = [
+        "R", "R'", "R2", "L", "L'", "L2", "R L", "R L'", "R L2", "R' L", "R' L'", "R' L2", "R2 L",
+        "R2 L'", "R2 L2",
+    ];
+
+    assert_eq!(moves.len(), 15);
+
+    for mov in moves {
+        assert!(expected.contains(&mov.to_string().as_str()));
+    }
+}
+
+#[test]
+fn non_redundant_given_last_axis() {
+    let moves = NonRedundantAxisMove::given_last_axis(&Axis::X).collect::<Vec<_>>();
+
+    let not_expected = [
+        "R", "R'", "R2", "L", "L'", "L2", "R L", "R L'", "R L2", "R' L", "R' L'", "R' L2", "R2 L",
+        "R2 L'", "R2 L2",
+    ];
+
+    assert_eq!(moves.len(), 30);
+
+    for mov in moves {
+        assert!(!not_expected.contains(&mov.to_string().as_str()));
+        dbg!(mov.to_string());
+    }
 }

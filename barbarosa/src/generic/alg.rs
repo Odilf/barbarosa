@@ -54,13 +54,17 @@ where
     T: IntoMove,
     Standard: Distribution<T::Move>,
 {
-    /// Creates a random algorithm of the given length
-    pub fn random(length: usize) -> Self {
-        Self::random_with_rng(length, &mut rand::thread_rng())
+    /// Creates a random algorithm of the given length that might not be normalized.
+    /// This means that it might contain moves that cancel each other out.
+    ///
+    /// More often you want a random algorith with no redundancies. For that purpose,
+    /// check if [Alg::random()] is implemented for the type in question.
+    pub fn random_unnormalized(length: usize) -> Self {
+        Self::random_unnormalized_with_rng(length, &mut rand::thread_rng())
     }
 
-    /// Same as [Self::random()], but specifying RNG
-    pub fn random_with_rng(length: usize, rng: &mut impl Rng) -> Self {
+    /// Same as [Self::random_unnormalized()], but specifying RNG
+    pub fn random_unnormalized_with_rng(length: usize, rng: &mut impl Rng) -> Self {
         Self::new((0..length).map(|_| rng.gen()).collect())
     }
 }

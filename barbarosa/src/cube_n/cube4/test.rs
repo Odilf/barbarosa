@@ -130,7 +130,8 @@ fn four_of_every_single_move() {
 #[test]
 
 fn solve_unsolve_journey() {
-    let alg = Alg::<WideAxisMove<1>>::random_with_rng(30, &mut StdRng::seed_from_u64(69420));
+    let alg =
+        Alg::<WideAxisMove<1>>::random_unnormalized_with_rng(30, &mut StdRng::seed_from_u64(69420));
 
     let mut cube = Cube4::new_solved();
 

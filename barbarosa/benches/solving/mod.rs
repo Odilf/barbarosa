@@ -15,10 +15,12 @@ pub fn bench(c: &mut Criterion) {
     // Setting the rng to an arbitrary seed for reproducibility
     let mut rng = StdRng::seed_from_u64(69420);
 
-    let amounts = [4, 6].into_iter();
+    let amounts = [4, 6, 10].into_iter();
 
     amounts.for_each(|move_amount: usize| {
         let alg = Alg::<AxisMove>::random_with_rng(move_amount, &mut rng);
+        println!("alg: {}", alg);
+        
         let cube = Cube3::new_solved().moved(&alg);
 
         let mut group = c.benchmark_group(format!("solving/{} moves", move_amount));
