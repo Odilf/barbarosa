@@ -6,7 +6,7 @@ use strum::IntoEnumIterator;
 
 use crate::{
     cube_n::space::{Axis, Direction, Face},
-    generic::Alg,
+    generic::{Alg, Cube, Movable, Move},
 };
 
 use super::{Amount, AxisMove};
@@ -117,8 +117,8 @@ impl NonRedundantAxisMove {
 /// In this context, "absorve" means modifying the original [NonRedundantAxisMove] in such
 /// a way that the result is the same as doing both moves sequentially.
 ///
-/// This function modifies `self` in-place. It returns `Ok(())` when it is possible to absorve
-/// the move, and an [AbsorveResult] otherwise.
+/// This function modifies `self` in-place. It returns an [AbsorveResult] specifying
+/// what happened with the input move.
 ///
 /// # Example
 ///
@@ -243,7 +243,7 @@ impl Alg<AxisMove> {
         let mut moves: Vec<AxisMove> = Vec::new();
 
         while moves.len() < length {
-            let chosen = match moves.get(0) {
+            let chosen = match moves.get(moves.len() - 1) {
                 Some(mov) => NonRedundantAxisMove::given_last_axis(&mov.face.axis)
                     .choose(rng)
                     .expect("`given_last_axis` returns 30 elements"),
@@ -324,6 +324,31 @@ impl Alg<AxisMove> {
     }
 }
 
+impl Move for NonRedundantAxisMove {
+    fn inverse(&self) -> Self {
+        match self {
+            NonRedundantAxisMove::Single(mov) => NonRedundantAxisMove::Single(mov.inverse()),
+            NonRedundantAxisMove::Double {
+                axis,
+                amount_positive,
+                amount_negative,
+            } => NonRedundantAxisMove::Double {
+                axis: *axis,
+                amount_positive: *amount_positive * Direction::Negative,
+                amount_negative: *amount_negative * Direction::Negative,
+            },
+        }
+    }
+}
+
+impl<C: Cube + Movable<AxisMove>> Movable<NonRedundantAxisMove> for C {
+    fn apply(&mut self, m: &NonRedundantAxisMove) {
+        for mov in m.moves() {
+            self.apply(&mov);
+        }
+    }
+}
+
 impl From<AxisMove> for NonRedundantAxisMove {
     fn from(value: AxisMove) -> Self {
         NonRedundantAxisMove::Single(value)
@@ -333,6 +358,20 @@ impl From<AxisMove> for NonRedundantAxisMove {
 impl From<NonRedundantAxisMove> for Alg<AxisMove> {
     fn from(value: NonRedundantAxisMove) -> Self {
         Alg::new(value.moves().collect::<Vec<_>>())
+    }
+}
+
+impl From<Alg<NonRedundantAxisMove>> for Alg<AxisMove> {
+    fn from(value: Alg<NonRedundantAxisMove>) -> Self {
+        let mut moves = Vec::with_capacity(value.moves.len());
+
+        for nr_move in value.moves {
+            for mov in nr_move.moves() {
+                moves.push(mov);
+            }
+        }
+
+        Self::new(moves)
     }
 }
 
