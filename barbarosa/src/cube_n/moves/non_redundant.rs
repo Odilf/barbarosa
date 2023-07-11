@@ -118,7 +118,7 @@ impl NonRedundantAxisMove {
 /// a way that the result is the same as doing both moves sequentially.
 ///
 /// This function modifies `self` in-place. It returns `Ok(())` when it is possible to absorve
-/// the move, and an [AbsorveError] otherwise.
+/// the move, and an [AbsorveResult] otherwise.
 ///
 /// # Example
 ///
