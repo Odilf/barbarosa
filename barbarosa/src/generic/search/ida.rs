@@ -6,7 +6,7 @@ pub struct IDASearcher<C, M, Heuristic, Successors, Iter>
 where
     C: Cube + Movable<M>,
     M: Move,
-    Heuristic: Fn(&C) -> i8,
+    Heuristic: Fn(&C) -> f32,
     Successors: Fn(&C) -> Iter,
     Iter: IntoIterator<Item = (C, M)>,
 {
@@ -20,7 +20,7 @@ impl<C, M, Heuristic, Successors, Iter> IDASearcher<C, M, Heuristic, Successors,
 where
     C: Cube + Movable<M>,
     M: Move,
-    Heuristic: Fn(&C) -> i8,
+    Heuristic: Fn(&C) -> f32,
     Successors: Fn(&C) -> Iter,
     Iter: IntoIterator<Item = (C, M)>,
 {
@@ -37,8 +37,8 @@ where
         &self,
         cube: &C,
         is_target: &impl Fn(&C) -> bool,
-        current_cost: i8,
-        bound: i8,
+        current_cost: f32,
+        bound: f32,
     ) -> Option<Alg<M>> {
         let f = current_cost + (self.heuristic)(cube);
 
@@ -51,7 +51,7 @@ where
         }
 
         for (successor, mov) in (self.successors)(cube) {
-            let new_search = self.search_impl(&successor, is_target, current_cost + 1, bound);
+            let new_search = self.search_impl(&successor, is_target, current_cost + 1.0, bound);
 
             if let Some(mut solution) = new_search {
                 solution.moves.push(mov);
@@ -68,21 +68,21 @@ impl<C, M, Heuristic, Successors, Iter> Searcher<C, M>
 where
     C: Cube + Movable<M>,
     M: Move,
-    Heuristic: Fn(&C) -> i8,
+    Heuristic: Fn(&C) -> f32,
     Successors: Fn(&C) -> Iter,
     Iter: IntoIterator<Item = (C, M)>,
 {
     fn search(&self, cube: &C, is_target: impl Fn(&C) -> bool) -> Option<Alg<M>> {
         let mut bound = (self.heuristic)(cube);
         for _ in 0..=self.max_depth {
-            let t = self.search_impl(cube, &is_target, 0, bound);
+            let t = self.search_impl(cube, &is_target, 0.0, bound);
 
             match t {
                 Some(mut solution) => {
                     solution.moves.reverse();
                     return Some(solution);
                 }
-                None => bound += 1,
+                None => bound += 1.0,
             }
         }
 

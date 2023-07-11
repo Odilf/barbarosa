@@ -35,9 +35,9 @@ fn corner_distances(corner: &[Corner]) -> f32 {
 }
 
 /// Heuristic based on the manhattan distance
-pub fn manhattan(cube: &Cube3) -> i8 {
+pub fn manhattan(cube: &Cube3) -> f32 {
     let edge_distance = edge_distances(&cube.edges);
     let corner_distance = corner_distances(&cube.corners);
 
-    ((edge_distance + corner_distance) / (8.0 * 2.0)) as i8
+    (edge_distance + corner_distance) / (8.0 * 2.0)
 }
