@@ -3,7 +3,6 @@ use std::iter;
 use itertools::{Either, Itertools};
 use rand::{seq::IteratorRandom, Rng};
 use strum::IntoEnumIterator;
-use thiserror::Error;
 
 use crate::{
     cube_n::space::{Axis, Direction, Face},
@@ -124,7 +123,7 @@ impl NonRedundantAxisMove {
 /// # Example
 ///
 /// ```rust
-/// use barbarosa::{cube_n::{moves::non_redundant::{NonRedundantAxisMove, absorve}, AxisMove}, generic::Parsable};
+/// use barbarosa::{cube_n::{moves::non_redundant::{NonRedundantAxisMove, absorve, AbsorveResult}, AxisMove}, generic::Parsable};
 ///
 /// // Quick function to make example more readable
 /// let parse = |mov| AxisMove::parse(mov).unwrap();
@@ -139,31 +138,31 @@ impl NonRedundantAxisMove {
 /// let mut non_redundant = None;
 ///
 /// for (mov, expected) in moves_and_expected {
-///     absorve(&mut non_redundant, &parse(mov)).unwrap();
+///     absorve(&mut non_redundant, &parse(mov));
 ///
 ///     assert_eq!(non_redundant.as_ref().unwrap().to_string(), expected);
 /// }
 ///
 /// // Can't absorve F (or any non R or L move)
-/// assert!(absorve(&mut non_redundant, &parse("F")).is_err());
+/// assert_eq!(absorve(&mut non_redundant, &parse("F")), AbsorveResult::NotAdded);
 ///
 /// // We can cancel out the current moves to get back to `None`
-/// absorve(&mut non_redundant, &parse("L'")).unwrap();
-/// absorve(&mut non_redundant, &parse("R2")).unwrap();
+/// absorve(&mut non_redundant, &parse("L'"));
+/// absorve(&mut non_redundant, &parse("R2"));
 ///
 /// assert!(non_redundant.is_none());
 ///
 /// // And we *can* absorve F (or any other move) into `None`
 /// let result = absorve(&mut non_redundant, &AxisMove::parse("F").unwrap());
-/// assert!(result.is_ok());
+/// assert_ne!(result, AbsorveResult::NotAdded);
 /// ```
 pub fn absorve(
     nr_move_option: &mut Option<NonRedundantAxisMove>,
     other: &AxisMove,
-) -> Result<(), AbsorveError> {
+) -> AbsorveResult {
     let Some(ref mut nr_move) = nr_move_option else {
         *nr_move_option = Some(NonRedundantAxisMove::Single(other.clone()));
-        return Ok(());
+        return AbsorveResult::Absorved;
     };
 
     match nr_move {
@@ -173,18 +172,28 @@ pub fn absorve(
             match (mov.face.direction, other.face.direction) {
                 // If faces are the same, just add the amounts
                 (Positive, Positive) | (Negative, Negative) => match mov.amount + other.amount {
-                    Some(amount) => mov.amount = amount,
-                    None => *nr_move_option = None,
+                    Some(amount) => {
+                        mov.amount = amount;
+                        AbsorveResult::Absorved
+                    }
+                    None => {
+                        *nr_move_option = None;
+                        AbsorveResult::Collapsed
+                    }
                 },
 
                 // If faces are different, add the move to `nr_move`
                 (Positive, Negative) => {
-                    *nr_move = NonRedundantAxisMove::double(mov.face.axis, mov.amount, other.amount)
+                    *nr_move =
+                        NonRedundantAxisMove::double(mov.face.axis, mov.amount, other.amount);
+                    AbsorveResult::Added
                 }
                 (Negative, Positive) => {
-                    *nr_move = NonRedundantAxisMove::double(mov.face.axis, other.amount, mov.amount)
+                    *nr_move =
+                        NonRedundantAxisMove::double(mov.face.axis, other.amount, mov.amount);
+                    AbsorveResult::Added
                 }
-            };
+            }
         }
 
         NonRedundantAxisMove::Double {
@@ -198,31 +207,39 @@ pub fn absorve(
             };
 
             match *match_amount + other.amount {
-                Some(amount) => *match_amount = amount,
+                Some(amount) => {
+                    *match_amount = amount;
+                    AbsorveResult::Absorved
+                }
                 None => {
                     *nr_move =
-                        NonRedundantAxisMove::single(*axis, -other.face.direction, *other_amount)
+                        NonRedundantAxisMove::single(*axis, -other.face.direction, *other_amount);
+                    AbsorveResult::Collapsed
                 }
-            };
+            }
         }
 
         _ => {
             debug_assert_ne!(nr_move.axis(), other.face.axis);
 
-            return Err(AbsorveError::DifferentAxes([
-                nr_move.axis(),
-                other.face.axis,
-            ]));
+            return AbsorveResult::NotAdded;
         }
-    };
-
-    Ok(())
+    }
 }
 
-#[derive(Debug, Error)]
-pub enum AbsorveError {
-    #[error("The axes of the moves are different({:?} and {:?})", .0[0], .0[1])]
-    DifferentAxes([Axis; 2]),
+#[derive(Debug, PartialEq, Eq)]
+pub enum AbsorveResult {
+    /// The move was absorved into the [NonRedundantAxisMove]. E.g.: `R2 + R => R'`
+    Absorved,
+
+    /// The move was not absorved, but it was added to the [NonRedundantAxisMove]. E.g.: `L + R2 => R2 L`
+    Added,
+
+    /// The move was not absorved, and it was not added to the [NonRedundantAxisMove]. E.g.: `R2 + F => Whoops`
+    NotAdded,
+
+    /// The move cancelled out with (one of the) [NonRedundantAxisMove]\(s\). E.g.: `R + R' => None` or `R2 L + L' => R2`
+    Collapsed,
 }
 
 impl Alg<AxisMove> {
@@ -250,6 +267,64 @@ impl Alg<AxisMove> {
 
     pub fn random(length: usize) -> Self {
         Self::random_with_rng(length, &mut rand::thread_rng())
+    }
+
+    /// Returns a new `Alg` that does the same thing as `self`, but with redundant moves removed.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use barbarosa::{
+    ///     generic::{Parsable, Alg},
+    ///     cube_n::{moves::non_redundant::NonRedundantAxisMove, AxisMove},
+    /// };
+    ///
+    /// let alg = Alg::<AxisMove>::parse("L' F R' L2 R L2 F' L B F B D").unwrap();
+    /// let normalized = alg.normalized();
+    ///
+    /// assert_eq!(normalized.to_string(), "B2 F D");
+    /// ```
+    pub fn normalized(mut self) -> Self {
+        let mut moves = Vec::with_capacity(self.moves.len());
+
+        let mut nr_move: Option<NonRedundantAxisMove> = None;
+
+        // `offload` takes any moves in `nr_move` and pushes it to `moves`
+        let offload = |nr_move: &mut Option<NonRedundantAxisMove>, moves: &mut Vec<AxisMove>| {
+            if let Some(nr_move) = nr_move.take() {
+                for mov in nr_move.moves() {
+                    moves.push(mov);
+                }
+            }
+        };
+
+        while let Some(mov) = &self.moves.pop() {
+            match absorve(&mut nr_move, mov) {
+                // If we didn't add it, it means we have to offload what we have and start again from `None`
+                AbsorveResult::NotAdded => {
+                    offload(&mut nr_move, &mut moves);
+                    absorve(&mut nr_move, mov);
+                }
+
+                // If we collapsed something, we need to go back one move to see if we can join it with something else
+                AbsorveResult::Collapsed => {
+                    offload(&mut nr_move, &mut moves);
+                    if let Some(mov) = moves.pop() {
+                        self.moves.push(mov);
+                    }
+                }
+
+                _ => (),
+            }
+        }
+
+        // offload the last moves
+        offload(&mut nr_move, &mut moves);
+
+        // Reverse since we were pushing it to a stack
+        moves.reverse();
+
+        Self::new(moves)
     }
 }
 
