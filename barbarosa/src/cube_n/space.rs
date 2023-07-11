@@ -59,7 +59,7 @@ impl Axis {
             Axis::Z => [Axis::X, Axis::Y],
         }
     }
-    
+
     /// Maps vector on slice in the specified axis. That is, you look at the
     /// axis head on and just assign `x` and `y` accordingly.
     pub fn map_on_slice<T: Clone>(

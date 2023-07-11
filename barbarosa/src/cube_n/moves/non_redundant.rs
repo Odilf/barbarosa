@@ -3,6 +3,7 @@ use std::iter;
 use itertools::{Either, Itertools};
 use rand::{seq::IteratorRandom, Rng};
 use strum::IntoEnumIterator;
+use thiserror::Error;
 
 use crate::{
     cube_n::space::{Axis, Direction, Face},
@@ -37,6 +38,25 @@ pub enum NonRedundantAxisMove {
 }
 
 impl NonRedundantAxisMove {
+    fn single(axis: Axis, direction: Direction, amount: Amount) -> Self {
+        NonRedundantAxisMove::Single(AxisMove::new(Face::new(axis, direction), amount))
+    }
+
+    fn double(axis: Axis, amount_positive: Amount, amount_negative: Amount) -> Self {
+        NonRedundantAxisMove::Double {
+            axis,
+            amount_positive,
+            amount_negative,
+        }
+    }
+
+    pub fn axis(&self) -> Axis {
+        match self {
+            NonRedundantAxisMove::Single(mov) => mov.face.axis,
+            NonRedundantAxisMove::Double { axis, .. } => *axis,
+        }
+    }
+
     /// Returns an iterator over the moves that this move represents. This iterator has either one or two items.
     pub fn moves(&self) -> impl Iterator<Item = AxisMove> {
         match self {
@@ -63,22 +83,9 @@ impl NonRedundantAxisMove {
             amounts_with_none().filter_map(move |amount_negative| {
                 match (amount_positive, amount_negative) {
                     (None, None) => None,
-
-                    (Some(amount_positive), None) => Some(NonRedundantAxisMove::Single(
-                        AxisMove::new(Face::new(axis, Direction::Positive), amount_positive),
-                    )),
-
-                    (None, Some(amount_negative)) => Some(NonRedundantAxisMove::Single(
-                        AxisMove::new(Face::new(axis, Direction::Negative), amount_negative),
-                    )),
-
-                    (Some(amount_positive), Some(amount_negative)) => {
-                        Some(NonRedundantAxisMove::Double {
-                            axis,
-                            amount_positive,
-                            amount_negative,
-                        })
-                    }
+                    (Some(pos), None) => Some(Self::single(axis, Direction::Positive, pos)),
+                    (None, Some(neg)) => Some(Self::single(axis, Direction::Negative, neg)),
+                    (Some(pos), Some(neg)) => Some(Self::double(axis, pos, neg)),
                 }
             })
         })
@@ -98,30 +105,124 @@ impl NonRedundantAxisMove {
     /// // `moves` doesn't contain any move on the X axis (so no L or R moves)
     /// ```
     pub fn given_last_axis(last_axis: &Axis) -> impl Iterator<Item = NonRedundantAxisMove> + '_ {
-        Axis::basis(last_axis)
-			.into_iter()
-            .flat_map(Self::of_axis)
+        Axis::basis(last_axis).into_iter().flat_map(Self::of_axis)
     }
 
     pub fn all() -> impl Iterator<Item = Self> {
         Axis::iter().flat_map(Self::of_axis)
     }
+}
 
-	pub fn absorve(&mut self, moves: impl Iterator<Item = AxisMove>) -> Option<()> {
-		todo!()
-		// let mut moves = moves.peekable();
+/// Tries to absorve an [AxisMove] into a [NonRedundantAxisMove].
+///
+/// In this context, "absorve" means modifying the original [NonRedundantAxisMove] in such
+/// a way that the result is the same as doing both moves sequentially.
+///
+/// This function modifies `self` in-place. It returns `Ok(())` when it is possible to absorve
+/// the move, and an [AbsorveError] otherwise.
+///
+/// # Example
+///
+/// ```rust
+/// use barbarosa::{cube_n::{moves::non_redundant::{NonRedundantAxisMove, absorve}, AxisMove}, generic::Parsable};
+///
+/// // Quick function to make example more readable
+/// let parse = |mov| AxisMove::parse(mov).unwrap();
+///
+/// let moves_and_expected = [
+///     ("R2", "R2"),
+///     ("R",  "R'"),
+///     ("L", "R' L"),
+///     ("R'", "R2 L"),
+/// ];
+///
+/// let mut non_redundant = None;
+///
+/// for (mov, expected) in moves_and_expected {
+///     absorve(&mut non_redundant, &parse(mov)).unwrap();
+///
+///     assert_eq!(non_redundant.as_ref().unwrap().to_string(), expected);
+/// }
+///
+/// // Can't absorve F (or any non R or L move)
+/// assert!(absorve(&mut non_redundant, &parse("F")).is_err());
+///
+/// // We can cancel out the current moves to get back to `None`
+/// absorve(&mut non_redundant, &parse("L'")).unwrap();
+/// absorve(&mut non_redundant, &parse("R2")).unwrap();
+///
+/// assert!(non_redundant.is_none());
+///
+/// // And we *can* absorve F (or any other move) into `None`
+/// let result = absorve(&mut non_redundant, &AxisMove::parse("F").unwrap());
+/// assert!(result.is_ok());
+/// ```
+pub fn absorve(
+    nr_move_option: &mut Option<NonRedundantAxisMove>,
+    other: &AxisMove,
+) -> Result<(), AbsorveError> {
+    let Some(ref mut nr_move) = nr_move_option else {
+        *nr_move_option = Some(NonRedundantAxisMove::Single(other.clone()));
+        return Ok(());
+    };
 
-		// let first = moves.next()?;
-		// let second = moves.peek()?;
+    match nr_move {
+        NonRedundantAxisMove::Single(ref mut mov) if mov.face.axis == other.face.axis => {
+            use Direction::*;
 
-		
+            match (mov.face.direction, other.face.direction) {
+                // If faces are the same, just add the amounts
+                (Positive, Positive) | (Negative, Negative) => match mov.amount + other.amount {
+                    Some(amount) => mov.amount = amount,
+                    None => *nr_move_option = None,
+                },
 
-		// Some(NonRedundantAxisMove::Double {
-		// 	axis,
-		// 	amount_positive,
-		// 	amount_negative,
-		// })
-	}
+                // If faces are different, add the move to `nr_move`
+                (Positive, Negative) => {
+                    *nr_move = NonRedundantAxisMove::double(mov.face.axis, mov.amount, other.amount)
+                }
+                (Negative, Positive) => {
+                    *nr_move = NonRedundantAxisMove::double(mov.face.axis, other.amount, mov.amount)
+                }
+            };
+        }
+
+        NonRedundantAxisMove::Double {
+            axis,
+            ref mut amount_positive,
+            ref mut amount_negative,
+        } if *axis == other.face.axis => {
+            let (match_amount, other_amount) = match other.face.direction {
+                Direction::Positive => (amount_positive, amount_negative),
+                Direction::Negative => (amount_negative, amount_positive),
+            };
+
+            match *match_amount + other.amount {
+                Some(amount) => *match_amount = amount,
+                None => {
+                    *nr_move =
+                        NonRedundantAxisMove::single(*axis, -other.face.direction, *other_amount)
+                }
+            };
+        }
+
+        _ => {
+            debug_assert_ne!(nr_move.axis(), other.face.axis);
+
+            return Err(AbsorveError::DifferentAxes([
+                nr_move.axis(),
+                other.face.axis,
+            ]));
+        }
+    };
+
+    Ok(())
+}
+
+#[derive(Debug, Error)]
+pub enum AbsorveError {
+    #[error("The axes of the moves are different({:?} and {:?})", .0[0], .0[1])]
+    DifferentAxes([Axis; 2]),
 }
 
 impl Alg<AxisMove> {
@@ -132,11 +233,11 @@ impl Alg<AxisMove> {
             let chosen = match moves.get(0) {
                 Some(mov) => NonRedundantAxisMove::given_last_axis(&mov.face.axis)
                     .choose(rng)
-                    .expect("`given_last_axis` always returns 30 elements"),
+                    .expect("`given_last_axis` returns 30 elements"),
 
                 None => NonRedundantAxisMove::all()
                     .choose(rng)
-                    .expect("`all` always returns 45 elements"),
+                    .expect("`all` returns 45 elements"),
             };
 
             for mov in chosen.moves() {

@@ -11,12 +11,12 @@ use self::wide::WideMoveCreationError;
 use super::space::{Axis, Direction, Face};
 use crate::generic::{self, parse, Parsable};
 
+pub mod non_redundant;
 pub mod perms;
 pub mod rotation;
 pub mod wide;
 
 mod amount;
-mod non_redundant;
 mod quarter;
 mod test;
 
