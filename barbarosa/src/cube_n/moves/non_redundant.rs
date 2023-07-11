@@ -219,11 +219,7 @@ pub fn absorve(
             }
         }
 
-        _ => {
-            debug_assert_ne!(nr_move.axis(), other.face.axis);
-
-            return AbsorveResult::NotAdded;
-        }
+        _ => AbsorveResult::NotAdded,
     }
 }
 

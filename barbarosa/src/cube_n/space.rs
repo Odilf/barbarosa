@@ -67,7 +67,7 @@ impl Axis {
         mut vec: Vector3<T>,
         f: impl FnOnce([&T; 2]) -> Vector2<T>,
     ) -> Vector3<T> {
-        let [x, y] = Axis::basis(&self);
+        let [x, y] = Axis::basis(self);
 
         let result = f([&vec[x], &vec[y]]);
         vec[x as usize] = result[0].clone();
