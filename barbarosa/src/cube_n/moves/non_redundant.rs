@@ -14,7 +14,7 @@ use super::{Amount, AxisMove};
 /// A type of move used to prevent redundancies in [AxisMove]s.
 ///
 /// This redundancy arises
-/// because you can have something like `R R` or `R L R' L'` which can clearly be simplified.
+/// because you can have something like `R R` or `R L R' L` which can clearly be simplified.
 /// [NonRedundantAxisMove] implements this by encoding all possible types of move in one axis.
 /// This way you can check the axis of the previous move and select only moves from another axis
 /// on the next one (see [Self::of_axis] and [Self::given_last_axis] for more info).
