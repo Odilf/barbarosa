@@ -1,3 +1,7 @@
+//! Center edge piece.
+//!
+//! See [`CenterEdge`] for more info.
+
 use crate::{
     cube_n::{
         moves::rotation::{AxisRotation, Rotatable},
@@ -8,10 +12,20 @@ use crate::{
     generic,
 };
 
+/// A center edge piece of the cube. There are 4 of these in each face of a cube.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct CenterEdge {
+    /// The main face of the center edge piece.
     pub main_face: Face,
+
+    /// The handedness of the basis of the edge piece. If the handedness is positive
+    /// then the side axis is the next one (so X -> Y -> Z -> X). If the handedness
+    /// is negative it's the other way around.
+    ///
+    /// You can get the side axis using [`Axis::next_with_handedness`]
     pub handedness: Direction,
+
+    /// The direction of the side axis
     pub side_direction: Direction,
 }
 
@@ -35,6 +49,7 @@ impl Rotatable for CenterEdge {
 }
 
 impl CenterEdge {
+    /// Creates a new [`CenterEdge`] piece.
     pub const fn new(main_face: Face, handedness: Direction, side_direction: Direction) -> Self {
         Self {
             main_face,
@@ -43,6 +58,7 @@ impl CenterEdge {
         }
     }
 
+    /// Tries to create a new [`CenterEdge`] piece from two faces. Fails if the axes of the faces are parallel.
     pub fn try_from_faces(main_face: Face, side_face: Face) -> Result<Self, ParallelAxesError> {
         let handedness = main_face.axis.get_handedness(&side_face.axis)?;
 
@@ -53,6 +69,7 @@ impl CenterEdge {
         })
     }
 
+    /// Gets the side face of the piece.
     pub fn side_face(&self) -> Face {
         let side_axis = self.main_face.axis.next_with_handedness(self.handedness);
 
@@ -61,10 +78,12 @@ impl CenterEdge {
         Face::new(side_axis, self.side_direction)
     }
 
+    /// Determines whether the [`CenterEdge`] is solved.
     pub fn is_solved(&self, original: &Self) -> bool {
         self.main_face == original.main_face
     }
 
+    /// Determines whether the [`CenterEdge`] is in the given [`WideAxisMove`].
     pub fn in_wide_move<const N: u32>(&self, piece_depth: u32, m: &WideAxisMove<N>) -> bool {
         if m.face() == &self.main_face {
             return true;
@@ -77,6 +96,7 @@ impl CenterEdge {
         false
     }
 
+    /// Gets the normal axis of the [`CenterEdge`] (so the axis that isn't the main or the side axis).
     pub fn normal_axis(&self) -> Axis {
         let output = self.main_face.axis.next_with_handedness(-self.handedness);
 
@@ -89,6 +109,7 @@ impl CenterEdge {
     }
 }
 
+/// The solved state of the [`CenterEdge`] pieces.
 pub const SOLVED: [CenterEdge; 24] = {
     use faces::*;
     use Direction::*;

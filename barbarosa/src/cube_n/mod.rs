@@ -1,11 +1,25 @@
 //! NxNxNs cube implementation.
+//!
+//! See [crate::generic] for more aspects that are generic across all cubes, such as moves and pieces.
+//!
+//! # Piece position
+//!
+//! A piece only stores where it is, not what it is. That is, you couldn't tell
+//! the color of, for example, a corner just by the information in the [Corner] struct.
+//!
+//! Rather, the cube is responsible for keeping track for which piece is which. Simply,
+//! the "color" of a piece is determined by that position in [Cube::solved](crate::generic::Cube::solved).
+//!
+//! You can use the functions [utils::item_at](crate::generic::utils::item_at) and
+//! [utils::position_of_item](crate::generic::utils::position_of_item) to find where
+//! pieces are.
 
-pub mod cube2;
+mod cube2;
 pub mod cube3;
-pub mod cube4;
-pub mod cube5;
-pub mod cube6;
-pub mod cube7;
+mod cube4;
+mod cube5;
+mod cube6;
+mod cube7;
 
 pub mod invariants;
 pub mod moves;

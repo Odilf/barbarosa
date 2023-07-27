@@ -1,6 +1,6 @@
 //! Generic cube traits and implementations
 
-use self::moves::IntoMove;
+use self::moves::AsMove;
 pub use self::{
     alg::Alg,
     moves::{Movable, Move},
@@ -37,7 +37,7 @@ mod scramble;
 /// Also the cubing community has plenty of other dubious names, like "algorithm" (as in a sequence
 /// of moves) and "permutations" (as in T perm). So I'm just going to call it a cube. suck it
 pub trait Cube:
-    Sized + Clone + PartialEq + Eq + std::fmt::Debug + IntoMove + Movable<Self::Move>
+    Sized + Clone + PartialEq + Eq + std::fmt::Debug + AsMove + Movable<Self::Move>
 {
     /// Returns a static reference to a solved cube.
     ///

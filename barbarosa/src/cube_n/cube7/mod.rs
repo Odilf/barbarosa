@@ -1,6 +1,6 @@
 mod test;
 
-use crate::generic::{self, moves::IntoMove};
+use crate::generic::{self, moves::AsMove};
 
 use super::{
     moves::{
@@ -14,6 +14,17 @@ use super::{
     Corner, Edge, WideAxisMove, Wing,
 };
 
+/// The 7x7x7 cube. The biggest [WCA](https://www.worldcubeassociation.org/) NxN.
+///
+/// It has:
+/// - 8 [`Corner`]s
+/// - 12 [`Edge`]s
+/// - 24 [`Wing`]s at depth 1 and 24 at depth 2
+/// - 24 [`CenterCorner`]s at depth 1 and another 24 at depth 2
+/// - 48 [`CenterWing`]s
+/// - 24 [`CenterEdge`]s at depth 1 and another 24 at depth 2
+///
+/// See [crate::cube_n] for more info.
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Cube7 {
     corners: [Corner; 8],
@@ -31,6 +42,7 @@ pub struct Cube7 {
 }
 
 impl Cube7 {
+    /// Iterates through the wings of the cube with the depth
     pub fn wing_iter(&self) -> impl Iterator<Item = (&Wing, u32)> {
         self.wings_1
             .iter()
@@ -38,6 +50,7 @@ impl Cube7 {
             .chain(self.wings_2.iter().map(|wing| (wing, 2)))
     }
 
+    /// Mutable version of [`Cube7::wing_iter`]
     pub fn wing_iter_mut(&mut self) -> impl Iterator<Item = (&mut Wing, u32)> {
         self.wings_1
             .iter_mut()
@@ -45,6 +58,7 @@ impl Cube7 {
             .chain(self.wings_2.iter_mut().map(|wing| (wing, 2)))
     }
 
+    /// Iterates through the center-corners of the cube with the depth
     pub fn center_corner_iter(&self) -> impl Iterator<Item = (&CenterCorner, u32)> {
         self.center_corners_1
             .iter()
@@ -52,6 +66,7 @@ impl Cube7 {
             .chain(self.center_corners_2.iter().map(|wing| (wing, 2)))
     }
 
+    /// Mutable version of [`Cube7::center_corner_iter`]
     pub fn center_corner_iter_mut(&mut self) -> impl Iterator<Item = (&mut CenterCorner, u32)> {
         self.center_corners_1
             .iter_mut()
@@ -59,6 +74,7 @@ impl Cube7 {
             .chain(self.center_corners_2.iter_mut().map(|wing| (wing, 2)))
     }
 
+    /// Iterates through the center-edges of the cube with the depth
     pub fn center_edge_iter(&self) -> impl Iterator<Item = (&CenterEdge, u32)> {
         self.center_edges_1
             .iter()
@@ -66,6 +82,7 @@ impl Cube7 {
             .chain(self.center_edges_2.iter().map(|wing| (wing, 2)))
     }
 
+    /// Mutable version of [`Cube7::center_edge_iter`]
     pub fn center_edge_iter_mut(&mut self) -> impl Iterator<Item = (&mut CenterEdge, u32)> {
         self.center_edges_1
             .iter_mut()
@@ -106,7 +123,7 @@ impl generic::Cube for Cube7 {
     }
 }
 
-impl IntoMove for Cube7 {
+impl AsMove for Cube7 {
     type Move = WideAxisMove<2>;
 }
 

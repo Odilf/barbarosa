@@ -79,6 +79,7 @@ impl generic::Movable<AxisMove> for Edge {
 impl_movable_array!(Edge, AxisMove);
 
 impl Edge {
+    /// Creates a new [`Edge`]
     pub const fn new(
         normal_axis: Axis,
         slice_position: Vector2<Direction>,
@@ -145,6 +146,7 @@ impl Edge {
         Ok((normal_axis, position))
     }
 
+    /// Returns the standard coordinates of the edge
     pub fn coordinates(&self) -> nalgebra::Vector3<f32> {
         self.normal_axis.map_on_slice(Vector3::zeros(), |_| {
             self.slice_position.map(|dir| dir.scalar() as f32)

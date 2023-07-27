@@ -1,3 +1,5 @@
+//! Moves for 4x4x4 and up
+
 use rand::prelude::Distribution;
 use thiserror::Error;
 
@@ -11,11 +13,13 @@ use self::generic::{Alg, Movable};
 
 use super::{Amount, AxisMove};
 
-// A wide move of at most depth `N`.
+/// A wide move of at most depth `N`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct WideAxisMove<const N: u32> {
     /// invariant: depth <= N
     depth: u32,
+
+    /// The corresponding depth 0 axis move
     pub axis_move: AxisMove,
 }
 
@@ -28,6 +32,9 @@ impl<const N: u32> generic::Move for WideAxisMove<N> {
 }
 
 impl<const N: u32> WideAxisMove<N> {
+    /// Creates a new [`WideAxisMove<N>`].
+    ///
+    /// Returns [WideMoveCreationError] if the depth is greater than `N`.
     pub fn new(face: Face, amount: Amount, depth: u32) -> Result<Self, WideMoveCreationError> {
         if depth > N {
             return Err(WideMoveCreationError::ExcededDepth(depth, N));
@@ -39,18 +46,24 @@ impl<const N: u32> WideAxisMove<N> {
         })
     }
 
+    /// Face of the move
     pub fn face(&self) -> &Face {
         &self.axis_move.face
     }
 
+    /// Amount of the move
     pub fn amount(&self) -> Amount {
         self.axis_move.amount
     }
 
+    /// Depth of the move
     pub fn depth(&self) -> u32 {
         self.depth
     }
 
+    /// Tries to set the depth of the move in-place.
+    ///
+    /// Fails and returns [WideMoveCreationError] if the depth is greater than `N`.
     pub fn set_depth(&mut self, new_depth: u32) -> Result<(), WideMoveCreationError> {
         if new_depth > N {
             return Err(WideMoveCreationError::ExcededDepth(new_depth, N));
@@ -62,7 +75,9 @@ impl<const N: u32> WideAxisMove<N> {
     }
 }
 
+/// An error if the depth of a wide move is greater than `N`.
 #[derive(Debug, Error)]
+#[allow(missing_docs)]
 pub enum WideMoveCreationError {
     #[error("Exceded maximum depth (given: {0}, max: {1})")]
     ExcededDepth(u32, u32),
@@ -119,6 +134,9 @@ impl<const N: u32> Distribution<WideAxisMove<N>> for rand::distributions::Standa
 }
 
 impl Alg<AxisMove> {
+    /// Widens an axis move into a [WideAxisMove].
+    ///
+    /// Fails if the depth is greater than `N`.
     pub fn widen<const N: u32>(
         self,
         depth: u32,

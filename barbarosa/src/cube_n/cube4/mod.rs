@@ -1,8 +1,6 @@
-//! 4x4x4 cube
-
 mod test;
 
-use crate::generic::{self, moves::IntoMove, Cube};
+use crate::generic::{self, moves::AsMove, Cube};
 
 use super::{
     moves::{
@@ -16,6 +14,11 @@ use super::{
     Corner, WideAxisMove, Wing,
 };
 
+/// The 4x4x4 cube.
+///
+/// It has 8 [`Corner`]s, 24 [`Wing`]s and 24 [`CenterCorner`]s.
+///
+/// See [crate::cube_n] for more info.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Cube4 {
     corners: [Corner; 8],
@@ -44,7 +47,7 @@ impl generic::Cube for Cube4 {
     }
 }
 
-impl IntoMove for Cube4 {
+impl AsMove for Cube4 {
     type Move = WideAxisMove<1>;
 }
 

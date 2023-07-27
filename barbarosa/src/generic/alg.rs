@@ -8,7 +8,7 @@ use rand::{distributions::Standard, prelude::Distribution, Rng};
 use strum::IntoEnumIterator;
 use thiserror::Error;
 
-use super::{moves::IntoMove, parse, Movable, Move, Parsable};
+use super::{moves::AsMove, parse, Movable, Move, Parsable};
 use crate::generic;
 
 /// An alg. A sequence of moves.
@@ -17,11 +17,11 @@ use crate::generic;
 /// However, that's the name it's used in the cubing community so I'm using it here.
 #[allow(missing_docs)]
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Alg<T: IntoMove> {
+pub struct Alg<T: AsMove> {
     pub moves: Vec<T::Move>,
 }
 
-impl<T: IntoMove> Alg<T> {
+impl<T: AsMove> Alg<T> {
     /// Creates a new alg from a vector of moves
     pub fn new(moves: Vec<T::Move>) -> Self {
         Self { moves }
@@ -38,7 +38,7 @@ impl<T: IntoMove> Alg<T> {
     }
 }
 
-impl<T: IntoMove> Parsable for Alg<T>
+impl<T: AsMove> Parsable for Alg<T>
 where
     T::Move: Parsable,
 {
@@ -51,7 +51,7 @@ where
 // Alg::random()
 impl<T> Alg<T>
 where
-    T: IntoMove,
+    T: AsMove,
     Standard: Distribution<T::Move>,
 {
     /// Creates a random algorithm of the given length that might not be normalized.
@@ -69,7 +69,7 @@ where
     }
 }
 
-impl<T: IntoMove> Alg<T>
+impl<T: AsMove> Alg<T>
 where
     T::Move: Debug + IntoEnumIterator,
 {
@@ -113,7 +113,7 @@ pub enum TryFromStatesError<M: Move, T: Movable<M> + Eq + Clone> {
 }
 
 // Parsing using `TryFrom`
-impl<T: IntoMove> TryFrom<&str> for Alg<T>
+impl<T: AsMove> TryFrom<&str> for Alg<T>
 where
     T::Move: Parsable,
 {
@@ -125,7 +125,7 @@ where
 }
 
 // Display
-impl<T: IntoMove> std::fmt::Display for Alg<T>
+impl<T: AsMove> std::fmt::Display for Alg<T>
 where
     T::Move: std::fmt::Display,
 {
@@ -143,13 +143,13 @@ impl<M: Move, C: Movable<M>> Movable<[M]> for C {
     }
 }
 
-impl<T: IntoMove, C: Movable<[T::Move]>> Movable<Alg<T>> for C {
+impl<T: AsMove, C: Movable<[T::Move]>> Movable<Alg<T>> for C {
     fn apply(&mut self, m: &Alg<T>) {
         self.apply(&m.moves);
     }
 }
 
-impl<T: IntoMove> FromIterator<T::Move> for Alg<T> {
+impl<T: AsMove> FromIterator<T::Move> for Alg<T> {
     fn from_iter<I: IntoIterator<Item = T::Move>>(iter: I) -> Self {
         let moves: Vec<_> = iter.into_iter().collect();
         Self::new(moves)

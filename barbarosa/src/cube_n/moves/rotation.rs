@@ -1,3 +1,7 @@
+//! Rotations of NxNxN cubes.
+//!
+//! This is mainly used because, for example, L and R' are the same rotation and
+/// the only difference is the pieces selected in the rotation.
 use nalgebra::{vector, Vector2, Vector3};
 
 use crate::cube_n::space::{Axis, Direction, Face};
@@ -5,8 +9,7 @@ use crate::cube_n::space::{Axis, Direction, Face};
 use super::{Amount, AxisMove};
 
 /// A rotation around an axis. This is similar to an [AxisMove](super::AxisMove), but it doesn't
-/// specify the face. Mainly, this is used because, for example, L and R' are the same rotation and
-/// the only difference is the pieces selected in the rotation.
+/// specify the face.
 #[derive(Debug, Clone)]
 pub struct AxisRotation {
     /// The axis that is being rotated around

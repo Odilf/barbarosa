@@ -1,3 +1,7 @@
+//! Moves that reduce redundancies.
+//!
+//! See [NonRedundantAxisMove] for more info.
+
 use std::iter;
 
 use itertools::{Either, Itertools};
@@ -28,10 +32,17 @@ use super::{Amount, AxisMove};
 /// the very obvious and very common redundancies.
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum NonRedundantAxisMove {
+    /// A single move
     Single(AxisMove),
+
+    /// Two moves on the same axis
     Double {
+        /// The main axis
         axis: Axis,
+        /// The amount of the move on the positive direction on the axis
         amount_positive: Amount,
+
+        /// The amount of the move on the negative direction on the axis
         amount_negative: Amount,
     },
 }
@@ -49,6 +60,7 @@ impl NonRedundantAxisMove {
         }
     }
 
+    /// The axis of the non redundant move
     pub fn axis(&self) -> Axis {
         match self {
             NonRedundantAxisMove::Single(mov) => mov.face.axis,
@@ -107,6 +119,7 @@ impl NonRedundantAxisMove {
         Axis::basis(last_axis).into_iter().flat_map(Self::of_axis)
     }
 
+    /// Returns all possible non-redundant moves
     pub fn all() -> impl Iterator<Item = Self> {
         Axis::iter().flat_map(Self::of_axis)
     }
@@ -223,6 +236,7 @@ pub fn absorve(
     }
 }
 
+/// The result of doing an [absorve]
 #[derive(Debug, PartialEq, Eq)]
 pub enum AbsorveResult {
     /// The move was absorved into the [NonRedundantAxisMove]. E.g.: `R2 + R => R'`
@@ -239,33 +253,39 @@ pub enum AbsorveResult {
 }
 
 impl Alg<AxisMove> {
+    /// Same as [`Self::random`], but with a custom [`Rng`].
     pub fn random_with_rng(length: usize, rng: &mut impl Rng) -> Self {
         let mut moves: Vec<AxisMove> = Vec::new();
 
         while moves.len() < length {
-            let chosen = match moves.get(moves.len() - 1) {
-                Some(mov) => NonRedundantAxisMove::given_last_axis(&mov.face.axis)
+            let chosen = match !moves.is_empty() {
+                true => NonRedundantAxisMove::given_last_axis(&moves[moves.len() - 1].face.axis)
                     .choose(rng)
                     .expect("`given_last_axis` returns 30 elements"),
 
-                None => NonRedundantAxisMove::all()
+                false => NonRedundantAxisMove::all()
                     .choose(rng)
                     .expect("`all` returns 45 elements"),
             };
 
             for mov in chosen.moves() {
                 moves.push(mov);
+
+                if moves.len() == length {
+                    break;
+                }
             }
         }
 
         Alg::new(moves)
     }
 
+    /// Creates a random [`Alg`] of the given length.
     pub fn random(length: usize) -> Self {
         Self::random_with_rng(length, &mut rand::thread_rng())
     }
 
-    /// Returns a new `Alg` that does the same thing as `self`, but with redundant moves removed.
+    /// Returns a new [`Alg`] that does the same thing as `self`, but with redundant moves removed.
     ///
     /// # Example
     ///

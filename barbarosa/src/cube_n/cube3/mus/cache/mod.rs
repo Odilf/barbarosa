@@ -5,6 +5,7 @@
 
 mod disk_storage;
 mod generation;
+mod test;
 
 use std::{io, sync::OnceLock};
 

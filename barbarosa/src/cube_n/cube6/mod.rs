@@ -1,6 +1,6 @@
 mod test;
 
-use crate::generic::{self, moves::IntoMove};
+use crate::generic::{self, moves::AsMove};
 
 use super::{
     moves::{
@@ -14,6 +14,12 @@ use super::{
     Corner, WideAxisMove, Wing,
 };
 
+/// The 6x6x6 cube.
+///
+/// It has 8 [`Corner`]s, 24 [`Wing`]s at depth 1 and 24 at depth 2, 24 [`CenterCorner`]s
+/// at depth 1 and another 24 at depth 2, and 48 [`CenterWing`]s.
+///
+/// See [crate::cube_n] for more info.
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Cube6 {
     corners: [Corner; 8],
@@ -27,6 +33,7 @@ pub struct Cube6 {
 }
 
 impl Cube6 {
+    /// Iterates through the wings of the cube with the depth
     pub fn wing_iter(&self) -> impl Iterator<Item = (&Wing, u32)> {
         self.wings_1
             .iter()
@@ -34,6 +41,7 @@ impl Cube6 {
             .chain(self.wings_2.iter().map(|wing| (wing, 2)))
     }
 
+    /// Mutable version of [`Cube6::wing_iter`]
     pub fn wing_iter_mut(&mut self) -> impl Iterator<Item = (&mut Wing, u32)> {
         self.wings_1
             .iter_mut()
@@ -41,6 +49,7 @@ impl Cube6 {
             .chain(self.wings_2.iter_mut().map(|wing| (wing, 2)))
     }
 
+    /// Iterates through the center corners of the cube with the depth
     pub fn center_corner_iter(&self) -> impl Iterator<Item = (&CenterCorner, u32)> {
         self.center_corners_1
             .iter()
@@ -48,6 +57,7 @@ impl Cube6 {
             .chain(self.center_corners_2.iter().map(|wing| (wing, 2)))
     }
 
+    /// Mutable version of [`Cube6::center_corner_iter`]
     pub fn center_corner_iter_mut(&mut self) -> impl Iterator<Item = (&mut CenterCorner, u32)> {
         self.center_corners_1
             .iter_mut()
@@ -83,7 +93,7 @@ impl generic::Cube for Cube6 {
     }
 }
 
-impl IntoMove for Cube6 {
+impl AsMove for Cube6 {
     type Move = WideAxisMove<2>;
 }
 

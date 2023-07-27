@@ -1,3 +1,5 @@
+//! Generic utilities
+
 /// Returns the original item at the current position of `target`
 ///
 /// # Examples

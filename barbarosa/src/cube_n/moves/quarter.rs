@@ -7,9 +7,16 @@ use crate::{
 
 use super::{Amount, AxisMove};
 
+/// Axis move for quarter turn metric. Same as [`AxisMove`], but without double moves.
+///
+/// You can always convert from `QuarterAxisMove` into `AxisMove` but not vice versa.
+/// However, you can convert from `Alg<AxisMove>` into `Alg<QuarterAxisMove>` (and of cource vice versa._
 #[derive(Debug, Clone, PartialEq, Eq, RandGen)]
 pub struct QuarterAxisMove {
+    /// The face that is being rotated
     pub face: Face,
+
+    /// The direction (either clockwise if positive or negative if counterclockwise)
     pub direction: Direction,
 }
 
@@ -23,6 +30,7 @@ impl generic::Move for QuarterAxisMove {
 }
 
 impl QuarterAxisMove {
+    /// Creates a new [`QuarterAxisMove`]
     pub const fn new(face: Face, direction: Direction) -> Self {
         Self { face, direction }
     }

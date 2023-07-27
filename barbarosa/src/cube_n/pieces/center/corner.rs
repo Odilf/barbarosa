@@ -1,3 +1,5 @@
+//! Center corner piece. See [CenterCorner] for more info.
+
 use nalgebra::{vector, Vector3};
 
 use crate::{
@@ -9,6 +11,7 @@ use crate::{
     generic,
 };
 
+/// A center corner piece of the cube. There are 4 of these in each face of a cube.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct CenterCorner {
     position: Vector3<Direction>,
@@ -29,10 +32,12 @@ impl CenterCorner {
         Self { position, axis }
     }
 
+    /// Determines whether the [`CenterCorner`] is solved.
     pub fn is_solved(&self, original: &CenterCorner) -> bool {
         self.position[self.axis] == original.position[original.axis]
     }
 
+    /// Determines whether the [`CenterCorner`] is in the given [`WideAxisMove`].
     pub fn in_wide_move<const N: u32>(&self, piece_depth: u32, m: &WideAxisMove<N>) -> bool {
         // If on the same direction
         if self.position[m.face().axis] == m.face().direction {
@@ -49,6 +54,7 @@ impl CenterCorner {
     }
 }
 
+/// Solved set of [`CenterCorner`]s.
 pub const SOLVED: [CenterCorner; 24] = {
     use Direction::*;
 

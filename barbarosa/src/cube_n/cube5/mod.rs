@@ -1,6 +1,6 @@
 mod test;
 
-use crate::generic::{self, moves::IntoMove};
+use crate::generic::{self, moves::AsMove};
 
 use super::{
     moves::{
@@ -14,6 +14,11 @@ use super::{
     Corner, Edge, WideAxisMove,
 };
 
+/// The 5x5x5 cube.
+///
+/// It has 8 [`Corner`]s, 12 [`Edge`]s and 24 [`CenterCorner`]s and 24 [`CenterEdge`]s.
+///
+/// See [crate::cube_n] for more info.
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Cube5 {
     corners: [Corner; 8],
@@ -29,7 +34,7 @@ const SOLVED: Cube5 = Cube5 {
     corner_edges: center::edge::SOLVED,
 };
 
-impl IntoMove for Cube5 {
+impl AsMove for Cube5 {
     type Move = WideAxisMove<1>;
 }
 

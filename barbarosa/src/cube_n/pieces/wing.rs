@@ -15,6 +15,11 @@ use crate::{
 
 use super::{edge::ParallelAxesError, Edge};
 
+/// The wing pieces. These exist on 4x4x4 and up.
+///
+/// They are pieces that look like edges, but there are 24 of those and they are not interchangeable. They are also not orientable.
+/// This means that there are 24 states of wings, and they are analogous to the 24 states of the edges (12 edges that can be either oriented
+/// or not).
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Wing {
     corresponding_edge: Edge,
@@ -29,14 +34,17 @@ impl Rotatable for Wing {
 }
 
 impl Wing {
+    /// Get the normal axis
     pub fn normal_axis(&self) -> Axis {
         self.corresponding_edge.normal_axis
     }
 
+    /// The position of the slice of the wing.
     pub fn slice_position(&self) -> Vector2<Direction> {
         self.corresponding_edge.slice_position
     }
 
+    /// The direction along the normal of the wing
     pub fn normal_direction(&self) -> Direction {
         wing_normal_direction(
             self.normal_axis(),
@@ -45,21 +53,28 @@ impl Wing {
         )
     }
 
+    /// Returns the two faces that the wing is on
     pub fn faces(&self) -> [Face; 2] {
         self.corresponding_edge.faces()
     }
 }
 
+/// Gets the wing normal direction based on a normal axis, the slice position and the hypothetical orientation.
+///
+/// This normal direction has properties such that it is consistent with the way that edges flip orientation
+/// (when doing a non double move on the X axis)
+///
+/// Look into the implementation for details.
 pub fn wing_normal_direction(
     normal_axis: Axis,
     slice_position: Vector2<Direction>,
-    oriented: bool,
+    hypothetically_oriented: bool,
 ) -> Direction {
     let is_x_axis = normal_axis == Axis::X;
 
     let is_even_position_parity = slice_position.x == slice_position.y;
 
-    if is_x_axis ^ is_even_position_parity ^ oriented {
+    if is_x_axis ^ is_even_position_parity ^ hypothetically_oriented {
         Direction::Negative
     } else {
         Direction::Positive
@@ -67,6 +82,7 @@ pub fn wing_normal_direction(
 }
 
 impl Wing {
+    /// Creates a new [`Wing`]
     pub fn new(
         normal_axis: Axis,
         slice_position: Vector2<Direction>,
@@ -90,7 +106,8 @@ impl Wing {
         }
     }
 
-    pub fn from_faces(
+    /// Tries to create a wing from the two faces it's on and the normal direction. Errors if the faces are parallel
+    pub fn try_from_faces(
         faces: [Face; 2],
         normal_direction: Direction,
     ) -> Result<Self, ParallelAxesError> {
@@ -98,6 +115,7 @@ impl Wing {
         Ok(Wing::new(normal_axis, slice_position, normal_direction))
     }
 
+    /// Determines whether the wing is in a wide move
     pub fn in_wide_move<const N: u32>(&self, wing_depth: u32, m: &WideAxisMove<N>) -> bool {
         let wing_edge = &self.corresponding_edge;
         // If just on the same face
@@ -129,6 +147,7 @@ impl std::fmt::Debug for Wing {
     }
 }
 
+/// The solved set of [`Wing`]s.
 pub const SOLVED: [Wing; 24] = {
     use Axis::*;
     use Direction::*;

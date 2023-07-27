@@ -38,8 +38,8 @@ fn has_correct_direction() {
 
 #[test]
 fn turning_on_u_face() {
-    let mut wing = Wing::from_faces([Face::R, Face::U], Positive).unwrap();
-    let mut wing_side = Wing::from_faces([Face::R, Face::F], Positive).unwrap();
+    let mut wing = Wing::try_from_faces([Face::R, Face::U], Positive).unwrap();
+    let mut wing_side = Wing::try_from_faces([Face::R, Face::F], Positive).unwrap();
 
     assert_eq!(wing_side.normal_axis(), Y);
     assert_eq!(wing_side.normal_direction(), Positive);
@@ -103,7 +103,7 @@ fn turning_on_r_face() {
 
 #[test]
 fn turning_on_f_face_inside_wings() {
-    let mut wing = Wing::from_faces([Face::U, Face::R], Positive).unwrap();
+    let mut wing = Wing::try_from_faces([Face::U, Face::R], Positive).unwrap();
 
     assert_eq!(wing.slice_position(), vector![Positive, Positive]);
 

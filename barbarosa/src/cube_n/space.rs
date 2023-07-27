@@ -52,6 +52,7 @@ impl From<&Axis> for Vector3<i8> {
 }
 
 impl Axis {
+    /// Returns the basis that you use with a given normal (and positive handedness)
     pub fn basis(normal: &Axis) -> [Axis; 2] {
         match *normal {
             Axis::X => [Axis::Y, Axis::Z],
@@ -102,6 +103,7 @@ impl Axis {
         }
     }
 
+    /// Returns the next vector given a handedness
     pub fn next_with_handedness(&self, handedness: Direction) -> Axis {
         match handedness {
             Direction::Positive => self.next(),
@@ -109,6 +111,8 @@ impl Axis {
         }
     }
 
+    /// Returns the handedness of `self` followed by `other`. If they're in order, it's positive; if they're
+    /// not, it's negative; and if they're parallel it errors.
     pub fn get_handedness(&self, other: &Axis) -> Result<Direction, ParallelAxesError> {
         match self.offset(other) {
             0 => Err(ParallelAxesError::SameAxes([*self, *other])),
@@ -320,10 +324,12 @@ impl Face {
         }
     }
 
+    /// Wether a face contains a vector
     pub fn contains_vector(&self, vec: &Vector3<Direction>) -> bool {
         vec[self.axis] == self.direction
     }
 
+    /// Whether a face contains an edge
     pub fn contains_edge(&self, edge: &Edge) -> bool {
         let offset = edge.normal_axis.offset(&self.axis);
 

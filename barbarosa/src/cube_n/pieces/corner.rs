@@ -45,6 +45,7 @@ impl generic::Movable<AxisMove> for Corner {
 impl_movable_array!(Corner, AxisMove);
 
 impl Corner {
+    /// Creates a new [`Corner`] with the given position and orientation axis.
     pub const fn new(position: Vector3<Direction>, orientation_axis: Axis) -> Self {
         Self {
             position,
@@ -110,6 +111,7 @@ impl Corner {
         };
     }
 
+    /// Gets the physical standard coordinates of the corner
     pub fn coordinates(&self) -> Vector3<f32> {
         self.position.map(|dir| dir.scalar() as f32)
     }

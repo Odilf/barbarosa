@@ -25,9 +25,14 @@ pub use non_redundant::NonRedundantAxisMove;
 pub use quarter::QuarterAxisMove;
 pub use wide::WideAxisMove;
 
-/// A move on the 3x3x3 cube
+/// A clockwise [move](generic::Move) on an axis. Main type of move for cuboids.
 ///
-/// todo!()
+/// It can be either single, double or inverse.
+///
+/// Variants of axis moves are:
+/// - [WideAxisMove] for big cubes (4x4 and up)
+/// - [QuarterAxisMove]
+/// - [NonRedundantAxisMove]
 #[derive(Debug, PartialEq, Eq, Clone, RandGen)]
 pub struct AxisMove {
     /// The face that is being rotated
@@ -37,6 +42,7 @@ pub struct AxisMove {
 }
 
 impl AxisMove {
+    /// Creates a new [`AxisMove`]
     pub fn new(face: Face, amount: Amount) -> Self {
         Self { face, amount }
     }

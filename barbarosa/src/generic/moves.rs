@@ -8,7 +8,9 @@ pub trait Move: Sized + Clone {
     fn inverse(&self) -> Self;
 }
 
-pub trait IntoMove {
+/// Something that can be used as a move. Basically, [`Move`]s and [`Cube`](super::Cube)s implement [`AsMove`].
+pub trait AsMove {
+    /// The move type of this object
     type Move: Move;
 }
 
@@ -44,7 +46,7 @@ macro_rules! impl_movable_array {
 
 pub(crate) use impl_movable_array;
 
-impl<M: Move> IntoMove for M {
+impl<M: Move> AsMove for M {
     type Move = Self;
 }
 

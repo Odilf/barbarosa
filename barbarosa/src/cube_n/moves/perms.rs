@@ -9,9 +9,7 @@ use super::AxisMove;
 /// R U R' U'. Yeee
 pub static SEXY_MOVE: Lazy<Alg<AxisMove>> = Lazy::new(|| "R U R' U'".try_into().unwrap());
 
-// pub static OLL_PARITY: Lazy<Alg<WideAxisMove<1>>> =
-//     Lazy::new(|| "Rw2 B2 U2 Rw2 U2 F2 Rw2 F2 U2 Rw2 B2 Rw2".try_into().unwrap());
-
+/// Collection of PLL (permutation of the last layer) algs
 pub mod pll {
     use super::*;
 

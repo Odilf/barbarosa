@@ -1,3 +1,5 @@
+//! The center-wing piece. See [`CenterWing`] for more info.
+
 use nalgebra::vector;
 
 use crate::{
@@ -33,6 +35,7 @@ impl Rotatable for CenterWing {
 }
 
 impl CenterWing {
+    /// Creates a new [`CenterWing`]
     pub fn new(
         main_face: Face,
         handedness: Direction,
@@ -55,6 +58,7 @@ impl CenterWing {
         }
     }
 
+    /// Create a new [`CenterWing`] using orientation instead of side directions and what not
     pub const fn new_with_orientation(
         main_face: Face,
         handedness: Direction,
@@ -67,18 +71,22 @@ impl CenterWing {
         }
     }
 
+    /// The main face
     pub fn main_face(&self) -> &Face {
         &self.corresponding_center_edge.main_face
     }
 
+    /// The side face
     pub fn side_face(&self) -> Face {
         self.corresponding_center_edge.side_face()
     }
 
+    /// The normal axis
     pub fn normal_axis(&self) -> Axis {
         self.corresponding_center_edge.normal_axis()
     }
 
+    /// The normal direction
     pub fn normal_direction(&self) -> Direction {
         wing_normal_direction(
             self.normal_axis(),
@@ -90,10 +98,12 @@ impl CenterWing {
         )
     }
 
+    /// Determines whether [`CenterWing`] is solved
     pub fn is_solved(&self, original: &Self) -> bool {
         self.main_face() == original.main_face()
     }
 
+    /// Determines whether the [`CenterWing`] is in the wide move
     pub fn in_wide_move<const N: u32>(
         &self,
         normal_depth: u32,
@@ -136,6 +146,7 @@ impl std::fmt::Debug for CenterWing {
     }
 }
 
+/// The solved set of [`CenterWing`]s.
 pub const SOLVED: [CenterWing; 48] = {
     use faces::*;
     use Direction::*;

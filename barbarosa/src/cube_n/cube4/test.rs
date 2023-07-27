@@ -22,8 +22,8 @@ use crate::{
 use super::*;
 
 fn expect_wing(cube: &Cube4, target: ([Face; 2], Direction), expected: ([Face; 2], Direction)) {
-    let target = Wing::from_faces(target.0, target.1).unwrap();
-    let expected = Wing::from_faces(expected.0, expected.1).unwrap();
+    let target = Wing::try_from_faces(target.0, target.1).unwrap();
+    let expected = Wing::try_from_faces(expected.0, expected.1).unwrap();
     let found = utils::item_at(&target, &cube.wings, &Cube4::solved().wings).unwrap();
     let position_of_expected =
         utils::position_of_item(&expected, &cube.wings, &Cube4::solved().wings);

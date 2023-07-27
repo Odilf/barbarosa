@@ -1,7 +1,6 @@
 //! The 3x3x3 Rubik's cube.
 //!
-//! See [Cube3] for more information. Also [crate::cube_n] and [crate::generic] for more generic aspects
-//! about the 3x3, such as moving and pieces lol.
+//! See [Cube3] and [cube_n](crate::cube_n) for more information.
 
 pub mod heuristics;
 pub mod mus;
@@ -12,7 +11,7 @@ use rand::{distributions::Standard, prelude::Distribution, seq::SliceRandom};
 
 use crate::{
     cube_n::{pieces, space::Axis},
-    generic::{self, moves::IntoMove, Cube},
+    generic::{self, moves::AsMove, Cube},
 };
 
 use super::invariants::{fix_corner_multiplicity, fix_edge_flip_parity, fix_swap_parity};
@@ -22,13 +21,6 @@ use super::{AxisMove, Corner, Edge};
 /// A 3x3x3 Rubik's cube.
 ///
 /// The cube is represented by 12 [Edge] pieces and 8 [Corner] pieces.
-///
-/// # Piece position
-/// A piece only stores where it is, not what it is. That is, you couldn't tell
-/// the color of, for example, a corner just by the information in the [Corner] struct.
-///
-/// Rather, the cube is responsible for keeping track for which piece is which. Simply,
-/// the "color" of a piece is determined by that position in [Cube::solved()]
 #[derive(Debug, PartialEq, Eq, Clone, Hash)]
 pub struct Cube3 {
     /// The edges of the cube.
@@ -49,7 +41,7 @@ impl generic::Cube for Cube3 {
     }
 }
 
-impl IntoMove for Cube3 {
+impl AsMove for Cube3 {
     type Move = AxisMove;
 }
 
