@@ -211,13 +211,8 @@ fn two_wide_js() {
 
     println!("Alg: {wide_j}");
 
-    for i in 0..2 {
-        println!("Iteration {i}");
-
-        for m in &wide_j.moves {
-            cube.apply(m);
-            cube.assert_consistent();
-        }
+    for _ in 0..2 {
+        cube.apply(&wide_j);
     }
 
     cube.assert_consistent();
