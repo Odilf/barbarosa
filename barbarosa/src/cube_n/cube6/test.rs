@@ -46,9 +46,6 @@ fn four_of_each() {
     for mov in &AxisMove::all() {
         for depth in 0..=2 {
             let mov = mov.clone().widen::<2>(depth).unwrap();
-
-            println!("Making move {mov}");
-
             let mut cube = Cube6::new_solved();
 
             for _ in 0..4 {

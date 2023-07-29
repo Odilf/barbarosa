@@ -65,10 +65,8 @@ fn four_wide_us() {
     let mut cube = Cube4::new_solved();
     let mov = WideAxisMove::<1>::new(Face::U, Amount::Single, 1).unwrap();
 
-    for i in 0..4 {
-        println!("{}", i);
+    for _ in 0..4 {
         cube.apply(&mov);
-        dbg!(&cube.wings);
         cube.assert_consistent();
     }
 

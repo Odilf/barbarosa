@@ -60,7 +60,6 @@ fn random_indexes_deindexes() {
     let original = StdRng::seed_from_u64(69420).gen::<Cube3>();
     let deindexed = Cube3::from_indices(original.indices());
 
-    dbg!(&original.corners, &deindexed.corners);
     assert_eq!(original, deindexed);
 }
 

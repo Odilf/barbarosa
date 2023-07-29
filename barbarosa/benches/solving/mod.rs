@@ -31,6 +31,5 @@ macro_rules! bench_heuristic {
 }
 
 pub fn bench(c: &mut Criterion) {
-    // bench_heuristic!(manhattan, c, [4, 5]);
-    bench_heuristic!(mus, c, [4, 6, 10, 12]);
+    bench_heuristic!(mus, c, [4, 6, 10, 12, 13]);
 }
