@@ -71,8 +71,8 @@ where
 
             path.push(successor);
 
-            let new_search =
-                self.search_impl(path, is_target, current_cost + 1.0, bound, min_exceeded);
+            let new_cost = current_cost + 1.0;
+            let new_search = self.search_impl(path, is_target, new_cost, bound, min_exceeded);
 
             if let Some(mut solution) = new_search {
                 solution.moves.push(mov);
