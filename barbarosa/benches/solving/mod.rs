@@ -30,7 +30,7 @@ macro_rules! bench_heuristic {
         assert!(cube.clone().moved(&solution).is_solved());
         assert!(solution.moves.len() <= alg.moves.len(), "Solution: {solution}, alg: {alg}");
 
-        if $amount > 13 {
+        if $amount >= 13 {
             $group.sample_size(10);
         }
 

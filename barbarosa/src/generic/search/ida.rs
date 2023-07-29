@@ -1,6 +1,6 @@
 //! Iterative deepening A*
 
-use std::{collections::HashSet, hash::Hash};
+use std::hash::Hash;
 
 use crate::generic::{Alg, Cube, Movable, Move};
 
@@ -41,19 +41,15 @@ where
 
     fn search_impl(
         &self,
-        cube: &C,
+        path: &mut Vec<C>,
         is_target: &impl Fn(&C) -> bool,
         current_cost: f32,
         bound: &f32,
         min_exceeded: &mut f32,
-        visited: &mut HashSet<C>,
     ) -> Option<Alg<M>> {
-        if visited.contains(cube) {
-            return None;
-        }
-
-        visited.insert(cube.clone());
-
+        let cube = path
+            .last()
+            .expect("Path should be populated before calling this function");
         let new_cost = current_cost + (self.heuristic)(cube);
 
         if new_cost > *bound {
@@ -69,19 +65,21 @@ where
         }
 
         for (successor, mov) in (self.successors)(cube) {
-            let new_search = self.search_impl(
-                &successor,
-                is_target,
-                current_cost + 1.0,
-                bound,
-                min_exceeded,
-                visited,
-            );
+            if path.contains(&successor) {
+                continue;
+            }
+
+            path.push(successor);
+
+            let new_search =
+                self.search_impl(path, is_target, current_cost + 1.0, bound, min_exceeded);
 
             if let Some(mut solution) = new_search {
                 solution.moves.push(mov);
                 return Some(solution);
             }
+
+            path.pop();
         }
 
         None
@@ -99,18 +97,14 @@ where
 {
     fn search(&self, cube: &C, is_target: impl Fn(&C) -> bool) -> Option<Alg<M>> {
         let mut bound = (self.heuristic)(cube);
+
         for _ in 0..=self.max_depth {
             let mut min_exceeded = bound + 1.0;
-            let mut visited = HashSet::new();
+            let mut path = Vec::with_capacity(20);
 
-            let t = self.search_impl(
-                cube,
-                &is_target,
-                0.0,
-                &bound,
-                &mut min_exceeded,
-                &mut visited,
-            );
+            path.push(cube.clone());
+
+            let t = self.search_impl(&mut path, &is_target, 0.0, &bound, &mut min_exceeded);
 
             match t {
                 Some(mut solution) => {
