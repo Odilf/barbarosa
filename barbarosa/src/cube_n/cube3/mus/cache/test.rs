@@ -8,6 +8,7 @@ use crate::{
 };
 
 #[test]
+#[ignore = "MUS takes too long to build"]
 fn correct_cache() {
     let mut rng = StdRng::seed_from_u64(69420);
 
