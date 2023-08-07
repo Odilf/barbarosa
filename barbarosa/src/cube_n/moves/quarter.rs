@@ -2,7 +2,7 @@ use rand_derive2::RandGen;
 
 use crate::{
     cube_n::space::{Direction, Face},
-    generic::{self, Alg, Movable},
+    generic::{self, Alg, Cube, Movable},
 };
 
 use super::{Amount, AxisMove};
@@ -48,9 +48,9 @@ impl From<&QuarterAxisMove> for AxisMove {
     }
 }
 
-impl<C: Movable<AxisMove>> generic::Movable<QuarterAxisMove> for C {
+impl<C: Cube + Movable<AxisMove>> generic::Movable<QuarterAxisMove> for C {
     fn apply(&mut self, m: &QuarterAxisMove) {
-        self.apply(&m.into());
+        self.apply(&AxisMove::from(m));
     }
 }
 

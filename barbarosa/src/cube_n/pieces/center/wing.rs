@@ -1,10 +1,14 @@
 //! The center-wing piece. See [`CenterWing`] for more info.
 
+use cartesian_array_product::cartesian_array_map;
 use nalgebra::vector;
 
 use crate::{
     cube_n::{
-        moves::rotation::Rotatable,
+        moves::{
+            rotation::Rotatable,
+            wide::{DepthPiece, DepthPieceSet},
+        },
         pieces::wing::wing_normal_direction,
         space::{faces, Axis, Direction, Face},
         WideAxisMove,
@@ -21,16 +25,41 @@ use super::edge::CenterEdge;
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct CenterWing {
     corresponding_center_edge: CenterEdge,
-    hypothetically_oriented: bool,
+    pseudo_oriented: bool,
 }
 
-impl generic::Piece for CenterWing {}
+impl generic::Piece<48> for CenterWing {
+    type Position = Self;
+
+    const REFERENCE_POSITIONS: [Self::Position; 48] = {
+        use faces::*;
+        use Direction::*;
+
+        cartesian_array_map!(
+            [R, U, F, L, D, B],
+            [Positive, Negative],
+            [Positive, Negative],
+            [true, false];
+            CenterWing::new_with_orientation
+        )
+    };
+
+    const SOLVED: [Self; 48] = Self::REFERENCE_POSITIONS;
+
+    fn position(&self) -> Self::Position {
+        self.clone()
+    }
+
+    fn is_solved(&self, original_pos: &Self::Position) -> bool {
+        self.main_face() == original_pos.main_face()
+    }
+}
 
 impl Rotatable for CenterWing {
     fn rotate(&mut self, rotation: &crate::cube_n::moves::rotation::AxisRotation) {
         self.corresponding_center_edge.rotate(rotation);
 
-        self.hypothetically_oriented ^= rotation.flips_edge_orientation(self.normal_axis());
+        self.pseudo_oriented ^= rotation.flips_edge_orientation(self.normal_axis());
     }
 }
 
@@ -43,7 +72,7 @@ impl CenterWing {
         normal_direction: Direction,
     ) -> Self {
         let corresponding_edge_center = CenterEdge::new(main_face, handedness, side_direction);
-        let hypothetically_oriented = wing_normal_direction(
+        let pseudo_oriented = wing_normal_direction(
             corresponding_edge_center.normal_axis(),
             vector![
                 corresponding_edge_center.main_face.direction,
@@ -54,7 +83,7 @@ impl CenterWing {
 
         Self {
             corresponding_center_edge: corresponding_edge_center,
-            hypothetically_oriented,
+            pseudo_oriented,
         }
     }
 
@@ -63,11 +92,11 @@ impl CenterWing {
         main_face: Face,
         handedness: Direction,
         side_direction: Direction,
-        hypothetically_oriented: bool,
+        pseudo_oriented: bool,
     ) -> Self {
         Self {
             corresponding_center_edge: CenterEdge::new(main_face, handedness, side_direction),
-            hypothetically_oriented,
+            pseudo_oriented,
         }
     }
 
@@ -94,21 +123,28 @@ impl CenterWing {
                 self.corresponding_center_edge.main_face.direction,
                 self.corresponding_center_edge.side_direction
             ],
-            self.hypothetically_oriented,
+            self.pseudo_oriented,
         )
     }
+}
 
-    /// Determines whether [`CenterWing`] is solved
-    pub fn is_solved(&self, original: &Self) -> bool {
-        self.main_face() == original.main_face()
+impl std::fmt::Debug for CenterWing {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("CenterWing")
+            .field("main_face", &self.corresponding_center_edge.main_face)
+            .field("side_face", &self.side_face())
+            .field("normal_direction", &self.normal_direction())
+            .field("hypo_orient", &self.pseudo_oriented)
+            .finish()
     }
+}
 
-    /// Determines whether the [`CenterWing`] is in the wide move
-    pub fn in_wide_move<const N: u32>(
+impl DepthPiece<48> for CenterWing {
+    fn is_in_wide_move<const M: u32>(
         &self,
         normal_depth: u32,
         tangent_depth: u32,
-        m: &WideAxisMove<N>,
+        m: &WideAxisMove<M>,
     ) -> bool {
         let (main, side, mov) = (self.main_face(), &self.side_face(), m.face());
 
@@ -135,70 +171,5 @@ impl CenterWing {
     }
 }
 
-impl std::fmt::Debug for CenterWing {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("CenterWing")
-            .field("main_face", &self.corresponding_center_edge.main_face)
-            .field("side_face", &self.side_face())
-            .field("normal_direction", &self.normal_direction())
-            .field("hypo_orient", &self.hypothetically_oriented)
-            .finish()
-    }
-}
-
-/// The solved set of [`CenterWing`]s.
-pub const SOLVED: [CenterWing; 48] = {
-    use faces::*;
-    use Direction::*;
-
-    [
-        CenterWing::new_with_orientation(R, Positive, Positive, true),
-        CenterWing::new_with_orientation(R, Positive, Negative, true),
-        CenterWing::new_with_orientation(R, Negative, Negative, true),
-        CenterWing::new_with_orientation(R, Negative, Positive, true),
-        CenterWing::new_with_orientation(U, Positive, Positive, true),
-        CenterWing::new_with_orientation(U, Positive, Negative, true),
-        CenterWing::new_with_orientation(U, Negative, Negative, true),
-        CenterWing::new_with_orientation(U, Negative, Positive, true),
-        CenterWing::new_with_orientation(F, Positive, Positive, true),
-        CenterWing::new_with_orientation(F, Positive, Negative, true),
-        CenterWing::new_with_orientation(F, Negative, Negative, true),
-        CenterWing::new_with_orientation(F, Negative, Positive, true),
-        CenterWing::new_with_orientation(L, Positive, Positive, true),
-        CenterWing::new_with_orientation(L, Positive, Negative, true),
-        CenterWing::new_with_orientation(L, Negative, Negative, true),
-        CenterWing::new_with_orientation(L, Negative, Positive, true),
-        CenterWing::new_with_orientation(D, Positive, Positive, true),
-        CenterWing::new_with_orientation(D, Positive, Negative, true),
-        CenterWing::new_with_orientation(D, Negative, Negative, true),
-        CenterWing::new_with_orientation(D, Negative, Positive, true),
-        CenterWing::new_with_orientation(B, Positive, Positive, true),
-        CenterWing::new_with_orientation(B, Positive, Negative, true),
-        CenterWing::new_with_orientation(B, Negative, Negative, true),
-        CenterWing::new_with_orientation(B, Negative, Positive, true),
-        CenterWing::new_with_orientation(R, Positive, Positive, false),
-        CenterWing::new_with_orientation(R, Positive, Negative, false),
-        CenterWing::new_with_orientation(R, Negative, Negative, false),
-        CenterWing::new_with_orientation(R, Negative, Positive, false),
-        CenterWing::new_with_orientation(U, Positive, Positive, false),
-        CenterWing::new_with_orientation(U, Positive, Negative, false),
-        CenterWing::new_with_orientation(U, Negative, Negative, false),
-        CenterWing::new_with_orientation(U, Negative, Positive, false),
-        CenterWing::new_with_orientation(F, Positive, Positive, false),
-        CenterWing::new_with_orientation(F, Positive, Negative, false),
-        CenterWing::new_with_orientation(F, Negative, Negative, false),
-        CenterWing::new_with_orientation(F, Negative, Positive, false),
-        CenterWing::new_with_orientation(L, Positive, Positive, false),
-        CenterWing::new_with_orientation(L, Positive, Negative, false),
-        CenterWing::new_with_orientation(L, Negative, Negative, false),
-        CenterWing::new_with_orientation(L, Negative, Positive, false),
-        CenterWing::new_with_orientation(D, Positive, Positive, false),
-        CenterWing::new_with_orientation(D, Positive, Negative, false),
-        CenterWing::new_with_orientation(D, Negative, Negative, false),
-        CenterWing::new_with_orientation(D, Negative, Positive, false),
-        CenterWing::new_with_orientation(B, Positive, Positive, false),
-        CenterWing::new_with_orientation(B, Positive, Negative, false),
-        CenterWing::new_with_orientation(B, Negative, Negative, false),
-        CenterWing::new_with_orientation(B, Negative, Positive, false),
-    ]
-};
+/// A set of [`CenterWing`]s with normal depth `ND` and tangent depth `TD`
+pub type CenterWingSet<const ND: u32, const TD: u32> = DepthPieceSet<CenterWing, 48, ND, TD>;

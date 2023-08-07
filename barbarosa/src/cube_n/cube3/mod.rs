@@ -7,14 +7,17 @@ pub mod mus;
 
 mod test;
 
-use rand::{distributions::Standard, prelude::Distribution, seq::SliceRandom};
+use rand::{distributions::Standard, prelude::Distribution};
 
 use crate::{
-    cube_n::{pieces, space::Axis},
+    cube_n::space::Axis,
     generic::{self, moves::AsMove, Cube},
 };
 
-use super::invariants::{fix_corner_multiplicity, fix_edge_flip_parity, fix_swap_parity};
+use super::{
+    invariants::{fix_corner_multiplicity, fix_edge_flip_parity, fix_swap_parity},
+    pieces::{corner::CornerSet, edge::EdgeSet},
+};
 
 use super::{AxisMove, Corner, Edge};
 
@@ -24,15 +27,15 @@ use super::{AxisMove, Corner, Edge};
 #[derive(Debug, PartialEq, Eq, Clone, Hash)]
 pub struct Cube3 {
     /// The edges of the cube.
-    pub edges: [Edge; 12],
+    pub edges: EdgeSet,
 
     /// The corners of the cube.
-    pub corners: [Corner; 8],
+    pub corners: CornerSet,
 }
 
 const SOLVED_CUBE: Cube3 = Cube3 {
-    edges: pieces::edge::SOLVED,
-    corners: pieces::corner::SOLVED,
+    edges: EdgeSet::SOLVED,
+    corners: CornerSet::SOLVED,
 };
 
 impl generic::Cube for Cube3 {
@@ -62,11 +65,11 @@ impl Distribution<Cube3> for Standard {
 
         // Flip pieces
         cube.edges
-            .iter_mut()
-            .for_each(|edge| edge.oriented = rng.gen());
+            .iter_mut_unchecked()
+            .for_each(|(_, edge)| edge.oriented = rng.gen());
         cube.corners
-            .iter_mut()
-            .for_each(|corner| corner.orientation_axis = rng.gen());
+            .iter_mut_unchecked()
+            .for_each(|(_, corner)| corner.orientation_axis = rng.gen());
 
         fix_swap_parity(&mut cube);
 

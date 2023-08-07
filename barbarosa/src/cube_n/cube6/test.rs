@@ -59,12 +59,12 @@ fn four_of_each() {
 
 #[test]
 fn center_wings_normal_directions() {
-    let ru = &Cube6::solved().center_wings[0];
+    let ru = &Cube6::solved().center_wings.pieces()[0];
 
     assert_eq!(ru.normal_axis(), Axis::Z);
     assert_eq!(ru.normal_direction(), Direction::Positive);
 
-    let uf = &Cube6::solved().center_wings[4];
+    let uf = &Cube6::solved().center_wings.pieces()[1];
 
     assert_eq!(uf.normal_axis(), Axis::X);
     assert_eq!(uf.normal_direction(), Direction::Negative);

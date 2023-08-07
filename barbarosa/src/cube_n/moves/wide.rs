@@ -1,5 +1,7 @@
 //! Moves for 4x4x4 and up
 
+use std::ops::Deref;
+
 use rand::prelude::Distribution;
 use thiserror::Error;
 
@@ -9,9 +11,12 @@ pub use crate::generic::{
     parse::{self, Parsable},
 };
 
-use self::generic::{Alg, Movable};
+use self::generic::{Alg, Cube, Movable, Piece, PieceSet};
 
-use super::{Amount, AxisMove};
+use super::{
+    rotation::{AxisRotation, Rotatable},
+    Amount, AxisMove,
+};
 
 /// A wide move of at most depth `N`.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -99,7 +104,7 @@ impl<const N: u32> std::fmt::Display for WideAxisMove<N> {
     }
 }
 
-impl<C: Movable<WideAxisMove<0>>> Movable<AxisMove> for C {
+impl<C: Cube + Movable<WideAxisMove<0>>> Movable<AxisMove> for C {
     fn apply(&mut self, m: &AxisMove) {
         self.apply(&m.clone().widen::<0>(0).unwrap());
     }
@@ -145,5 +150,60 @@ impl Alg<AxisMove> {
             .into_iter()
             .map(|axis_move| axis_move.widen(depth))
             .collect()
+    }
+}
+
+/// A piece that can be moved by a wide move
+pub trait DepthPiece<const N: usize>: Piece<N> {
+    /// Whether the piece is in the wide move if it has the given normal and tangent depth.
+    fn is_in_wide_move<const M: u32>(
+        &self,
+        normal_depth: u32,
+        tangent_depth: u32,
+        m: &WideAxisMove<M>,
+    ) -> bool;
+}
+
+/// A set of pieces that have varying depths and can be moved by a wide move.
+///
+/// Actually, this struct is just a wrapper around a [`PieceSet`] that adds the depth information as generics and
+/// implements [`Movable`] for [`WideAxisMove`]s.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DepthPieceSet<
+    P: DepthPiece<N>,
+    const N: usize,
+    const NORMAL_DEPTH: u32,
+    const TANGENT_DEPTH: u32 = 0,
+> {
+    /// The original set of pieces.
+    pub set: PieceSet<P, N>,
+}
+
+impl<P: DepthPiece<N>, const N: usize, const ND: u32, const TD: u32> DepthPieceSet<P, N, ND, TD> {
+    /// Alias to [`Piece::SOLVED`]
+    pub const SOLVED: Self = Self {
+        set: PieceSet::SOLVED,
+    };
+}
+
+impl<P: DepthPiece<N> + Rotatable, const M: u32, const N: usize, const ND: u32, const TD: u32>
+    Movable<WideAxisMove<M>> for DepthPieceSet<P, N, ND, TD>
+{
+    fn apply(&mut self, m: &WideAxisMove<M>) {
+        self.set
+            .iter_mut_unchecked()
+            .map(|(_, piece)| piece)
+            .filter(|piece| piece.is_in_wide_move::<M>(ND, TD, m))
+            .for_each(|piece| piece.rotate(&AxisRotation::from(&m.axis_move)));
+    }
+}
+
+impl<P: DepthPiece<N>, const N: usize, const ND: u32, const TD: u32> Deref
+    for DepthPieceSet<P, N, ND, TD>
+{
+    type Target = PieceSet<P, N>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.set
     }
 }

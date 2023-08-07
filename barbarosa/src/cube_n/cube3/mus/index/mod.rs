@@ -10,7 +10,7 @@ use crate::{
     },
 };
 
-use super::HalfEdges;
+use super::HalfEdgesMUS;
 
 /// Const calculation of the factorial of a number
 ///
@@ -146,12 +146,12 @@ pub fn orientation_permutation_index<T: OrientationIndexable, const N: usize>(
 }
 
 impl Cube3 {
-    fn edge_partition(&self) -> [&HalfEdges; 2] {
+    fn edge_partition(&self) -> [&HalfEdgesMUS; 2] {
         [
-            self.edges[0..6].try_into().expect(
+            self.edges.pieces()[0..6].try_into().expect(
                 "`self.edges` has a const length of 12, and [0, 6) is in the range [0, 12)",
             ),
-            self.edges[6..12].try_into().expect(
+            self.edges.pieces()[6..12].try_into().expect(
                 "`self.edges` has a const length of 12, and [7, 12) is in the range [0, 12)",
             ),
         ]
@@ -165,7 +165,7 @@ impl Cube3 {
         let edges = [edges[0], &adjust_second_edges_for_indexing(edges[1])];
 
         CubeIndices {
-            corners: self.corners.index(),
+            corners: self.corners.pieces().index(),
             edges: edges.map(|edges| edges.index()),
         }
     }
@@ -189,10 +189,11 @@ pub struct CubeIndices {
 /// # Warning
 ///
 /// This depends on the structure of `Cube::solved()`.
-fn adjust_second_edges_for_indexing(edges: &HalfEdges) -> HalfEdges {
+fn adjust_second_edges_for_indexing(edges: &HalfEdgesMUS) -> HalfEdgesMUS {
     let mut output = edges.clone();
 
     for edge in output.iter_mut() {
+        // edge.slice_position = -edge.slice_position;
         edge.rotate(&AxisRotation::new(Axis::X, Amount::Double))
     }
 

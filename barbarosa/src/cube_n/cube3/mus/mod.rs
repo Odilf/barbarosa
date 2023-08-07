@@ -29,5 +29,5 @@ pub mod cache;
 pub mod deindex;
 pub mod index;
 
-type Corners = [Corner; 8];
-type HalfEdges = [Edge; 6];
+type CornersMUS = [Corner; 8];
+type HalfEdgesMUS = [Edge; 6];
