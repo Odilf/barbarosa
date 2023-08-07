@@ -77,13 +77,12 @@ fn swap_cycles<T: PositionIndexable + PartialEq + Debug, const N: usize>(values:
 ///
 /// See the [module-level documentation](self) for more info.
 pub fn fix_edge_flip_parity(edges: &mut EdgeSet) {
-    let oriented_edges = edges.iter().filter(|(_, edge)| edge.oriented).count();
+    let oriented_edges = edges.iter().filter(|edge| edge.oriented).count();
     if oriented_edges % 2 == 1 {
         edges
             .iter_mut_unchecked()
             .last()
             .expect("There are 12 edges, which is more than 0")
-            .1
             .flip();
     }
 }
@@ -94,7 +93,7 @@ pub fn fix_edge_flip_parity(edges: &mut EdgeSet) {
 pub fn fix_corner_multiplicity(corners: &mut CornerSet) {
     let oriented_corners: i32 = corners
         .iter()
-        .map(|(_, corner)| corner.orientation_index() as i32)
+        .map(|corner| corner.orientation_index() as i32)
         .sum();
 
     let corner_orientation_offset = (-oriented_corners).rem_euclid(3);
@@ -104,7 +103,6 @@ pub fn fix_corner_multiplicity(corners: &mut CornerSet) {
             .iter_mut_unchecked()
             .last()
             .expect("There are 8 corners, which is more than 0")
-            .1
             .twist();
     }
 
@@ -112,7 +110,7 @@ pub fn fix_corner_multiplicity(corners: &mut CornerSet) {
     debug_assert!({
         let oriented_corners: i32 = corners
             .iter()
-            .map(|(_, corner)| corner.orientation_index() as i32)
+            .map(|corner| corner.orientation_index() as i32)
             .sum();
 
         oriented_corners % 3 == 0

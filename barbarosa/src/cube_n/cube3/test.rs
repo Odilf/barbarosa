@@ -64,7 +64,7 @@ fn test_f() {
     let target_index = cube
         .edges
         .iter()
-        .position(|(_, current)| current == &target)
+        .position(|current| current == &target)
         .unwrap();
 
     cube.apply(&AxisMove::parse("F").unwrap());

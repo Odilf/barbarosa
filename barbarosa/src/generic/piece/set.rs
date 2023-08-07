@@ -57,26 +57,31 @@ impl<P: Piece<N>, const N: usize> PieceSet<P, N> {
         P::REFERENCE_POSITIONS.into_iter().zip(other)
     }
 
+    /// Iterator over pieces of [`self`]
+    pub fn iter(&self) -> impl Iterator<Item = &P> {
+        self.pieces.iter()
+    }
+
     /// Iterator over the pieces and their original positions
-    // TODO: Make an iterator that validates this
-    pub fn iter(&self) -> impl Iterator<Item = (P::Position, &P)> {
+    pub fn iter_with_pos(&self) -> impl Iterator<Item = (P::Position, &P)> {
         Self::zip_positions(self.pieces.iter())
     }
 
-    /// Mutable iterator over the pieces and their original positions. It doesn't check the invariants.
+    /// Mutable iterator over the pieces. It doesn't check the invariants.
     // TODO: Validate anyway in debug mode
-    pub fn iter_mut_unchecked(&mut self) -> impl Iterator<Item = (P::Position, &mut P)> {
-        Self::zip_positions(self.pieces.iter_mut())
+    pub fn iter_mut_unchecked(&mut self) -> impl Iterator<Item = &mut P> {
+        self.pieces.iter_mut()
     }
 
     /// Whether the set is solved
     pub fn is_solved(&self) -> bool {
-        self.iter().all(|(pos, piece)| piece.is_solved(&pos))
+        self.iter_with_pos()
+            .all(|(pos, piece)| piece.is_solved(&pos))
     }
 
     /// Returns the piece that was originally at `target_pos`
     pub fn piece_originally_at(&self, target_pos: &P::Position) -> &P {
-        self.iter()
+        self.iter_with_pos()
             .find(|(pos, _piece)| pos == target_pos)
             .map(|(_, piece)| piece)
             .expect("There should be a piece at each position")
@@ -86,7 +91,7 @@ impl<P: Piece<N>, const N: usize> PieceSet<P, N> {
     ///
     /// Returns [`None`] if there is no piece at `target_pos`.
     pub fn original_position_of_piece_at(&self, target_pos: &P::Position) -> P::Position {
-        self.iter()
+        self.iter_with_pos()
             .find(|(_, piece)| piece.position() == *target_pos)
             .map(|(pos, _piece)| pos)
             .expect("There should be a piece at each position")

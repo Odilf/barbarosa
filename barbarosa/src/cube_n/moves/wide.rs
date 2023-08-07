@@ -192,7 +192,6 @@ impl<P: DepthPiece<N> + Rotatable, const M: u32, const N: usize, const ND: u32, 
     fn apply(&mut self, m: &WideAxisMove<M>) {
         self.set
             .iter_mut_unchecked()
-            .map(|(_, piece)| piece)
             .filter(|piece| piece.is_in_wide_move::<M>(ND, TD, m))
             .for_each(|piece| piece.rotate(&AxisRotation::from(&m.axis_move)));
     }

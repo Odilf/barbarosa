@@ -66,10 +66,10 @@ impl Distribution<Cube3> for Standard {
         // Flip pieces
         cube.edges
             .iter_mut_unchecked()
-            .for_each(|(_, edge)| edge.oriented = rng.gen());
+            .for_each(|edge| edge.oriented = rng.gen());
         cube.corners
             .iter_mut_unchecked()
-            .for_each(|(_, corner)| corner.orientation_axis = rng.gen());
+            .for_each(|corner| corner.orientation_axis = rng.gen());
 
         fix_swap_parity(&mut cube);
 

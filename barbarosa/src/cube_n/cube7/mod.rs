@@ -5,11 +5,7 @@ use crate::generic::{self, moves::AsMove};
 use super::{
     center::{corner::CenterCornerSet, edge::CenterEdgeSet, wing::CenterWingSet},
     moves::wide::impl_movable_wide_move_inductively,
-    pieces::{
-        corner::CornerSet,
-        edge::EdgeSet,
-        wing::WingSet,
-    },
+    pieces::{corner::CornerSet, edge::EdgeSet, wing::WingSet},
     WideAxisMove,
 };
 

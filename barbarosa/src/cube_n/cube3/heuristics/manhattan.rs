@@ -14,7 +14,7 @@ fn piece_set_manhattan<P: Piece<N>, const N: usize>(
     set: &PieceSet<P, N>,
     coords: impl Fn(&P::Position) -> Vector3<f32>,
 ) -> f32 {
-    set.iter()
+    set.iter_with_pos()
         .map(|(pos, piece)| vec_manhattan(&coords(&piece.position()), &coords(&pos)))
         .sum()
 }
