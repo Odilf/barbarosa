@@ -14,8 +14,6 @@ use super::{
 
 /// The 5x5x5 cube.
 ///
-/// It has 8 [`Corner`]s, 12 [`Edge`]s and 24 [`CenterCorner`]s and 24 [`CenterEdge`]s.
-///
 /// See [crate::cube_n] for more info.
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Cube5 {

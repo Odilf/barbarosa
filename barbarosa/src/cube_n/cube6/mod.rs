@@ -11,9 +11,6 @@ use super::{
 
 /// The 6x6x6 cube.
 ///
-/// It has 8 [`Corner`]s, 24 [`Wing`]s at depth 1 and 24 at depth 2, 24 [`CenterCorner`]s
-/// at depth 1 and another 24 at depth 2, and 48 [`CenterWing`]s.
-///
 /// See [crate::cube_n] for more info.
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Cube6 {

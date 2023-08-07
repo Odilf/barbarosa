@@ -11,8 +11,6 @@ use super::{
 
 /// The 4x4x4 cube.
 ///
-/// It has 8 [`Corner`]s, 24 [`Wing`]s and 24 [`CenterCorner`]s.
-///
 /// See [crate::cube_n] for more info.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Cube4 {

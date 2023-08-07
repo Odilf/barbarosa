@@ -8,7 +8,7 @@ mod test;
 
 /// The 2x2x2 cube.
 ///
-///
+/// See [crate::cube_n] for more info.
 #[derive(Debug, PartialEq, Eq, Clone, Hash)]
 pub struct Cube2 {
     /// Corners of the 2x2x2 cube (actually, it's the only piece type it has).

@@ -11,14 +11,6 @@ use super::{
 
 /// The 7x7x7 cube. The biggest [WCA](https://www.worldcubeassociation.org/) NxN.
 ///
-/// It has:
-/// - 8 [`Corner`]s
-/// - 12 [`Edge`]s
-/// - 24 [`Wing`]s at depth 1 and 24 at depth 2
-/// - 24 [`CenterCorner`]s at depth 1 and another 24 at depth 2
-/// - 48 [`CenterWing`]s
-/// - 24 [`CenterEdge`]s at depth 1 and another 24 at depth 2
-///
 /// See [crate::cube_n] for more info.
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Cube7 {
