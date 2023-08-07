@@ -12,6 +12,9 @@ use super::Piece;
 ///
 /// This struct provides methods in order to ensure that each piece is unique and that each position
 /// exactly 1 piece. Some methods have an `_unchecked` variant which skips these checks.
+/// 
+/// [`PieceSet`] is not responsible for enforcing the specific invariants of the different piece types. 
+/// For example, [`EdgeSet`](crate::cube_n::pieces::edge::EdgeSet) does not check that the parity of the edges is correct.
 #[derive(Debug, PartialEq, Eq, Clone, Hash)]
 pub struct PieceSet<P: Piece<N>, const N: usize> {
     pieces: [P; N],
@@ -57,7 +60,7 @@ impl<P: Piece<N>, const N: usize> PieceSet<P, N> {
         P::REFERENCE_POSITIONS.into_iter().zip(other)
     }
 
-    /// Iterator over pieces of [`self`]
+    /// Iterator over pieces of [`PieceSet`]
     pub fn iter(&self) -> impl Iterator<Item = &P> {
         self.pieces.iter()
     }
