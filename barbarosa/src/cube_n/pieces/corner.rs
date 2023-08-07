@@ -44,7 +44,7 @@ impl generic::Piece<8> for Corner {
     }
 
     fn is_solved(&self, original_pos: &Self::Position) -> bool {
-        self.position() == *original_pos && self.orientation_axis == Axis::X
+        self.position() == *original_pos && self.is_oriented()
     }
 }
 
@@ -136,6 +136,14 @@ impl Corner {
     /// Gets the physical standard coordinates of the corner
     pub fn coordinates(position: &Vector3<Direction>) -> Vector3<f32> {
         position.map(|dir| dir.scalar() as f32)
+    }
+
+    /// Whether the corner is oriented. This is true if the orientation axis is
+    /// the X axis.
+    /// 
+    /// This method might be ever so slightly faster then doing `corner.orientation_index() == 0`.
+    pub fn is_oriented(&self) -> bool {
+        self.orientation_axis == Axis::X
     }
 }
 
