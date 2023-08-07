@@ -242,6 +242,19 @@ impl Face {
     /// The back face
     pub const B: Face = Face::new(Axis::Z, Direction::Negative);
 
+    /// Iterates over all 6 faces
+    pub fn iter() -> impl Iterator<Item = Face> {
+        use faces::*;
+        use std::iter::once;
+
+        once(R)
+            .chain(once(U))
+            .chain(once(F))
+            .chain(once(L))
+            .chain(once(D))
+            .chain(once(B))
+    }
+
     /// Gets the opposite face
     pub fn opposite(&self) -> Face {
         Face {
