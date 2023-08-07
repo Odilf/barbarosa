@@ -3,7 +3,7 @@ use std::{fs, io, path::Path};
 use chrono::Local;
 
 use crate::{
-    cube3::mus::{deindex::Deindexable, index::Indexable, Corners, HalfEdges},
+    cube3::mus::{deindex::Deindexable, index::Indexable, CornersMUS, HalfEdgesMUS},
     cube_n::AxisMove,
     generic::Movable,
 };
@@ -11,15 +11,15 @@ use crate::{
 use super::{generation::build_partial, Cache};
 
 pub fn load() -> io::Result<Cache> {
-    let edges = load_partial::<HalfEdges>()?;
-    let corners = load_partial::<Corners>()?;
+    let edges = load_partial::<HalfEdgesMUS>()?;
+    let corners = load_partial::<CornersMUS>()?;
 
     Ok(Cache { edges, corners })
 }
 
 pub fn load_or_build() -> io::Result<Cache> {
-    let edges = load_or_build_partial::<HalfEdges>()?;
-    let corners = load_or_build_partial::<Corners>()?;
+    let edges = load_or_build_partial::<HalfEdgesMUS>()?;
+    let corners = load_or_build_partial::<CornersMUS>()?;
 
     Ok(Cache { edges, corners })
 }
@@ -43,11 +43,11 @@ pub trait DiskCacheable: Indexable {
     const PATH: &'static str;
 }
 
-impl DiskCacheable for Corners {
+impl DiskCacheable for CornersMUS {
     const PATH: &'static str = "mus-cache/corners.barbarosa";
 }
 
-impl DiskCacheable for HalfEdges {
+impl DiskCacheable for HalfEdgesMUS {
     const PATH: &'static str = "mus-cache/edges.barbarosa";
 }
 

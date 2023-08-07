@@ -1,9 +1,9 @@
 use crate::{
     cube3::{
-        mus::{Corners, HalfEdges},
-        Corner, Cube3, Edge,
+        mus::{CornersMUS, HalfEdgesMUS},
+        Corner, Edge,
     },
-    generic::Cube,
+    generic::Piece,
 };
 
 use super::{
@@ -13,11 +13,10 @@ use super::{
 
 impl PositionIndexable for Corner {
     fn position_index(&self) -> usize {
-        Cube3::solved()
-            .corners
+        Corner::REFERENCE_POSITIONS
             .iter()
-            .position(|corner| corner.position == self.position)
-            .unwrap()
+            .position(|reference_pos| *reference_pos == self.position)
+            .expect("There should be a corner in every position")
     }
 
     const POSITION_SET_SIZE: usize = 8;
@@ -33,13 +32,10 @@ impl OrientationIndexable for Corner {
 
 impl PositionIndexable for Edge {
     fn position_index(&self) -> usize {
-        Cube3::solved()
-            .edges
+        Edge::REFERENCE_POSITIONS
             .iter()
-            .position(|edge| {
-                edge.normal_axis == self.normal_axis && edge.slice_position == self.slice_position
-            })
-            .unwrap()
+            .position(|reference_pos| *reference_pos == self.position())
+            .expect("There should be an edge in every position")
     }
 
     const POSITION_SET_SIZE: usize = 12;
@@ -56,7 +52,7 @@ impl OrientationIndexable for Edge {
     const ORIENTATION_SET_SIZE: usize = 2;
 }
 
-impl PositionIndexable for HalfEdges {
+impl PositionIndexable for HalfEdgesMUS {
     fn position_index(&self) -> usize {
         position_disposition_index::<_, 6, { Edge::POSITION_SET_SIZE }>(self)
     }
@@ -64,7 +60,7 @@ impl PositionIndexable for HalfEdges {
     const POSITION_SET_SIZE: usize = factorial(12) / factorial(12 - 6);
 }
 
-impl OrientationIndexable for HalfEdges {
+impl OrientationIndexable for HalfEdgesMUS {
     fn orientation_index(&self) -> usize {
         orientation_permutation_index(self)
     }
@@ -72,7 +68,7 @@ impl OrientationIndexable for HalfEdges {
     const ORIENTATION_SET_SIZE: usize = 2usize.pow(6);
 }
 
-impl PositionIndexable for Corners {
+impl PositionIndexable for CornersMUS {
     fn position_index(&self) -> usize {
         position_disposition_index::<_, 8, { Corner::POSITION_SET_SIZE }>(self)
     }
@@ -80,7 +76,7 @@ impl PositionIndexable for Corners {
     const POSITION_SET_SIZE: usize = factorial(8);
 }
 
-impl OrientationIndexable for Corners {
+impl OrientationIndexable for CornersMUS {
     fn orientation_index(&self) -> usize {
         // The last corner is determined by the other 7 so we should ignore it
         let useful_corners: &[Corner; 7] = self[0..7].try_into().unwrap();

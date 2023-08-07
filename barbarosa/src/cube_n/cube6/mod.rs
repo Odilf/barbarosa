@@ -3,15 +3,10 @@ mod test;
 use crate::generic::{self, moves::AsMove};
 
 use super::{
-    moves::{
-        rotation::{AxisRotation, Rotatable},
-        wide::impl_movable_wide_move_inductively,
-    },
-    pieces::{
-        center::{self, wing::CenterWing},
-        corner, wing, CenterCorner,
-    },
-    Corner, WideAxisMove, Wing,
+    center::{corner::CenterCornerSet, wing::CenterWingSet},
+    moves::wide::impl_movable_wide_move_inductively,
+    pieces::{corner::CornerSet, wing::WingSet},
+    WideAxisMove,
 };
 
 /// The 6x6x6 cube.
@@ -22,48 +17,14 @@ use super::{
 /// See [crate::cube_n] for more info.
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Cube6 {
-    corners: [Corner; 8],
+    corners: CornerSet,
 
-    wings_1: [Wing; 24],
-    wings_2: [Wing; 24],
+    wings_1: WingSet<1>,
+    wings_2: WingSet<2>,
 
-    center_corners_1: [CenterCorner; 24],
-    center_corners_2: [CenterCorner; 24],
-    center_wings: [CenterWing; 48],
-}
-
-impl Cube6 {
-    /// Iterates through the wings of the cube with the depth
-    pub fn wing_iter(&self) -> impl Iterator<Item = (&Wing, u32)> {
-        self.wings_1
-            .iter()
-            .map(|wing| (wing, 1))
-            .chain(self.wings_2.iter().map(|wing| (wing, 2)))
-    }
-
-    /// Mutable version of [`Cube6::wing_iter`]
-    pub fn wing_iter_mut(&mut self) -> impl Iterator<Item = (&mut Wing, u32)> {
-        self.wings_1
-            .iter_mut()
-            .map(|wing| (wing, 1))
-            .chain(self.wings_2.iter_mut().map(|wing| (wing, 2)))
-    }
-
-    /// Iterates through the center corners of the cube with the depth
-    pub fn center_corner_iter(&self) -> impl Iterator<Item = (&CenterCorner, u32)> {
-        self.center_corners_1
-            .iter()
-            .map(|wing| (wing, 1))
-            .chain(self.center_corners_2.iter().map(|wing| (wing, 2)))
-    }
-
-    /// Mutable version of [`Cube6::center_corner_iter`]
-    pub fn center_corner_iter_mut(&mut self) -> impl Iterator<Item = (&mut CenterCorner, u32)> {
-        self.center_corners_1
-            .iter_mut()
-            .map(|wing| (wing, 1))
-            .chain(self.center_corners_2.iter_mut().map(|wing| (wing, 2)))
-    }
+    center_corners_1: CenterCornerSet<1>,
+    center_corners_2: CenterCornerSet<2>,
+    center_wings: CenterWingSet<1, 2>,
 }
 
 impl generic::Cube for Cube6 {
@@ -75,21 +36,12 @@ impl generic::Cube for Cube6 {
     where
         Self: 'static,
     {
-        let corners = self.corners == Self::solved().corners;
-        let wings_1 = self.wings_1 == Self::solved().wings_1;
-        let wings_2 = self.wings_2 == Self::solved().wings_2;
-
-        let center_corners = self
-            .center_corner_iter()
-            .zip(Self::solved().center_corner_iter())
-            .all(|((c, _), (o, _))| c.is_solved(o));
-        let center_wings = self
-            .center_wings
-            .iter()
-            .zip(Self::solved().center_wings.iter())
-            .all(|(c, o)| c.is_solved(o));
-
-        corners && wings_1 && wings_2 && center_corners && center_wings
+        self.corners.is_solved()
+            && self.wings_1.is_solved()
+            && self.wings_2.is_solved()
+            && self.center_corners_1.is_solved()
+            && self.center_corners_2.is_solved()
+            && self.center_wings.is_solved()
     }
 }
 
@@ -100,31 +52,23 @@ impl AsMove for Cube6 {
 impl generic::Movable<WideAxisMove<2>> for Cube6 {
     fn apply(&mut self, m: &WideAxisMove<2>) {
         self.corners.apply(&m.axis_move);
-
-        self.wing_iter_mut()
-            .filter(|(wing, depth)| wing.in_wide_move(*depth, m))
-            .for_each(|(wing, _depth)| wing.rotate(&AxisRotation::from(&m.axis_move)));
-
-        self.center_corner_iter_mut()
-            .filter(|(cc, depth)| cc.in_wide_move(*depth, m))
-            .for_each(|(cc, _)| cc.rotate(&AxisRotation::from(&m.axis_move)));
-
-        self.center_wings
-            .iter_mut()
-            .filter(|cw| cw.in_wide_move(1, 2, m))
-            .for_each(|cw| cw.rotate(&AxisRotation::from(&m.axis_move)));
+        self.wings_1.apply(m);
+        self.wings_2.apply(m);
+        self.center_corners_1.apply(m);
+        self.center_corners_2.apply(m);
+        self.center_wings.apply(m);
     }
 }
 
 impl_movable_wide_move_inductively!(Cube6, 2, [0, 1]);
 
 const SOLVED: Cube6 = Cube6 {
-    corners: corner::SOLVED,
+    corners: CornerSet::SOLVED,
 
-    wings_1: wing::SOLVED,
-    wings_2: wing::SOLVED,
+    wings_1: WingSet::SOLVED,
+    wings_2: WingSet::SOLVED,
 
-    center_corners_1: center::corner::SOLVED,
-    center_corners_2: center::corner::SOLVED,
-    center_wings: center::wing::SOLVED,
+    center_corners_1: CenterCornerSet::SOLVED,
+    center_corners_2: CenterCornerSet::SOLVED,
+    center_wings: CenterWingSet::SOLVED,
 };

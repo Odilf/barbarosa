@@ -1,10 +1,14 @@
 //! Center corner piece. See [CenterCorner] for more info.
 
+use cartesian_array_product::cartesian_array_map;
 use nalgebra::{vector, Vector3};
 
 use crate::{
     cube_n::{
-        moves::rotation::{AxisRotation, Rotatable},
+        moves::{
+            rotation::{AxisRotation, Rotatable},
+            wide::{DepthPiece, DepthPieceSet},
+        },
         space::{Axis, Direction},
         WideAxisMove,
     },
@@ -18,7 +22,40 @@ pub struct CenterCorner {
     axis: Axis,
 }
 
-impl generic::Piece for CenterCorner {}
+impl generic::Piece<24> for CenterCorner {
+    type Position = Self;
+
+    const SOLVED: [Self; 24] = {
+        use Direction::*;
+
+        const fn from_tuple(
+            sp1: Direction,
+            sp2: Direction,
+            sp3: Direction,
+            axis: Axis,
+        ) -> CenterCorner {
+            CenterCorner::new(vector![sp1, sp2, sp3], axis)
+        }
+
+        cartesian_array_map!(
+            [Positive, Negative],
+            [Positive, Negative],
+            [Positive, Negative],
+            [Axis::X, Axis::Y, Axis::Z];
+            from_tuple
+        )
+    };
+
+    const REFERENCE_POSITIONS: [Self::Position; 24] = Self::SOLVED;
+
+    fn position(&self) -> Self::Position {
+        self.clone()
+    }
+
+    fn is_solved(&self, original_pos: &Self::Position) -> bool {
+        self.position[self.axis] == original_pos.position[original_pos.axis]
+    }
+}
 
 impl Rotatable for CenterCorner {
     fn rotate(&mut self, rotation: &AxisRotation) {
@@ -27,21 +64,16 @@ impl Rotatable for CenterCorner {
     }
 }
 
-impl CenterCorner {
-    const fn new(position: Vector3<Direction>, axis: Axis) -> Self {
-        Self { position, axis }
-    }
-
-    /// Determines whether the [`CenterCorner`] is solved.
-    pub fn is_solved(&self, original: &CenterCorner) -> bool {
-        self.position[self.axis] == original.position[original.axis]
-    }
-
-    /// Determines whether the [`CenterCorner`] is in the given [`WideAxisMove`].
-    pub fn in_wide_move<const N: u32>(&self, piece_depth: u32, m: &WideAxisMove<N>) -> bool {
+impl DepthPiece<24> for CenterCorner {
+    fn is_in_wide_move<const M: u32>(
+        &self,
+        normal_depth: u32,
+        _tangent_depth: u32,
+        m: &WideAxisMove<M>,
+    ) -> bool {
         // If on the same direction
         if self.position[m.face().axis] == m.face().direction {
-            if piece_depth <= m.depth() {
+            if normal_depth <= m.depth() {
                 return true;
             }
 
@@ -54,34 +86,16 @@ impl CenterCorner {
     }
 }
 
-/// Solved set of [`CenterCorner`]s.
-pub const SOLVED: [CenterCorner; 24] = {
-    use Direction::*;
+impl CenterCorner {
+    const fn new(position: Vector3<Direction>, axis: Axis) -> Self {
+        Self { position, axis }
+    }
 
-    [
-        CenterCorner::new(vector![Positive, Positive, Positive], Axis::X),
-        CenterCorner::new(vector![Positive, Positive, Negative], Axis::X),
-        CenterCorner::new(vector![Positive, Negative, Positive], Axis::X),
-        CenterCorner::new(vector![Positive, Negative, Negative], Axis::X),
-        CenterCorner::new(vector![Negative, Positive, Positive], Axis::X),
-        CenterCorner::new(vector![Negative, Positive, Negative], Axis::X),
-        CenterCorner::new(vector![Negative, Negative, Positive], Axis::X),
-        CenterCorner::new(vector![Negative, Negative, Negative], Axis::X),
-        CenterCorner::new(vector![Positive, Positive, Positive], Axis::Y),
-        CenterCorner::new(vector![Positive, Positive, Negative], Axis::Y),
-        CenterCorner::new(vector![Positive, Negative, Positive], Axis::Y),
-        CenterCorner::new(vector![Positive, Negative, Negative], Axis::Y),
-        CenterCorner::new(vector![Negative, Positive, Positive], Axis::Y),
-        CenterCorner::new(vector![Negative, Positive, Negative], Axis::Y),
-        CenterCorner::new(vector![Negative, Negative, Positive], Axis::Y),
-        CenterCorner::new(vector![Negative, Negative, Negative], Axis::Y),
-        CenterCorner::new(vector![Positive, Positive, Positive], Axis::Z),
-        CenterCorner::new(vector![Positive, Positive, Negative], Axis::Z),
-        CenterCorner::new(vector![Positive, Negative, Positive], Axis::Z),
-        CenterCorner::new(vector![Positive, Negative, Negative], Axis::Z),
-        CenterCorner::new(vector![Negative, Positive, Positive], Axis::Z),
-        CenterCorner::new(vector![Negative, Positive, Negative], Axis::Z),
-        CenterCorner::new(vector![Negative, Negative, Positive], Axis::Z),
-        CenterCorner::new(vector![Negative, Negative, Negative], Axis::Z),
-    ]
-};
+    /// Determines whether the [`CenterCorner`] is solved.
+    pub fn is_solved(&self, original: &CenterCorner) -> bool {
+        self.position[self.axis] == original.position[original.axis]
+    }
+}
+
+/// A set of [`CenterCorner`]s with depth `ND`
+pub type CenterCornerSet<const ND: u32> = DepthPieceSet<CenterCorner, 24, ND>;

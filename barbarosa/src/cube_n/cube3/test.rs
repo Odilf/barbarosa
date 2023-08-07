@@ -7,7 +7,7 @@ use nalgebra::{vector, Vector3};
 
 use crate::{
     cube_n::space::Direction,
-    generic::{Cube, Movable, Parsable},
+    generic::{Cube, Movable, Parsable, Piece},
 };
 
 use super::*;
@@ -18,15 +18,17 @@ fn solved_cube_has_pieces_in_all_coordinates() {
 
     let mut positions: HashSet<_> = solved_cube
         .edges
+        .pieces()
         .into_iter()
-        .map(|piece| piece.coordinates().map(|i| i as i32))
+        .map(|piece| Edge::coordinates(&piece.position()).map(|i| i as i32))
         .collect();
 
     positions.extend(
         solved_cube
             .corners
+            .pieces()
             .into_iter()
-            .map(|piece| piece.coordinates().map(|i| i as i32)),
+            .map(|piece| Corner::coordinates(&piece.position()).map(|i| i as i32)),
     );
 
     assert!(
@@ -62,12 +64,12 @@ fn test_f() {
     let target_index = cube
         .edges
         .iter()
-        .position(|current| current == &target)
+        .position(|(_, current)| current == &target)
         .unwrap();
 
     cube.apply(&AxisMove::parse("F").unwrap());
 
-    let rotated = &cube.edges[target_index];
+    let rotated = &cube.edges.pieces()[target_index];
 
     assert_eq!(rotated.normal_axis, Axis::X);
     assert_eq!(

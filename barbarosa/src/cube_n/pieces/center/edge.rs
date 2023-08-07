@@ -2,9 +2,14 @@
 //!
 //! See [`CenterEdge`] for more info.
 
+use cartesian_array_product::cartesian_array_map;
+
 use crate::{
     cube_n::{
-        moves::rotation::{AxisRotation, Rotatable},
+        moves::{
+            rotation::{AxisRotation, Rotatable},
+            wide::{DepthPiece, DepthPieceSet},
+        },
         pieces::edge::ParallelAxesError,
         space::{faces, Axis, Direction, Face},
         WideAxisMove,
@@ -29,7 +34,31 @@ pub struct CenterEdge {
     pub side_direction: Direction,
 }
 
-impl generic::Piece for CenterEdge {}
+impl generic::Piece<24> for CenterEdge {
+    type Position = Self;
+
+    const REFERENCE_POSITIONS: [Self::Position; 24] = {
+        use faces::*;
+        use Direction::*;
+
+        cartesian_array_map!(
+            [R, U, F, L, D, B],
+            [Positive, Negative],
+            [Positive, Negative];
+            CenterEdge::new
+        )
+    };
+
+    const SOLVED: [Self; 24] = Self::REFERENCE_POSITIONS;
+
+    fn position(&self) -> Self::Position {
+        self.clone()
+    }
+
+    fn is_solved(&self, original_pos: &Self::Position) -> bool {
+        self.main_face == original_pos.main_face
+    }
+}
 
 impl Rotatable for CenterEdge {
     fn rotate(&mut self, rotation: &AxisRotation) {
@@ -78,24 +107,6 @@ impl CenterEdge {
         Face::new(side_axis, self.side_direction)
     }
 
-    /// Determines whether the [`CenterEdge`] is solved.
-    pub fn is_solved(&self, original: &Self) -> bool {
-        self.main_face == original.main_face
-    }
-
-    /// Determines whether the [`CenterEdge`] is in the given [`WideAxisMove`].
-    pub fn in_wide_move<const N: u32>(&self, piece_depth: u32, m: &WideAxisMove<N>) -> bool {
-        if m.face() == &self.main_face {
-            return true;
-        }
-
-        if m.face() == &self.side_face() && piece_depth <= N {
-            return true;
-        }
-
-        false
-    }
-
     /// Gets the normal axis of the [`CenterEdge`] (so the axis that isn't the main or the side axis).
     pub fn normal_axis(&self) -> Axis {
         let output = self.main_face.axis.next_with_handedness(-self.handedness);
@@ -109,35 +120,24 @@ impl CenterEdge {
     }
 }
 
-/// The solved state of the [`CenterEdge`] pieces.
-pub const SOLVED: [CenterEdge; 24] = {
-    use faces::*;
-    use Direction::*;
+impl DepthPiece<24> for CenterEdge {
+    fn is_in_wide_move<const M: u32>(
+        &self,
+        normal_depth: u32,
+        _tangent_depth: u32,
+        m: &WideAxisMove<M>,
+    ) -> bool {
+        if m.face() == &self.main_face {
+            return true;
+        }
 
-    [
-        CenterEdge::new(R, Positive, Positive),
-        CenterEdge::new(R, Positive, Negative),
-        CenterEdge::new(R, Negative, Negative),
-        CenterEdge::new(R, Negative, Positive),
-        CenterEdge::new(U, Positive, Positive),
-        CenterEdge::new(U, Positive, Positive),
-        CenterEdge::new(U, Positive, Negative),
-        CenterEdge::new(U, Positive, Negative),
-        CenterEdge::new(F, Negative, Negative),
-        CenterEdge::new(F, Negative, Negative),
-        CenterEdge::new(F, Negative, Positive),
-        CenterEdge::new(F, Negative, Positive),
-        CenterEdge::new(L, Positive, Positive),
-        CenterEdge::new(L, Positive, Negative),
-        CenterEdge::new(L, Negative, Negative),
-        CenterEdge::new(L, Negative, Positive),
-        CenterEdge::new(D, Positive, Positive),
-        CenterEdge::new(D, Positive, Positive),
-        CenterEdge::new(D, Positive, Negative),
-        CenterEdge::new(D, Positive, Negative),
-        CenterEdge::new(B, Negative, Negative),
-        CenterEdge::new(B, Negative, Negative),
-        CenterEdge::new(B, Negative, Positive),
-        CenterEdge::new(B, Negative, Positive),
-    ]
-};
+        if m.face() == &self.side_face() && normal_depth <= M {
+            return true;
+        }
+
+        false
+    }
+}
+
+/// A set of [`CenterEdge`] pieces with depth `ND`
+pub type CenterEdgeSet<const ND: u32> = DepthPieceSet<CenterEdge, 24, ND>;

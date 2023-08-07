@@ -1,6 +1,9 @@
 //!
 
-use nalgebra::{vector, Vector3};
+use arr_macro::arr;
+use cartesian_array_product::cartesian_array_map;
+use nalgebra::Vector3;
+use static_assertions::const_assert_eq;
 
 use crate::{
     cube_n::{
@@ -8,10 +11,8 @@ use crate::{
         space::{Axis, Direction, Face},
         AxisMove,
     },
-    generic::{self, moves::impl_movable_array},
+    generic::{self, moves::impl_movable_array, utils::map_array_const, PieceSet},
 };
-
-// use super::ContainedInMove;
 
 /// A corner piece of the cube.
 #[derive(PartialEq, Eq, Clone, Hash)]
@@ -24,7 +25,28 @@ pub struct Corner {
     pub orientation_axis: Axis,
 }
 
-impl generic::Piece for Corner {}
+impl generic::Piece<8> for Corner {
+    type Position = Vector3<Direction>;
+
+    const REFERENCE_POSITIONS: [Self::Position; 8] = {
+        use Direction::*;
+
+        cartesian_array_map!(
+            [Positive, Negative], [Positive, Negative], [Positive, Negative];
+            Vector3::new
+        )
+    };
+
+    const SOLVED: [Self; 8] = map_array_const!(Corner::REFERENCE_POSITIONS, 8, Corner::oriented);
+
+    fn position(&self) -> Self::Position {
+        self.position
+    }
+
+    fn is_solved(&self, original_pos: &Self::Position) -> bool {
+        self.position() == *original_pos && self.orientation_axis == Axis::X
+    }
+}
 
 impl Rotatable for Corner {
     fn rotate(&mut self, rotation: &AxisRotation) {
@@ -112,8 +134,8 @@ impl Corner {
     }
 
     /// Gets the physical standard coordinates of the corner
-    pub fn coordinates(&self) -> Vector3<f32> {
-        self.position.map(|dir| dir.scalar() as f32)
+    pub fn coordinates(position: &Vector3<Direction>) -> Vector3<f32> {
+        position.map(|dir| dir.scalar() as f32)
     }
 }
 
@@ -129,18 +151,5 @@ impl std::fmt::Debug for Corner {
     }
 }
 
-/// Reference for a set of solved corners
-pub const SOLVED: [Corner; 8] = {
-    use Direction::*;
-
-    [
-        Corner::oriented(vector![Positive, Positive, Positive]),
-        Corner::oriented(vector![Positive, Positive, Negative]),
-        Corner::oriented(vector![Positive, Negative, Positive]),
-        Corner::oriented(vector![Positive, Negative, Negative]),
-        Corner::oriented(vector![Negative, Positive, Positive]),
-        Corner::oriented(vector![Negative, Positive, Negative]),
-        Corner::oriented(vector![Negative, Negative, Positive]),
-        Corner::oriented(vector![Negative, Negative, Negative]),
-    ]
-};
+/// The piece set of 8 [`Corner`]s.
+pub type CornerSet = PieceSet<Corner, 8>;

@@ -5,7 +5,7 @@ pub use self::{
     alg::Alg,
     moves::{Movable, Move},
     parse::Parsable,
-    pieces::Piece,
+    piece::{Piece, PieceSet},
     scramble::Scrambleable,
 };
 
@@ -15,7 +15,7 @@ pub mod parse;
 pub mod search;
 pub mod utils;
 
-mod pieces;
+mod piece;
 mod scramble;
 
 /// A generic cube (or twisty puzzle)

@@ -30,17 +30,23 @@
 
 use std::fmt::Debug;
 
-use crate::cube_n::{cube3::mus::index::PositionIndexable, Corner, Cube3, Edge};
+use crate::{
+    cube_n::{cube3::mus::index::PositionIndexable, Cube3, Edge},
+    generic::Piece,
+};
+
+use super::pieces::{corner::CornerSet, edge::EdgeSet};
 
 /// Swaps `cube.edges[0]` and `cube.edges[1]` if the parity of the edge permutation is different from the parity of the corner permutation.
 ///
 /// See the [module-level documentation](self) for more info.
 pub fn fix_swap_parity(cube: &mut Cube3) {
-    let edge_swap_parity = swap_cycles(&cube.edges) % 2 == 0;
-    let corner_swap_parity = swap_cycles(&cube.corners) % 2 == 0;
+    let edge_swap_parity = swap_cycles(cube.edges.pieces()) % 2 == 0;
+    let corner_swap_parity = swap_cycles(cube.corners.pieces()) % 2 == 0;
 
     if edge_swap_parity != corner_swap_parity {
-        (cube.edges[0], cube.edges[1]) = (cube.edges[1].clone(), cube.edges[0].clone());
+        cube.edges
+            .swap(Edge::REFERENCE_POSITIONS[0], Edge::REFERENCE_POSITIONS[1])
     }
 }
 
@@ -70,33 +76,43 @@ fn swap_cycles<T: PositionIndexable + PartialEq + Debug, const N: usize>(values:
 /// Flips `cube.edges[11]` if the number of oriented edges is odd.
 ///
 /// See the [module-level documentation](self) for more info.
-pub fn fix_edge_flip_parity(edges: &mut [Edge; 12]) {
-    let oriented_edges = edges.iter().filter(|edge| edge.oriented).count();
+pub fn fix_edge_flip_parity(edges: &mut EdgeSet) {
+    let oriented_edges = edges.iter().filter(|(_, edge)| edge.oriented).count();
     if oriented_edges % 2 == 1 {
-        edges[11].flip();
+        edges
+            .iter_mut_unchecked()
+            .last()
+            .expect("There are 12 edges, which is more than 0")
+            .1
+            .flip();
     }
 }
 
-/// Twists `cube.corners[7]` such that the sum of corner orientation indices is divisble by 3.
+/// Twists `cube.corners[7]` such that the sum of corner orientation indices is divisible by 3.
 ///
 /// See the [module-level documentation](self) for more info.
-pub fn fix_corner_multiplicity(corners: &mut [Corner; 8]) {
+pub fn fix_corner_multiplicity(corners: &mut CornerSet) {
     let oriented_corners: i32 = corners
         .iter()
-        .map(|corner| corner.orientation_index() as i32)
+        .map(|(_, corner)| corner.orientation_index() as i32)
         .sum();
 
     let corner_orientation_offset = (-oriented_corners).rem_euclid(3);
 
     for _ in 0..corner_orientation_offset {
-        corners[7].twist();
+        corners
+            .iter_mut_unchecked()
+            .last()
+            .expect("There are 8 corners, which is more than 0")
+            .1
+            .twist();
     }
 
     // Assert that orientation is actually fixed. Useful to have because corner orientation can be surprisingly tricky
     debug_assert!({
         let oriented_corners: i32 = corners
             .iter()
-            .map(|corner| corner.orientation_index() as i32)
+            .map(|(_, corner)| corner.orientation_index() as i32)
             .sum();
 
         oriented_corners % 3 == 0

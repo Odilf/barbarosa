@@ -3,15 +3,13 @@ mod test;
 use crate::generic::{self, moves::AsMove};
 
 use super::{
-    moves::{
-        rotation::{AxisRotation, Rotatable},
-        wide::impl_movable_wide_move_inductively,
-    },
+    moves::wide::impl_movable_wide_move_inductively,
     pieces::{
-        center::{self, edge::CenterEdge},
-        corner, edge, CenterCorner,
+        center::{corner::CenterCornerSet, edge::CenterEdgeSet},
+        corner::CornerSet,
+        edge::EdgeSet,
     },
-    Corner, Edge, WideAxisMove,
+    WideAxisMove,
 };
 
 /// The 5x5x5 cube.
@@ -21,17 +19,17 @@ use super::{
 /// See [crate::cube_n] for more info.
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Cube5 {
-    corners: [Corner; 8],
-    edges: [Edge; 12],
-    corner_centers: [CenterCorner; 24],
-    corner_edges: [CenterEdge; 24],
+    corners: CornerSet,
+    edges: EdgeSet,
+    corner_centers: CenterCornerSet<1>,
+    corner_edges: CenterEdgeSet<1>,
 }
 
 const SOLVED: Cube5 = Cube5 {
-    corners: corner::SOLVED,
-    edges: edge::SOLVED,
-    corner_centers: center::corner::SOLVED,
-    corner_edges: center::edge::SOLVED,
+    corners: CornerSet::SOLVED,
+    edges: EdgeSet::SOLVED,
+    corner_centers: CenterCornerSet::SOLVED,
+    corner_edges: CenterEdgeSet::SOLVED,
 };
 
 impl AsMove for Cube5 {
@@ -48,16 +46,8 @@ impl generic::Movable<WideAxisMove<1>> for Cube5 {
     fn apply(&mut self, m: &WideAxisMove<1>) {
         self.corners.apply(&m.axis_move);
         self.edges.apply(&m.axis_move);
-
-        self.corner_centers
-            .iter_mut()
-            .filter(|cc| cc.in_wide_move(1, m))
-            .for_each(|cc| cc.rotate(&AxisRotation::from(&m.axis_move)));
-
-        self.corner_edges
-            .iter_mut()
-            .filter(|ce| ce.in_wide_move(1, m))
-            .for_each(|ce| ce.rotate(&AxisRotation::from(&m.axis_move)));
+        self.corner_centers.apply(m);
+        self.corner_edges.apply(m);
     }
 }
 

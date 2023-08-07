@@ -14,9 +14,9 @@ use crate::{
             Direction::{self, *},
             Face,
         },
-        AxisMove,
+        AxisMove, Wing,
     },
-    generic::{utils, Alg, Cube, Movable},
+    generic::{Alg, Cube, Movable},
 };
 
 use super::*;
@@ -24,12 +24,12 @@ use super::*;
 fn expect_wing(cube: &Cube4, target: ([Face; 2], Direction), expected: ([Face; 2], Direction)) {
     let target = Wing::try_from_faces(target.0, target.1).unwrap();
     let expected = Wing::try_from_faces(expected.0, expected.1).unwrap();
-    let found = utils::item_at(&target, &cube.wings, &Cube4::solved().wings).unwrap();
-    let position_of_expected =
-        utils::position_of_item(&expected, &cube.wings, &Cube4::solved().wings);
+
+    let found = cube.wings.original_position_of_piece_at(&target);
+    let position_of_expected = cube.wings.original_position_of_piece_at(&expected);
 
     assert_eq!(
-        found, &expected,
+        found, expected,
         "Expected {:#?} at {:#?}, found {:#?}. Expected is actually at {:#?}",
         expected, target, found, position_of_expected
     );
@@ -67,7 +67,6 @@ fn four_wide_us() {
 
     for _ in 0..4 {
         cube.apply(&mov);
-        cube.assert_consistent();
     }
 
     assert!(cube.is_solved());
@@ -80,7 +79,6 @@ fn four_wide_fs() {
 
     for i in 0..4 {
         cube.apply(&mov);
-        cube.assert_consistent();
 
         match i {
             0 => expect_wing(&cube, ([R, F], Positive), ([U, F], Negative)),
@@ -98,7 +96,6 @@ fn four_wide_rs() {
 
     for _ in 0..4 {
         cube.apply(&mov);
-        cube.assert_consistent();
     }
 
     assert!(cube.is_solved());
@@ -134,7 +131,6 @@ fn solve_unsolve_journey() {
     let mut cube = Cube4::new_solved();
 
     cube.apply(&alg);
-    cube.assert_consistent();
 
     cube.apply(&alg.reversed());
     assert!(cube.is_solved());
@@ -152,7 +148,6 @@ fn six_wide_sexies() {
 
     for _ in 0..6 {
         cube.apply(&wide_sexy);
-        cube.assert_consistent();
     }
 
     assert_eq!(cube.corners, Cube4::solved().corners);
@@ -212,8 +207,6 @@ fn two_wide_js() {
     for _ in 0..2 {
         cube.apply(&wide_j);
     }
-
-    cube.assert_consistent();
 
     assert_eq!(Cube4::solved().corners, cube.corners);
     assert_eq!(Cube4::solved().centers, cube.centers);

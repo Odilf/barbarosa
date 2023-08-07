@@ -59,3 +59,23 @@ pub fn position_of_item<'a, T: PartialEq>(
             }
         })
 }
+
+macro_rules! map_array_const {
+    ($array:expr, $array_length:literal, $f:expr) => {
+        {
+            const_assert_eq!($array.len(), $array_length);
+            let mut output = arr![$f ($array[0]); $array_length];
+            let mut i = 0;
+
+            while i < $array.len() {
+                output[i] = $f ($array[i]);
+
+                i += 1;
+            };
+
+            output
+        }
+    };
+}
+
+pub(crate) use map_array_const;

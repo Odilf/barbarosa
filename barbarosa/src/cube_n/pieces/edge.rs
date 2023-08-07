@@ -1,6 +1,8 @@
 //! Edge piece of the cube.
 
+use arr_macro::arr;
 use nalgebra::{vector, Vector2, Vector3};
+use static_assertions::const_assert_eq;
 use thiserror::Error;
 
 use crate::{
@@ -9,7 +11,7 @@ use crate::{
         space::{Axis, Direction, Face},
         AxisMove,
     },
-    generic::{self, moves::impl_movable_array},
+    generic::{self, moves::impl_movable_array, utils::map_array_const, Piece, PieceSet},
 };
 
 // use super::{ContainedInMove, Corner};
@@ -42,19 +44,66 @@ pub struct Edge {
     pub oriented: bool,
 }
 
-impl generic::Piece for Edge {}
+impl generic::Piece<12> for Edge {
+    type Position = (Axis, Vector2<Direction>);
+
+    // TODO: Try to use cartesian product to make this nicer
+    const REFERENCE_POSITIONS: [(Axis, Vector2<Direction>); 12] = {
+        use Axis::*;
+        use Direction::*;
+
+        [
+            (X, vector![Positive, Positive]),
+            (X, vector![Positive, Negative]),
+            (Y, vector![Positive, Positive]),
+            (Y, vector![Positive, Negative]),
+            (Z, vector![Positive, Positive]),
+            (Z, vector![Negative, Positive]),
+            (X, vector![Negative, Negative]),
+            (X, vector![Negative, Positive]),
+            (Y, vector![Negative, Positive]),
+            (Y, vector![Negative, Negative]),
+            (Z, vector![Positive, Negative]),
+            (Z, vector![Negative, Negative]),
+        ]
+    };
+
+    /// A list of all the edges in a solved cube.
+    ///
+    /// Edges are set up this way so that an X2 rotation increases the index by 6.
+    /// That is, `SOLVED[n]` and `SOLVED[n + 6]` differ by an X2 rotation. This is
+    /// useful for indexing into the HalfEdges permutation table with the second half
+    /// of the edges.
+    ///
+    /// See [crate::cube_n::cube3::mus] for more information.
+    const SOLVED: [Edge; 12] = {
+        const fn from_tuple((axis, pos): (Axis, Vector2<Direction>)) -> Edge {
+            Edge::oriented(axis, pos)
+        }
+
+        map_array_const!(Edge::REFERENCE_POSITIONS, 12, from_tuple)
+    };
+
+    fn position(&self) -> Self::Position {
+        (self.normal_axis, self.slice_position)
+    }
+
+    fn is_solved(&self, original_pos: &Self::Position) -> bool {
+        self.position() == *original_pos && self.oriented
+    }
+}
 
 impl Rotatable for Edge {
     fn rotate(&mut self, rotation: &AxisRotation) {
         // Orientation changes whenever there's a not double move on the X axis
         self.oriented ^= rotation.flips_edge_orientation(self.normal_axis);
 
+        // Position
         if rotation.axis == self.normal_axis {
             self.slice_position = rotate_vec2(&rotation.amount, &self.slice_position);
             return;
         }
 
-        // Position
         let faces = self.faces().map(|face| face.rotated(rotation));
         match Edge::position_from_faces(faces) {
             Ok((new_normal, new_slice_position)) => {
@@ -147,9 +196,11 @@ impl Edge {
     }
 
     /// Returns the standard coordinates of the edge
-    pub fn coordinates(&self) -> nalgebra::Vector3<f32> {
-        self.normal_axis.map_on_slice(Vector3::zeros(), |_| {
-            self.slice_position.map(|dir| dir.scalar() as f32)
+    pub fn coordinates(
+        (normal_axis, slice_position): &<Edge as Piece<12>>::Position,
+    ) -> nalgebra::Vector3<f32> {
+        normal_axis.map_on_slice(Vector3::zeros(), |_| {
+            slice_position.map(|dir| dir.scalar() as f32)
         })
     }
 }
@@ -185,30 +236,5 @@ pub enum ParallelAxesError {
     SameAxes([Axis; 2]),
 }
 
-/// A list of all the edges in a solved cube.
-///
-/// Edges are set up this way so that an X2 rotation increases the index by 6.
-/// That is, `SOLVED[n]` and `SOLVED[n + 6]` differ by an X2 rotation. This is
-/// useful for indexing into the HalfEdges permutation table with the second half
-/// of the edges.
-///
-/// See [crate::cube_n::cube3::mus] for more information.
-pub const SOLVED: [Edge; 12] = {
-    use Axis::*;
-    use Direction::*;
-
-    [
-        Edge::oriented(X, vector![Positive, Positive]),
-        Edge::oriented(X, vector![Positive, Negative]),
-        Edge::oriented(Y, vector![Positive, Positive]),
-        Edge::oriented(Y, vector![Positive, Negative]),
-        Edge::oriented(Z, vector![Positive, Positive]),
-        Edge::oriented(Z, vector![Negative, Positive]),
-        Edge::oriented(X, vector![Negative, Negative]),
-        Edge::oriented(X, vector![Negative, Positive]),
-        Edge::oriented(Y, vector![Negative, Positive]),
-        Edge::oriented(Y, vector![Negative, Negative]),
-        Edge::oriented(Z, vector![Positive, Negative]),
-        Edge::oriented(Z, vector![Negative, Negative]),
-    ]
-};
+/// The piece set of 12 [`Edge`]s
+pub type EdgeSet = PieceSet<Edge, 12>;

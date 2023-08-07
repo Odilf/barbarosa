@@ -11,18 +11,20 @@ keywords = ["rubik", "3x3", "cubing", "speedcubing", "twisty-puzzle"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-strum = { version = "0.24", features = ["derive"] }
+strum = { version = "0.25", features = ["derive"] }
 nalgebra = "0.32.2"
 once_cell = "1.17.1"
 thiserror = "1.0.40"
 enum_dispatch = "0.3.11"
 rand = "0.8.5"
-itertools = "0.10.5"
+itertools = "0.11.0"
 pathfinding = "4.3.0"
 chrono = "0.4.26"
 clap = { version = "4.3.11", features = ["derive"] }
 rand_derive2 = "0.1.20"
 static_assertions = "1.1.0"
+cartesian_array_product = "1.1.1"
+arr_macro = "0.2.1"
 
 [dev-dependencies]
 criterion = { version = "0.5.1", features = ["html_reports"] }

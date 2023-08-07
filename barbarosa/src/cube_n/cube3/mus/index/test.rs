@@ -3,7 +3,7 @@
 use itertools::Itertools;
 
 use crate::{
-    cube3::{mus::Corners, Corner, Edge},
+    cube3::{mus::CornersMUS, Corner, Edge},
     generic::Cube,
 };
 
@@ -96,25 +96,25 @@ fn first_orientation_indices() {
 
 #[test]
 fn first_and_last_corner_index() {
-    let mut corner = Cube3::solved().corners[7].clone();
+    let mut corner = Cube3::solved().corners.pieces()[7].clone();
     corner.twist();
     corner.twist();
 
-    assert_eq!(Cube3::solved().corners[0].index(), 0);
+    assert_eq!(Cube3::solved().corners.pieces()[0].index(), 0);
     assert_eq!(corner.index(), Corner::TOTAL_SET_SIZE - 1);
 }
 
 #[test]
 fn first_and_last_edge_index() {
-    let first_edge = Cube3::solved().edges[0].clone();
-    let last_edge = Cube3::solved().edges[11].clone().flipped();
+    let first_edge = Cube3::solved().edges.pieces()[0].clone();
+    let last_edge = Cube3::solved().edges.pieces()[11].clone().flipped();
 
     assert_eq!(first_edge.index(), 0);
     assert_eq!(last_edge.index(), Edge::TOTAL_SET_SIZE - 1);
 }
 
 #[test]
-fn second_edges_are_flip() {
+fn second_edges_adjustment_solved() {
     let [edges_1, edges_2] = Cube3::solved().edge_partition();
     let adjusted = &adjust_second_edges_for_indexing(edges_2);
 
@@ -123,9 +123,9 @@ fn second_edges_are_flip() {
 
 #[test]
 fn first_and_last_corner_set() {
-    let first_corners = Cube3::new_solved().corners;
+    let first_corners = Cube3::solved().corners.pieces().clone();
     let last_corners = {
-        let mut corners = Cube3::new_solved().corners;
+        let mut corners = Cube3::solved().corners.pieces().clone();
         corners.reverse();
         corners.iter_mut().for_each(|corner| {
             corner.twist();
@@ -136,7 +136,7 @@ fn first_and_last_corner_set() {
     };
 
     assert_eq!(first_corners.index(), 0);
-    assert_eq!(last_corners.index(), Corners::TOTAL_SET_SIZE - 1);
+    assert_eq!(last_corners.index(), CornersMUS::TOTAL_SET_SIZE - 1);
 }
 
 #[test]
@@ -154,11 +154,11 @@ fn first_and_last_edge_set() {
 
     assert_eq!(
         last_edges.position_index(),
-        <HalfEdges>::POSITION_SET_SIZE - 1
+        <HalfEdgesMUS>::POSITION_SET_SIZE - 1
     );
     assert_eq!(
         last_edges.orientation_index(),
-        <HalfEdges>::ORIENTATION_SET_SIZE - 1
+        <HalfEdgesMUS>::ORIENTATION_SET_SIZE - 1
     );
-    assert_eq!(last_edges.index(), <HalfEdges>::TOTAL_SET_SIZE - 1);
+    assert_eq!(last_edges.index(), <HalfEdgesMUS>::TOTAL_SET_SIZE - 1);
 }

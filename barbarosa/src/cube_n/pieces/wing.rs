@@ -2,11 +2,15 @@
 
 mod test;
 
+use cartesian_array_product::cartesian_array_map;
 use nalgebra::{vector, Vector2};
 
 use crate::{
     cube_n::{
-        moves::rotation::{AxisRotation, Rotatable},
+        moves::{
+            rotation::{AxisRotation, Rotatable},
+            wide::{DepthPiece, DepthPieceSet},
+        },
         space::{Axis, Direction, Face},
         WideAxisMove,
     },
@@ -25,7 +29,42 @@ pub struct Wing {
     corresponding_edge: Edge,
 }
 
-impl generic::Piece for Wing {}
+impl generic::Piece<24> for Wing {
+    type Position = Self;
+
+    /// The solved set of [`Wing`]s.
+    const SOLVED: [Wing; 24] = {
+        use Axis::*;
+        use Direction::*;
+
+        const fn from_tuple(
+            axis: Axis,
+            sp1: Direction,
+            sp2: Direction,
+            pseudo_oriented: bool,
+        ) -> Wing {
+            Wing::new_with_orientation(axis, vector![sp1, sp2], pseudo_oriented)
+        }
+
+        cartesian_array_map!(
+            [X, Y, Z],
+            [Positive, Negative],
+            [Positive, Negative],
+            [true, false];
+            from_tuple
+        )
+    };
+
+    const REFERENCE_POSITIONS: [Self::Position; 24] = Self::SOLVED;
+
+    fn position(&self) -> Self::Position {
+        self.clone()
+    }
+
+    fn is_solved(&self, original_pos: &Self::Position) -> bool {
+        self == original_pos
+    }
+}
 
 impl Rotatable for Wing {
     fn rotate(&mut self, rotation: &AxisRotation) {
@@ -59,7 +98,7 @@ impl Wing {
     }
 }
 
-/// Gets the wing normal direction based on a normal axis, the slice position and the hypothetical orientation.
+/// Gets the wing normal direction based on a normal axis, the slice position and the pseudo orientation.
 ///
 /// This normal direction has properties such that it is consistent with the way that edges flip orientation
 /// (when doing a non double move on the X axis)
@@ -68,13 +107,13 @@ impl Wing {
 pub fn wing_normal_direction(
     normal_axis: Axis,
     slice_position: Vector2<Direction>,
-    hypothetically_oriented: bool,
+    pseudo_oriented: bool,
 ) -> Direction {
     let is_x_axis = normal_axis == Axis::X;
 
     let is_even_position_parity = slice_position.x == slice_position.y;
 
-    if is_x_axis ^ is_even_position_parity ^ hypothetically_oriented {
+    if is_x_axis ^ is_even_position_parity ^ pseudo_oriented {
         Direction::Negative
     } else {
         Direction::Positive
@@ -114,9 +153,15 @@ impl Wing {
         let (normal_axis, slice_position) = Edge::position_from_faces(faces)?;
         Ok(Wing::new(normal_axis, slice_position, normal_direction))
     }
+}
 
-    /// Determines whether the wing is in a wide move
-    pub fn in_wide_move<const N: u32>(&self, wing_depth: u32, m: &WideAxisMove<N>) -> bool {
+impl DepthPiece<24> for Wing {
+    fn is_in_wide_move<const M: u32>(
+        &self,
+        normal_depth: u32,
+        _tangent_depth: u32,
+        m: &WideAxisMove<M>,
+    ) -> bool {
         let wing_edge = &self.corresponding_edge;
         // If just on the same face
         if m.axis_move.face.contains_edge(&self.corresponding_edge) {
@@ -126,7 +171,7 @@ impl Wing {
         // If on parallel slices (so, same normal)
         if wing_edge.normal_axis == m.face().axis {
             // If it's on the right depth
-            if wing_depth <= m.depth() && m.face().direction == self.normal_direction() {
+            if normal_depth <= m.depth() && m.face().direction == self.normal_direction() {
                 return true;
             }
         }
@@ -147,35 +192,5 @@ impl std::fmt::Debug for Wing {
     }
 }
 
-/// The solved set of [`Wing`]s.
-pub const SOLVED: [Wing; 24] = {
-    use Axis::*;
-    use Direction::*;
-
-    [
-        Wing::new_with_orientation(X, vector![Positive, Positive], true),
-        Wing::new_with_orientation(X, vector![Positive, Negative], true),
-        Wing::new_with_orientation(X, vector![Negative, Negative], true),
-        Wing::new_with_orientation(X, vector![Negative, Positive], true),
-        Wing::new_with_orientation(Y, vector![Positive, Positive], true),
-        Wing::new_with_orientation(Y, vector![Positive, Negative], true),
-        Wing::new_with_orientation(Y, vector![Negative, Negative], true),
-        Wing::new_with_orientation(Y, vector![Negative, Positive], true),
-        Wing::new_with_orientation(Z, vector![Positive, Positive], true),
-        Wing::new_with_orientation(Z, vector![Positive, Negative], true),
-        Wing::new_with_orientation(Z, vector![Negative, Negative], true),
-        Wing::new_with_orientation(Z, vector![Negative, Positive], true),
-        Wing::new_with_orientation(X, vector![Positive, Positive], false),
-        Wing::new_with_orientation(X, vector![Positive, Negative], false),
-        Wing::new_with_orientation(X, vector![Negative, Negative], false),
-        Wing::new_with_orientation(X, vector![Negative, Positive], false),
-        Wing::new_with_orientation(Y, vector![Positive, Positive], false),
-        Wing::new_with_orientation(Y, vector![Positive, Negative], false),
-        Wing::new_with_orientation(Y, vector![Negative, Negative], false),
-        Wing::new_with_orientation(Y, vector![Negative, Positive], false),
-        Wing::new_with_orientation(Z, vector![Positive, Positive], false),
-        Wing::new_with_orientation(Z, vector![Positive, Negative], false),
-        Wing::new_with_orientation(Z, vector![Negative, Negative], false),
-        Wing::new_with_orientation(Z, vector![Negative, Positive], false),
-    ]
-};
+/// A set of [`Wing`]s with depth `ND`
+pub type WingSet<const ND: u32> = DepthPieceSet<Wing, 24, ND>;

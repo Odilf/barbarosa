@@ -12,6 +12,7 @@ use crate::{
             rotation::{AxisRotation, Rotatable},
             Amount,
         },
+        pieces::{corner::CornerSet, edge::EdgeSet},
         space::Axis,
     },
 };
@@ -20,7 +21,7 @@ use super::{
     index::{
         disposition_multipliers, CubeIndices, Indexable, OrientationIndexable, PositionIndexable,
     },
-    Corners, HalfEdges,
+    CornersMUS, HalfEdgesMUS,
 };
 
 /// A trait for types that can be deindexed. That is, they can be restored from an [index](super::index::Indexable)
@@ -89,8 +90,8 @@ fn deindex_positions<T: PositionIndexable, const N: usize, const T_POSITION_SET_
 impl Cube3 {
     /// Construct a cube from the indices of its corners and edges
     pub fn from_indices(indices: CubeIndices) -> Self {
-        let corners = Corners::from_index(indices.corners);
-        let mut edges = indices.edges.map(HalfEdges::from_index);
+        let corners = CornersMUS::from_index(indices.corners);
+        let mut edges = indices.edges.map(HalfEdgesMUS::from_index);
 
         adjust_second_edges_for_deindexing(&mut edges[1]);
 
@@ -99,14 +100,17 @@ impl Cube3 {
             .try_into()
             .expect("2 arrays of length 6 make 12 in total");
 
-        Cube3 { corners, edges }
+        Cube3 {
+            corners: CornerSet::new(corners).expect("Corners from cube index should be valid"),
+            edges: EdgeSet::new(edges).expect("Edges from cube index should be valid"),
+        }
     }
 }
 
 /// Inverts what `index::adjust_second_edges_for_indexing` does
 ///
 /// Fun fact: because of the way it's implemented, it's basically the same thing lol
-fn adjust_second_edges_for_deindexing(edges: &mut HalfEdges) {
+fn adjust_second_edges_for_deindexing(edges: &mut HalfEdgesMUS) {
     for edge in edges.iter_mut() {
         edge.rotate(&AxisRotation::new(Axis::X, Amount::Double))
     }

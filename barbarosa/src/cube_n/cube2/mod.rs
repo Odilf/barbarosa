@@ -1,8 +1,8 @@
-use rand::{distributions::Standard, prelude::Distribution, seq::SliceRandom};
+use rand::{distributions::Standard, prelude::Distribution};
 
 use crate::generic::{self, moves::AsMove, Cube};
 
-use super::{invariants::fix_corner_multiplicity, pieces, AxisMove, Corner};
+use super::{invariants::fix_corner_multiplicity, pieces::corner::CornerSet, AxisMove};
 
 mod test;
 
@@ -12,11 +12,11 @@ mod test;
 #[derive(Debug, PartialEq, Eq, Clone, Hash)]
 pub struct Cube2 {
     /// Corners of the 2x2x2 cube (actually, it's the only piece type it has).
-    pub corners: [Corner; 8],
+    pub corners: CornerSet,
 }
 
 const SOLVED_CUBE: Cube2 = Cube2 {
-    corners: pieces::corner::SOLVED,
+    corners: CornerSet::SOLVED,
 };
 
 impl generic::Cube for Cube2 {
