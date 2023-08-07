@@ -3,7 +3,7 @@
 use crate::{
     cube3::Cube3,
     generic::{
-        search::{ida::IDASearcher, Searcher},
+        search::{ida::IDASearcher, Solver},
         Alg, Movable,
     },
 };
