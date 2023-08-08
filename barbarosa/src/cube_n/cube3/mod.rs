@@ -61,7 +61,7 @@ impl CubeN for Cube3 {
 }
 
 impl Cube3 {
-    /// Returns every possible state after doing a move on the current state. 
+    /// Returns every possible state after doing a move on the current state.
     pub fn successors(&self) -> impl IntoIterator<Item = (Self, AxisMove)> {
         AxisMove::all().map(|mov| (self.clone().moved(&mov), mov))
     }
