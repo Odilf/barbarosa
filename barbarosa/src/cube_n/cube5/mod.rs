@@ -9,7 +9,7 @@ use super::{
         corner::CornerSet,
         edge::EdgeSet,
     },
-    WideAxisMove,
+    CubeN, WideAxisMove,
 };
 
 /// The 5x5x5 cube.
@@ -48,5 +48,7 @@ impl generic::Movable<WideAxisMove<1>> for Cube5 {
         self.corner_edges.apply(m);
     }
 }
+
+impl CubeN for Cube5 {}
 
 impl_movable_wide_move_inductively!(Cube5, 1, [0]);

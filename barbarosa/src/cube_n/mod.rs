@@ -36,3 +36,8 @@ pub use cube4::Cube4;
 pub use cube5::Cube5;
 pub use cube6::Cube6;
 pub use cube7::Cube7;
+
+/// An NxNxN cube.
+///
+/// Currently just a marker trait.s
+pub trait CubeN {}

@@ -17,6 +17,7 @@ use crate::{
 use super::{
     invariants::{fix_corner_multiplicity, fix_edge_flip_parity, fix_swap_parity},
     pieces::{corner::CornerSet, edge::EdgeSet},
+    CubeN,
 };
 
 use super::{AxisMove, Corner, Edge};
@@ -54,6 +55,8 @@ impl generic::Movable<AxisMove> for Cube3 {
         self.edges.apply(m);
     }
 }
+
+impl CubeN for Cube3 {}
 
 impl Distribution<Cube3> for Standard {
     fn sample<R: rand::Rng + ?Sized>(&self, rng: &mut R) -> Cube3 {

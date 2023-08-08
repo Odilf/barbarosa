@@ -6,7 +6,7 @@ use super::{
     center::{corner::CenterCornerSet, edge::CenterEdgeSet, wing::CenterWingSet},
     moves::wide::impl_movable_wide_move_inductively,
     pieces::{corner::CornerSet, edge::EdgeSet, wing::WingSet},
-    WideAxisMove,
+    CubeN, WideAxisMove,
 };
 
 /// The 7x7x7 cube. The biggest [WCA](https://www.worldcubeassociation.org/) NxN.
@@ -66,6 +66,8 @@ impl generic::Movable<WideAxisMove<2>> for Cube7 {
         self.center_edges_2.apply(m);
     }
 }
+
+impl CubeN for Cube7 {}
 
 impl_movable_wide_move_inductively!(Cube7, 2, [0, 1]);
 

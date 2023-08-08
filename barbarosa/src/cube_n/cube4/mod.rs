@@ -6,7 +6,7 @@ use super::{
     center::corner::CenterCornerSet,
     moves::wide::impl_movable_wide_move_inductively,
     pieces::{corner::CornerSet, wing::WingSet},
-    WideAxisMove,
+    CubeN, WideAxisMove,
 };
 
 /// The 4x4x4 cube.
@@ -43,6 +43,8 @@ impl generic::Movable<WideAxisMove<1>> for Cube4 {
         self.centers.apply(m);
     }
 }
+
+impl CubeN for Cube4 {}
 
 impl_movable_wide_move_inductively!(Cube4, 1, [0]);
 
