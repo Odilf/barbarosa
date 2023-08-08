@@ -29,7 +29,9 @@ impl AsMove for Cube2 {
     type Move = AxisMove;
 }
 
-impl CubeN for Cube2 {}
+impl CubeN for Cube2 {
+    const N: u32 = 2;
+}
 
 impl generic::Movable<AxisMove> for Cube2 {
     fn apply(&mut self, m: &AxisMove) {

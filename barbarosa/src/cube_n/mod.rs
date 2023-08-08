@@ -4,6 +4,8 @@
 //!
 //! # Piece position
 //!
+//! todo!("This is totally outdated because of piece sets")
+//!
 //! A piece only stores where it is, not what it is. That is, you couldn't tell
 //! the color of, for example, a corner just by the information in the [Corner] struct.
 //!
@@ -23,6 +25,7 @@ mod cube7;
 
 pub mod invariants;
 pub mod moves;
+mod orientable;
 pub mod pieces;
 pub mod search;
 pub mod space;
@@ -37,7 +40,12 @@ pub use cube5::Cube5;
 pub use cube6::Cube6;
 pub use cube7::Cube7;
 
+use crate::generic;
+
 /// An NxNxN cube.
 ///
-/// Currently just a marker trait.s
-pub trait CubeN {}
+/// Currently just a marker trait.
+pub trait CubeN: generic::Cube {
+	/// The size of the cube.
+	const N: u32;
+}

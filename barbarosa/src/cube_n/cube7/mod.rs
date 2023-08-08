@@ -67,7 +67,9 @@ impl generic::Movable<WideAxisMove<2>> for Cube7 {
     }
 }
 
-impl CubeN for Cube7 {}
+impl CubeN for Cube7 {
+    const N: u32 = 7;
+}
 
 impl_movable_wide_move_inductively!(Cube7, 2, [0, 1]);
 

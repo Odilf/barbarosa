@@ -56,7 +56,9 @@ impl generic::Movable<AxisMove> for Cube3 {
     }
 }
 
-impl CubeN for Cube3 {}
+impl CubeN for Cube3 {
+    const N: u32 = 3;
+}
 
 impl Cube3 {
     /// Returns every possible state after doing a move on the current state. 
