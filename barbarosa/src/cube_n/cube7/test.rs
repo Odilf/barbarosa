@@ -27,7 +27,7 @@ fn six_sexies() {
 }
 
 #[test]
-fn two_t_perms_of_variyng_depths() {
+fn two_t_perms_of_varying_depths() {
     let mut cube = Cube7::new_solved();
     let alg = |i| pll::T.clone().widen::<2>(i).unwrap();
 
