@@ -218,6 +218,5 @@ fn non_redundant_given_last_axis() {
 
     for mov in moves {
         assert!(!not_expected.contains(&mov.to_string().as_str()));
-        dbg!(mov.to_string());
     }
 }
