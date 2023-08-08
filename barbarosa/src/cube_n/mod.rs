@@ -31,6 +31,7 @@ pub mod search;
 pub mod space;
 
 pub use moves::{AxisMove, WideAxisMove};
+pub use orientable::{Orientable, Orientation};
 pub use pieces::{center, Corner, Edge, Wing};
 
 pub use cube2::Cube2;
@@ -46,6 +47,6 @@ use crate::generic;
 ///
 /// Currently just a marker trait.
 pub trait CubeN: generic::Cube {
-	/// The size of the cube.
-	const N: u32;
+    /// The size of the cube.
+    const N: u32;
 }
