@@ -140,7 +140,7 @@ impl Corner {
 
     /// Whether the corner is oriented. This is true if the orientation axis is
     /// the X axis.
-    /// 
+    ///
     /// This method might be ever so slightly faster then doing `corner.orientation_index() == 0`.
     pub fn is_oriented(&self) -> bool {
         self.orientation_axis == Axis::X
