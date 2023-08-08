@@ -179,7 +179,7 @@ impl Edge {
         [a, b]: [Face; 2],
     ) -> Result<(Axis, Vector2<Direction>), ParallelAxesError> {
         let normal_axis =
-            Axis::other(&a.axis, &b.axis).ok_or(ParallelAxesError::SameAxes([a.axis, b.axis]))?;
+            Axis::other(&a.axis, &b.axis).ok_or(ParallelAxesError::SameAxis(a.axis))?;
 
         let x = normal_axis.next();
         let y = x.next();
@@ -233,7 +233,7 @@ impl TryFrom<[Face; 2]> for Edge {
 #[derive(Debug, Error)]
 pub enum ParallelAxesError {
     #[error("Faces must be on different axes")]
-    SameAxes([Axis; 2]),
+    SameAxis(Axis),
 }
 
 /// The piece set of 12 [`Edge`]s

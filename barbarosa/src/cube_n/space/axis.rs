@@ -110,7 +110,7 @@ impl Axis {
     /// not, it's negative; and if they're parallel it errors.
     pub fn get_handedness(&self, other: &Axis) -> Result<Direction, ParallelAxesError> {
         match self.offset(other) {
-            0 => Err(ParallelAxesError::SameAxes([*self, *other])),
+            0 => Err(ParallelAxesError::SameAxis(*self)),
             1 => Ok(Direction::Positive),
             2 => Ok(Direction::Negative),
             _ => unreachable!(),
