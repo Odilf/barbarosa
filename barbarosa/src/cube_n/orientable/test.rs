@@ -46,7 +46,7 @@ fn moves_rotated_simple() {
 
     let expected = Cube3::new_solved().moved(&AxisMove::new(Face::D, Amount::Single));
 
-    assert_eq!(cube.cube, expected)
+    assert_eq!(cube.base_cube, expected)
 }
 
 #[test]
@@ -62,5 +62,5 @@ fn moves_rotated() {
 
     let expected = Cube3::new_solved().moved(&Alg::<AxisMove>::parse("B D B' D'").unwrap());
 
-    assert_eq!(cube.cube, expected)
+    assert_eq!(cube.base_cube, expected)
 }

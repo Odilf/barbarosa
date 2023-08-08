@@ -11,7 +11,7 @@ use super::{moves::rotation::Rotatable, CubeN};
 /// A cube that can be oriented. This means that you can rotate it, do slice moves and such.
 pub struct Orientable<C: CubeN> {
     /// The original cube
-    pub cube: C,
+    pub base_cube: C,
 
     /// The orientation of the cube
     pub orientation: Orientation,
@@ -21,7 +21,7 @@ impl<C: CubeN> Orientable<C> {
     /// Creates a new orientable cube with the default orientation.
     pub fn new(cube: C) -> Self {
         Self {
-            cube,
+            base_cube: cube,
             orientation: Orientation::default(),
         }
     }
@@ -47,6 +47,6 @@ impl<M: Move + Rotatable, C: CubeN + Movable<M>> Movable<M> for Orientable<C> {
             m.rotate(&rotation);
         }
 
-        self.cube.apply(&m);
+        self.base_cube.apply(&m);
     }
 }
