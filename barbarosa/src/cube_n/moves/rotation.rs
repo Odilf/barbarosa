@@ -95,3 +95,17 @@ pub fn rotate_vec2(amount: &Amount, vec: &Vector2<Direction>) -> Vector2<Directi
         Amount::Inverse => vector![-vec.y, vec.x],
     }
 }
+
+impl Rotatable for AxisMove {
+    fn rotate(&mut self, axis_rotation: &AxisRotation) {
+        self.face.rotate(axis_rotation);
+    }
+}
+
+impl Rotatable for Alg<AxisMove> {
+    fn rotate(&mut self, rotation: &AxisRotation) {
+        for mov in &mut self.moves {
+            mov.rotate(rotation);
+        }
+    }
+}
