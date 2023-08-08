@@ -4,13 +4,16 @@
 /// the only difference is the pieces selected in the rotation.
 use nalgebra::{vector, Vector2, Vector3};
 
-use crate::cube_n::space::{Axis, Direction, Face};
+use crate::{
+    cube_n::space::{Axis, Direction, Face},
+    generic::Alg,
+};
 
 use super::{Amount, AxisMove};
 
 /// A rotation around an axis. This is similar to an [AxisMove](super::AxisMove), but it doesn't
 /// specify the face.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AxisRotation {
     /// The axis that is being rotated around
     pub axis: Axis,
