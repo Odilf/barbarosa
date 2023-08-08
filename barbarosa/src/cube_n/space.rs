@@ -353,6 +353,19 @@ impl Face {
             _ => unreachable!("Offset should be in the range 0..3"),
         }
     }
+
+    /// Computes the "cross product" of two faces. That is, returns the face that is
+    /// perpendicular to both faces, according to the right-hand rule.
+    pub fn cross(&self, other: &Face) -> Option<Face> {
+        let axis = Axis::other(&self.axis, &other.axis)?;
+
+        let direction = match self.clone().next_around(&axis) == *other {
+            false => Direction::Positive,
+            true => Direction::Negative,
+        };
+
+        Some(Face::new(axis, direction))
+    }
 }
 
 #[test]
@@ -361,4 +374,11 @@ fn text_next_around() {
     assert_eq!(Face::U.next_around(&Axis::X), Face::B);
     assert_eq!(Face::B.next_around(&Axis::X), Face::D);
     assert_eq!(Face::D.next_around(&Axis::X), Face::F);
+}
+
+#[test]
+fn test_cross() {
+    assert_eq!(Face::R.cross(&Face::U), Some(Face::F));
+    assert_eq!(Face::U.cross(&Face::R), Some(Face::B));
+    assert_eq!(Face::F.cross(&Face::U), Some(Face::L));
 }
