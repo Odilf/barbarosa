@@ -11,7 +11,7 @@ use rand::{distributions::Standard, prelude::Distribution};
 
 use crate::{
     cube_n::space::Axis,
-    generic::{self, moves::AsMove, Cube},
+    generic::{self, moves::AsMove, Cube, Movable},
 };
 
 use super::{
@@ -57,6 +57,13 @@ impl generic::Movable<AxisMove> for Cube3 {
 }
 
 impl CubeN for Cube3 {}
+
+impl Cube3 {
+    /// Returns every possible state after doing a move on the current state. 
+    pub fn successors(&self) -> impl IntoIterator<Item = (Self, AxisMove)> {
+        AxisMove::all().map(|mov| (self.clone().moved(&mov), mov))
+    }
+}
 
 impl Distribution<Cube3> for Standard {
     fn sample<R: rand::Rng + ?Sized>(&self, rng: &mut R) -> Cube3 {
