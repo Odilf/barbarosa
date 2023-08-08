@@ -58,16 +58,6 @@ fn moves_rotated() {
     cube.orientation
         .rotate(&AxisRotation::new(Axis::Y, Amount::Inverse));
 
-    println!(
-        "{:?} {:?}",
-        cube.orientation.r_face(),
-        cube.orientation.u_face()
-    );
-
-    for rot in cube.orientation.rotations() {
-        println!("orientation rot: {:?}", rot);
-    }
-
     cube.apply(&SEXY_MOVE);
 
     let expected = Cube3::new_solved().moved(&Alg::<AxisMove>::parse("B D B' D'").unwrap());

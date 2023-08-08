@@ -35,8 +35,6 @@ fn connecting_rotation(from: &Face, to: &Face) -> Option<AxisRotation> {
         }
     };
 
-    println!("Found {output:?}");
-
     Some(output)
 }
 
