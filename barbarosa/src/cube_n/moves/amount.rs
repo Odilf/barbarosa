@@ -66,3 +66,12 @@ impl Amount {
         }
     }
 }
+
+impl From<Direction> for Amount {
+    fn from(value: Direction) -> Self {
+        match value {
+            Direction::Positive => Amount::Single,
+            Direction::Negative => Amount::Inverse,
+        }
+    }
+}
