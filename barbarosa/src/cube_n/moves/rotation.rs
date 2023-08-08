@@ -30,6 +30,14 @@ impl AxisRotation {
     pub fn flips_edge_orientation(&self, normal_axis: Axis) -> bool {
         self.amount != Amount::Double && (self.axis == Axis::X || self.axis == normal_axis)
     }
+
+    /// Retruns the inverse rotation, such that if both get applied the result is no rotation.
+    pub fn inverse(&self) -> Self {
+        Self {
+            axis: self.axis,
+            amount: self.amount * Direction::Negative,
+        }
+    }
 }
 
 /// Things that can be rotated.
