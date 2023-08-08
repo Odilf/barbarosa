@@ -195,6 +195,8 @@ impl Face {
 
     /// Computes the "cross product" of two faces. That is, returns the face that is
     /// perpendicular to both faces, according to the right-hand rule.
+    /// 
+    /// Retruns `None` if the faces are parallel.
     pub fn cross(&self, other: &Face) -> Option<Face> {
         let axis = Axis::other(&self.axis, &other.axis)?;
 
