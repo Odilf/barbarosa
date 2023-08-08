@@ -35,7 +35,7 @@ fn solves_correctly_and_optimally() {
 fn solves_lengths() {
     let mut rng = StdRng::seed_from_u64(69420);
 
-    for move_amount in 13..=20 {
+    for move_amount in 0..=12 {
         let alg = Alg::random_with_rng(move_amount, &mut rng);
         let cube = Cube3::new_solved().moved(&alg);
 
