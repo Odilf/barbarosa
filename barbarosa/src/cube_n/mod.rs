@@ -26,6 +26,7 @@ mod cube7;
 pub mod invariants;
 pub mod moves;
 mod orientable;
+mod parser;
 pub mod pieces;
 pub mod search;
 pub mod space;

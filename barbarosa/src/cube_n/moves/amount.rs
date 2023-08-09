@@ -1,7 +1,7 @@
 use rand_derive2::RandGen;
 use strum::EnumIter;
 
-use crate::{cube_n::space::Direction, generic::parse};
+use crate::cube_n::space::Direction;
 
 /// A move amount (either single, double or reverse)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter, RandGen)]
@@ -48,18 +48,6 @@ impl std::ops::Add<Amount> for Amount {
             2 => Some(Amount::Double),
             3 => Some(Amount::Inverse),
             _ => unreachable!(),
-        }
-    }
-}
-
-impl Amount {
-    /// Parses an [Amount]
-    pub fn parse(value: Option<char>) -> parse::Result<Amount> {
-        match value {
-            None => Ok(Amount::Single),
-            Some('2') => Ok(Amount::Double),
-            Some('\'') => Ok(Amount::Inverse),
-            Some(other) => Err(parse::Error::InvalidChar(other)),
         }
     }
 }

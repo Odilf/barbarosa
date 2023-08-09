@@ -62,7 +62,7 @@ impl<M: Move> AsMove for M {
 /// let mov = AxisMove::parse("B'").unwrap();
 /// let moved = cube.clone().moved(&mov);
 ///
-/// assert_eq!(moves::connect::<AxisMove, _>(cube, &moved), Some(mov));
+/// assert_eq!(moves::connect::<AxisMove, _>(&cube, &moved), Some(mov));
 /// ```
 pub fn connect<M: Move + IntoEnumIterator, T: Movable<M> + Eq + Clone>(
     from: &T,

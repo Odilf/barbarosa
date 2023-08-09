@@ -9,7 +9,7 @@ use strum::IntoEnumIterator;
 use self::wide::WideMoveCreationError;
 
 use super::space::{Axis, Direction, Face};
-use crate::generic::{self, parse, Parsable};
+use crate::generic;
 
 pub mod non_redundant;
 pub mod perms;
@@ -84,23 +84,6 @@ impl AxisMove {
     /// Returns the wide version of this move at the specified depth
     pub fn widen<const N: u32>(self, depth: u32) -> Result<WideAxisMove<N>, WideMoveCreationError> {
         WideAxisMove::new(self.face, self.amount, depth)
-    }
-}
-
-impl Parsable for AxisMove {
-    fn parse(s: &str) -> parse::Result<Self> {
-        let mut chars = s.chars();
-        let face = chars.next().ok_or(parse::Error::UnexpectedEnd)?;
-        let amount = chars.next();
-
-        if let Some(next) = chars.next() {
-            return Err(parse::Error::ExpectedEnd(next));
-        }
-
-        let face = Face::parse(face)?;
-        let amount = Amount::parse(amount)?;
-
-        Ok(AxisMove::new(face, amount))
     }
 }
 

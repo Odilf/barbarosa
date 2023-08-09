@@ -42,8 +42,13 @@ impl<T: AsMove> Parsable for Alg<T>
 where
     T::Move: Parsable,
 {
+    type Rule = <T::Move as Parsable>::Rule;
+
     fn parse(s: &str) -> parse::Result<Self> {
-        let moves: parse::Result<Vec<_>> = s.split_whitespace().map(T::Move::parse).collect();
+        type Err<R> = pest::error::Error<R>;
+
+        let moves: Result<Vec<_>, Err<Self::Rule>> =
+            s.split_whitespace().map(T::Move::parse).collect();
         Ok(Self::new(moves?))
     }
 }
@@ -117,7 +122,7 @@ impl<T: AsMove> TryFrom<&str> for Alg<T>
 where
     T::Move: Parsable,
 {
-    type Error = parse::Error;
+    type Error = pest::error::Error<<Self as Parsable>::Rule>;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         Self::parse(value)

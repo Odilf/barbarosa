@@ -25,6 +25,8 @@ rand_derive2 = "0.1.20"
 static_assertions = "1.1.0"
 cartesian_array_product = "1.1.1"
 arr_macro = "0.2.1"
+pest = "2.7.2"
+pest_derive = "2.7.2"
 
 [dev-dependencies]
 criterion = { version = "0.5.1", features = ["html_reports"] }

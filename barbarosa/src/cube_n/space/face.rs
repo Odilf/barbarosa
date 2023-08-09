@@ -1,11 +1,10 @@
 use core::fmt;
 use std::fmt::Display;
 
-use generic::parse;
 use nalgebra::Vector3;
 use rand_derive2::RandGen;
 
-use crate::{cube_n::Edge, generic};
+use crate::cube_n::Edge;
 
 use super::{Axis, Direction};
 
@@ -157,22 +156,6 @@ impl Face {
                 Face::D => Face::R,
                 _ => self,
             },
-        }
-    }
-
-    /// Parses a face from a character.
-    ///
-    /// Not implemented with [Parsable](crate::generic::parse::Parsable) because it's easier
-    /// to just accept a char instead of a string.
-    pub fn parse(value: char) -> parse::Result<Face> {
-        match value {
-            'R' => Ok(Face::R),
-            'L' => Ok(Face::L),
-            'U' => Ok(Face::U),
-            'D' => Ok(Face::D),
-            'F' => Ok(Face::F),
-            'B' => Ok(Face::B),
-            other => Err(parse::Error::InvalidChar(other)),
         }
     }
 

@@ -20,10 +20,7 @@ pub enum ExtendedAxisMove {
     Regular(AxisMove),
     Rotation(AxisRotation),
     Wide(WideAxisMove<{ u32::MAX }>),
-    Slice {
-        rot: AxisRotation,
-        wide: bool,
-    },
+    Slice { rot: AxisRotation, wide: bool },
 }
 
 impl Move for ExtendedAxisMove {
@@ -32,7 +29,10 @@ impl Move for ExtendedAxisMove {
             Self::Regular(m) => Self::Regular(m.inverse()),
             Self::Rotation(m) => Self::Rotation(m.inverse()),
             Self::Wide(m) => Self::Wide(m.inverse()),
-            Self::Slice { rot, wide } => Self::Slice { rot: rot.inverse(), wide: *wide },
+            Self::Slice { rot, wide } => Self::Slice {
+                rot: rot.inverse(),
+                wide: *wide,
+            },
         }
     }
 }
@@ -67,6 +67,7 @@ macro_rules! impl_movable_extended {
                         let m = if m.depth() < depth_oppossite {
                             m.clone()
                         } else {
+                            self.orientation.rotate(&AxisRotation::from(&m.axis_move));
                             opposite(&m, depth_oppossite)
                         };
 
