@@ -73,7 +73,7 @@ impl Orientation {
         let r_rot = connecting_rotation(&Face::R, &self.r_face);
         let new_u = r_rot
             .as_ref()
-            .map(|rot| Face::U.rotated(&rot))
+            .map(|rot| Face::U.rotated(rot))
             .unwrap_or(Face::U);
 
         let r_face = r_rot.as_ref().map(|rot| Face::R.rotated(rot));
@@ -90,6 +90,14 @@ impl Orientation {
             (None, None) => Left(Left(empty())),
             (Some(rot), None) | (None, Some(rot)) => Left(Right(once(rot))),
             (Some(r_rot), Some(u_rot)) => Right(once(r_rot).chain(once(u_rot))),
+        }
+    }
+
+    pub(super) const fn const_default() -> Self {
+        Self {
+            r_face: Face::R,
+            handedness: Direction::Positive,
+            side_direction: Direction::Positive,
         }
     }
 }
@@ -128,11 +136,7 @@ impl Rotatable for Orientation {
 
 impl Default for Orientation {
     fn default() -> Self {
-        Self {
-            r_face: Face::R,
-            handedness: Direction::Positive,
-            side_direction: Direction::Positive,
-        }
+        Self::const_default()
     }
 }
 
