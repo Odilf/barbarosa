@@ -27,10 +27,10 @@ pub struct Cube6 {
 impl generic::Cube for Cube6 {
     const SOLVED: Self = Self {
         corners: CornerSet::SOLVED,
-    
+
         wings_1: WingSet::SOLVED,
         wings_2: WingSet::SOLVED,
-    
+
         center_corners_1: CenterCornerSet::SOLVED,
         center_corners_2: CenterCornerSet::SOLVED,
         center_wings: CenterWingSet::SOLVED,

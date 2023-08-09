@@ -32,14 +32,14 @@ impl generic::Cube for Cube7 {
     const SOLVED: Self = Self {
         corners: CornerSet::SOLVED,
         edges: EdgeSet::SOLVED,
-    
+
         wings_1: WingSet::SOLVED,
         wings_2: WingSet::SOLVED,
-    
+
         center_corners_1: CenterCornerSet::SOLVED,
         center_corners_2: CenterCornerSet::SOLVED,
         center_wings: CenterWingSet::SOLVED,
-    
+
         center_edges_1: CenterEdgeSet::SOLVED,
         center_edges_2: CenterEdgeSet::SOLVED,
     };
