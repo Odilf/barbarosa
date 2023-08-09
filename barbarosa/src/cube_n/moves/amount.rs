@@ -26,9 +26,6 @@ impl std::ops::Mul<Direction> for Amount {
     type Output = Amount;
 
     /// Multiply an amount by a direction to get the resulting amount.
-    ///
-    /// Used to convert between moves to rotations, encoding the fact that
-    /// R and L' is the same rotation (namely, a 90 degree rotation around the X axis)
     fn mul(self, rhs: Direction) -> Self::Output {
         use Amount::*;
         use Direction::*;
