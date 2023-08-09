@@ -30,16 +30,16 @@ fn index_deindex_positions() {
 
 #[test]
 fn index_deindex_solved() {
-    let cube = Cube3::solved();
+    let cube = Cube3::SOLVED;
     let indices = cube.indices();
     let deindexed_cube = Cube3::from_indices(indices);
 
-    assert_eq!(cube, &deindexed_cube);
+    assert_eq!(cube, deindexed_cube);
 }
 
 #[test]
 fn index_deindex_edges() {
-    let cube = Cube3::new_solved().moved(&Alg::<AxisMove>::parse("R").unwrap());
+    let cube = Cube3::SOLVED.moved(&Alg::<AxisMove>::parse("R").unwrap());
     let indices = cube.indices();
     let deindexed_cube = Cube3::from_indices(indices);
 
@@ -48,7 +48,7 @@ fn index_deindex_edges() {
 
 #[test]
 fn index_deindex_corners() {
-    let cube = Cube3::new_solved().moved(&Alg::<AxisMove>::parse("U").unwrap());
+    let cube = Cube3::SOLVED.moved(&Alg::<AxisMove>::parse("U").unwrap());
     let indices = cube.indices();
     let deindexed_cube = Cube3::from_indices(indices);
 

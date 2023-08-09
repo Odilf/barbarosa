@@ -96,18 +96,18 @@ fn first_orientation_indices() {
 
 #[test]
 fn first_and_last_corner_index() {
-    let mut corner = Cube3::solved().corners.pieces()[7].clone();
+    let mut corner = Cube3::SOLVED.corners.pieces()[7].clone();
     corner.twist();
     corner.twist();
 
-    assert_eq!(Cube3::solved().corners.pieces()[0].index(), 0);
+    assert_eq!(Cube3::SOLVED.corners.pieces()[0].index(), 0);
     assert_eq!(corner.index(), Corner::TOTAL_SET_SIZE - 1);
 }
 
 #[test]
 fn first_and_last_edge_index() {
-    let first_edge = Cube3::solved().edges.pieces()[0].clone();
-    let last_edge = Cube3::solved().edges.pieces()[11].clone().flipped();
+    let first_edge = Cube3::SOLVED.edges.pieces()[0].clone();
+    let last_edge = Cube3::SOLVED.edges.pieces()[11].clone().flipped();
 
     assert_eq!(first_edge.index(), 0);
     assert_eq!(last_edge.index(), Edge::TOTAL_SET_SIZE - 1);
@@ -115,7 +115,7 @@ fn first_and_last_edge_index() {
 
 #[test]
 fn second_edges_adjustment_solved() {
-    let [edges_1, edges_2] = Cube3::solved().edge_partition();
+    let [edges_1, edges_2] = Cube3::SOLVED.edge_partition();
     let adjusted = &adjust_second_edges_for_indexing(edges_2);
 
     assert_eq!(adjusted, edges_1);
@@ -123,9 +123,9 @@ fn second_edges_adjustment_solved() {
 
 #[test]
 fn first_and_last_corner_set() {
-    let first_corners = Cube3::solved().corners.pieces().clone();
+    let first_corners = Cube3::SOLVED.corners.pieces().clone();
     let last_corners = {
-        let mut corners = Cube3::solved().corners.pieces().clone();
+        let mut corners = Cube3::SOLVED.corners.pieces().clone();
         corners.reverse();
         corners.iter_mut().for_each(|corner| {
             corner.twist();
@@ -141,9 +141,9 @@ fn first_and_last_corner_set() {
 
 #[test]
 fn first_and_last_edge_set() {
-    let first_edges = Cube3::new_solved().edge_partition()[0].clone();
+    let first_edges = Cube3::SOLVED.edge_partition()[0].clone();
     let last_edges = {
-        let cube = Cube3::new_solved();
+        let cube = Cube3::SOLVED;
         let mut edges = cube.edge_partition()[1].clone();
         edges.reverse();
         edges.iter_mut().for_each(|edge| edge.flip());

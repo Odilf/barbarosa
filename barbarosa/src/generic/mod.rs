@@ -42,14 +42,16 @@ pub trait Cube:
     /// Returns a static reference to a solved cube.
     ///
     /// It's nice when implementing this to make the reference `const`, if possible.
-    fn solved() -> &'static Self;
+    // fn solved() -> &'static Self;
+
+    const SOLVED: Self;
 
     /// Creates a new solved cube
     fn new_solved() -> Self
     where
         Self: 'static,
     {
-        Self::solved().clone()
+        Self::SOLVED.clone()
     }
 
     /// Checks whether a cube is solved by comparing it to [Cube::solved]   
@@ -57,6 +59,6 @@ pub trait Cube:
     where
         Self: 'static,
     {
-        self == Self::solved()
+        *self == Self::SOLVED
     }
 }

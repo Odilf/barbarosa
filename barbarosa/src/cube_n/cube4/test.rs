@@ -37,12 +37,12 @@ fn expect_wing(cube: &Cube4, target: ([Face; 2], Direction), expected: ([Face; 2
 
 #[test]
 fn just_solved() {
-    assert!(Cube4::solved().is_solved());
+    assert!(Cube4::SOLVED.is_solved());
 }
 
 #[test]
 fn apply_move() {
-    let mut cube = Cube4::new_solved();
+    let mut cube = Cube4::SOLVED;
     let mov = WideAxisMove::<1>::new(Face::R, Amount::Single, 1).unwrap();
 
     cube.apply(&mov);
@@ -51,7 +51,7 @@ fn apply_move() {
 
 #[test]
 fn six_sexy_moves() {
-    let mut cube = Cube4::new_solved();
+    let mut cube = Cube4::SOLVED;
 
     for _ in 0..6 {
         cube.apply(&perms::SEXY_MOVE);
@@ -62,7 +62,7 @@ fn six_sexy_moves() {
 
 #[test]
 fn four_wide_us() {
-    let mut cube = Cube4::new_solved();
+    let mut cube = Cube4::SOLVED;
     let mov = WideAxisMove::<1>::new(Face::U, Amount::Single, 1).unwrap();
 
     for _ in 0..4 {
@@ -74,7 +74,7 @@ fn four_wide_us() {
 
 #[test]
 fn four_wide_fs() {
-    let mut cube = Cube4::new_solved();
+    let mut cube = Cube4::SOLVED;
     let mov = WideAxisMove::<1>::new(Face::F, Amount::Single, 1).unwrap();
 
     for i in 0..4 {
@@ -91,7 +91,7 @@ fn four_wide_fs() {
 
 #[test]
 fn four_wide_rs() {
-    let mut cube = Cube4::new_solved();
+    let mut cube = Cube4::SOLVED;
     let mov = WideAxisMove::<1>::new(Face::R, Amount::Single, 1).unwrap();
 
     for _ in 0..4 {
@@ -106,7 +106,7 @@ fn four_of_every_single_move() {
     for m in AxisMove::all() {
         let m_wide = m.clone().widen::<1>(1).unwrap();
 
-        let mut cube = Cube4::new_solved();
+        let mut cube = Cube4::SOLVED;
 
         for _ in 0..4 {
             cube.apply(&m_wide);
@@ -128,7 +128,7 @@ fn solve_unsolve_journey() {
     let alg =
         Alg::<WideAxisMove<1>>::random_unnormalized_with_rng(30, &mut StdRng::seed_from_u64(69420));
 
-    let mut cube = Cube4::new_solved();
+    let mut cube = Cube4::SOLVED;
 
     cube.apply(&alg);
 
@@ -138,7 +138,7 @@ fn solve_unsolve_journey() {
 
 #[test]
 fn six_wide_sexies() {
-    let mut cube = Cube4::new_solved();
+    let mut cube = Cube4::SOLVED;
 
     let wide_sexy: Alg<WideAxisMove<1>> = perms::SEXY_MOVE
         .moves
@@ -150,22 +150,22 @@ fn six_wide_sexies() {
         cube.apply(&wide_sexy);
     }
 
-    assert_eq!(cube.corners, Cube4::solved().corners);
+    assert_eq!(cube.corners, Cube4::SOLVED.corners);
 
     assert_eq!(
         cube.centers,
-        Cube4::solved().centers,
+        Cube4::SOLVED.centers,
         "Centers are not solved"
     );
 
-    assert_eq!(cube.wings, Cube4::solved().wings, "Wings are not solved");
+    assert_eq!(cube.wings, Cube4::SOLVED.wings, "Wings are not solved");
 
     assert!(cube.is_solved());
 }
 
 #[test]
 fn two_wide_ts() {
-    let mut cube = Cube4::new_solved();
+    let mut cube = Cube4::SOLVED;
     let wide_t: Alg<Cube4> = pll::T
         .clone()
         .moves
@@ -188,13 +188,13 @@ fn two_wide_ts() {
 
     cube.apply(&wide_t);
 
-    assert_eq!(cube.wings, Cube4::solved().wings);
+    assert_eq!(cube.wings, Cube4::SOLVED.wings);
     assert!(cube.is_solved());
 }
 
 #[test]
 fn two_wide_js() {
-    let mut cube = Cube4::new_solved();
+    let mut cube = Cube4::SOLVED;
     let wide_j: Alg<Cube4> = pll::J
         .clone()
         .moves
@@ -208,14 +208,14 @@ fn two_wide_js() {
         cube.apply(&wide_j);
     }
 
-    assert_eq!(Cube4::solved().corners, cube.corners);
-    assert_eq!(Cube4::solved().centers, cube.centers);
+    assert_eq!(Cube4::SOLVED.corners, cube.corners);
+    assert_eq!(Cube4::SOLVED.centers, cube.centers);
 
     assert_eq!(
-        Cube4::solved().wings,
+        Cube4::SOLVED.wings,
         cube.wings,
         "Solved: {:#?} got: {:#?}",
-        Cube4::solved().wings,
+        Cube4::SOLVED.wings,
         cube.wings
     );
 
@@ -224,7 +224,7 @@ fn two_wide_js() {
 
 #[test]
 fn random_amount_of_wide_u_perms() {
-    let mut cube = Cube4::new_solved();
+    let mut cube = Cube4::SOLVED;
     let wide_u: Alg<Cube4> = pll::U
         .clone()
         .moves
@@ -241,7 +241,7 @@ fn random_amount_of_wide_u_perms() {
 
 #[test]
 fn regular_ass_t_perm_lol() {
-    let mut cube = Cube4::new_solved();
+    let mut cube = Cube4::SOLVED;
 
     for _ in 0..2 {
         cube.apply(&pll::T);
@@ -256,7 +256,7 @@ fn moves_by_all_widenesses() {
     let w0 = WideAxisMove::<0>::new(Face::R, Amount::Single, 0).unwrap();
     let w1 = WideAxisMove::<1>::new(Face::R, Amount::Single, 0).unwrap();
 
-    Cube4::new_solved().apply(&normal);
-    Cube4::new_solved().apply(&w0);
-    Cube4::new_solved().apply(&w1);
+    Cube4::SOLVED.clone().apply(&normal);
+    Cube4::SOLVED.clone().apply(&w0);
+    Cube4::SOLVED.clone().apply(&w1);
 }

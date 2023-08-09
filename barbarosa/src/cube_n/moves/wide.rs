@@ -19,6 +19,9 @@ use super::{
 };
 
 /// A wide move of at most depth `N`.
+///
+/// [`WideAxisMove<0>`] should never be implemented directly. Instead, you should implement [`AxisMove`]
+/// which automatically implements [`WideAxisMove<0>`]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct WideAxisMove<const N: u32> {
     /// invariant: depth <= N
@@ -104,26 +107,40 @@ impl<const N: u32> std::fmt::Display for WideAxisMove<N> {
     }
 }
 
-impl<C: Cube + Movable<WideAxisMove<0>>> Movable<AxisMove> for C {
-    fn apply(&mut self, m: &AxisMove) {
-        self.apply(&m.clone().widen::<0>(0).unwrap());
+impl<C: Cube + Movable<AxisMove>> Movable<WideAxisMove<0>> for C {
+    fn apply(&mut self, m: &WideAxisMove<0>) {
+        self.apply(&m.axis_move);
     }
 }
 
 macro_rules! impl_movable_wide_move_inductively {
-    ($cube:ty, $max_width:literal, [$($width:literal),*]) => {
+    ($cube:ty, $max_width:literal, [$($width:tt),*]) => {
         $(
-            static_assertions::const_assert!($width < $max_width);
-            impl crate::generic::Movable<WideAxisMove<$width>> for $cube {
-                fn apply(&mut self, m: &WideAxisMove<$width>) {
-                    let wider = unsafe {
-                        std::mem::transmute::<&WideAxisMove<$width>, &WideAxisMove<$max_width>>(m)
-                    };
-
-                    self.apply(wider);
-                }
-            }
+            impl_movable_wide_move_inductively!($cube, $max_width, $width);
         )*
+    };
+
+    ($cube:ty, $max_width:literal, 0) => {
+        impl crate::generic::Movable<crate::cube_n::AxisMove> for $cube {
+            fn apply(&mut self, m: &crate::cube_n::AxisMove) {
+                <$cube as crate::generic::Movable<WideAxisMove<$max_width>>>::apply(self, &m.clone().widen($max_width).unwrap());
+            }
+        }
+    };
+
+    ($cube:ty, $max_width:literal, $width:literal) => {
+        static_assertions::const_assert!($width < $max_width);
+        impl crate::generic::Movable<WideAxisMove<$width>> for $cube {
+            fn apply(&mut self, m: &WideAxisMove<$width>) {
+                // Safe because width is statically asserted to be less than max_width
+                // (and even if it wasn't it wouldn't be memory unsafe, just incorrect)
+                let wider = unsafe {
+                    std::mem::transmute::<&WideAxisMove<$width>, &WideAxisMove<$max_width>>(m)
+                };
+
+                self.apply(wider);
+            }
+        }
     };
 }
 

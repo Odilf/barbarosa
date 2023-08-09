@@ -17,7 +17,7 @@ impl Deindexable for CornersMUS {
         let position_indices = deindex_positions::<Self, 8, 8>(position_index);
         let orientations = deindex_orientations::<Corner, 7>(orientation_index);
 
-        let mut corners = position_indices.map(|i| Cube3::solved().corners.pieces()[i].clone());
+        let mut corners = position_indices.map(|i| Cube3::SOLVED.corners.pieces()[i].clone());
 
         for (corner, orientation) in corners.iter_mut().zip(orientations.iter()) {
             for _ in 0..*orientation {
@@ -44,7 +44,7 @@ impl Deindexable for HalfEdgesMUS {
         let position_indices = deindex_positions::<Self, 6, 12>(position_index);
         let orientations = deindex_orientations::<Edge, 6>(orientation_index);
 
-        let mut edges = position_indices.map(|i| Cube3::solved().edges.pieces()[i].clone());
+        let mut edges = position_indices.map(|i| Cube3::SOLVED.edges.pieces()[i].clone());
 
         for (edge, orientation) in edges.iter_mut().zip(orientations.iter()) {
             if *orientation != 0 {

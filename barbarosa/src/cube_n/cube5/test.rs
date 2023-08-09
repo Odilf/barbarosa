@@ -9,7 +9,7 @@ use super::Cube5;
 
 #[test]
 fn two_t_pems_solve_it() {
-    let mut cube = Cube5::new_solved();
+    let mut cube = Cube5::SOLVED;
 
     let wide_t = pll::T.clone().widen::<1>(1).unwrap();
 
@@ -24,7 +24,7 @@ fn two_t_pems_solve_it() {
 
 #[test]
 fn half_wide_t_perm() {
-    let mut cube = Cube5::new_solved();
+    let mut cube = Cube5::SOLVED;
 
     let half_wide_t: Alg<Cube5> = pll::T
         .clone()

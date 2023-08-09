@@ -20,9 +20,11 @@ pub struct Cube4 {
 }
 
 impl generic::Cube for Cube4 {
-    fn solved() -> &'static Self {
-        &SOLVED
-    }
+    const SOLVED: Self = Self {
+        corners: CornerSet::SOLVED,
+        wings: WingSet::SOLVED,
+        centers: CenterCornerSet::SOLVED,
+    };
 
     fn is_solved(&self) -> bool
     where
@@ -49,9 +51,3 @@ impl CubeN for Cube4 {
 }
 
 impl_movable_wide_move_inductively!(Cube4, 1, [0]);
-
-const SOLVED: Cube4 = Cube4 {
-    corners: CornerSet::SOLVED,
-    wings: WingSet::SOLVED,
-    centers: CenterCornerSet::SOLVED,
-};

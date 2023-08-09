@@ -15,14 +15,10 @@ pub struct Cube2 {
     pub corners: CornerSet,
 }
 
-const SOLVED_CUBE: Cube2 = Cube2 {
-    corners: CornerSet::SOLVED,
-};
-
 impl generic::Cube for Cube2 {
-    fn solved() -> &'static Self {
-        &SOLVED_CUBE
-    }
+    const SOLVED: Self = Self {
+        corners: CornerSet::SOLVED,
+    };
 }
 
 impl AsMove for Cube2 {
@@ -41,7 +37,7 @@ impl generic::Movable<AxisMove> for Cube2 {
 
 impl Distribution<Cube2> for Standard {
     fn sample<R: rand::Rng + ?Sized>(&self, rng: &mut R) -> Cube2 {
-        let mut cube = Cube2::new_solved();
+        let mut cube = Cube2::SOLVED;
 
         cube.corners.shuffle(rng);
 

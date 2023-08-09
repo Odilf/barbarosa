@@ -22,7 +22,7 @@ macro_rules! bench_heuristic {
     ($heuristic:tt, $c:tt, $group:expr, $amount:literal) => {
         let mut rng = StdRng::seed_from_u64(69420);
         let alg = Alg::<AxisMove>::random_with_rng($amount, &mut rng);
-        let cube = Cube3::new_solved().moved(&alg);
+        let cube = Cube3::SOLVED.moved(&alg);
 
         println!("Benching solving alg {alg}");
 

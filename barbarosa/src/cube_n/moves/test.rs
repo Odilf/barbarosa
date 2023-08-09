@@ -143,18 +143,18 @@ fn prints_moves() {
 
 #[test]
 fn six_sexy_moves_solves_cube() {
-    let mut cube = Cube3::new_solved();
+    let mut cube = Cube3::SOLVED;
 
     for _ in 0..6 {
         cube.apply(&perms::SEXY_MOVE);
     }
 
-    assert_eq!(cube, *Cube3::solved());
+    assert_eq!(cube, Cube3::SOLVED);
 }
 
 #[test]
 fn two_t_perms_solve_cube() {
-    let mut cube = Cube3::new_solved();
+    let mut cube = Cube3::SOLVED;
 
     for _ in 0..2 {
         cube.apply(&pll::T);
@@ -167,7 +167,7 @@ fn two_t_perms_solve_cube() {
 fn alg_and_inverse_solve_cube() {
     let alg = <Alg<AxisMove>>::random(30);
 
-    let mut cube = Cube3::new_solved();
+    let mut cube = Cube3::SOLVED;
 
     cube.apply(&alg);
     cube.apply(&alg.reversed());
@@ -184,8 +184,8 @@ fn quarter_moves() {
     assert!(alg.moves.len() <= quarter_move_alg.moves.len());
 
     assert_eq!(
-        Cube3::new_solved().moved(&alg),
-        Cube3::new_solved().moved(&quarter_move_alg),
+        Cube3::SOLVED.moved(&alg),
+        Cube3::SOLVED.moved(&quarter_move_alg),
     );
 }
 
@@ -219,4 +219,9 @@ fn non_redundant_given_last_axis() {
     for mov in moves {
         assert!(!not_expected.contains(&mov.to_string().as_str()));
     }
+}
+
+#[test]
+fn extended_moves() {
+    todo!("parse extended moves")
 }

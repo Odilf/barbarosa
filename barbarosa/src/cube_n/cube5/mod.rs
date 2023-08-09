@@ -23,21 +23,17 @@ pub struct Cube5 {
     corner_edges: CenterEdgeSet<1>,
 }
 
-const SOLVED: Cube5 = Cube5 {
-    corners: CornerSet::SOLVED,
-    edges: EdgeSet::SOLVED,
-    corner_centers: CenterCornerSet::SOLVED,
-    corner_edges: CenterEdgeSet::SOLVED,
-};
-
 impl AsMove for Cube5 {
     type Move = WideAxisMove<1>;
 }
 
 impl generic::Cube for Cube5 {
-    fn solved() -> &'static Self {
-        &SOLVED
-    }
+    const SOLVED: Self = Self {
+        corners: CornerSet::SOLVED,
+        edges: EdgeSet::SOLVED,
+        corner_centers: CenterCornerSet::SOLVED,
+        corner_edges: CenterEdgeSet::SOLVED,
+    };
 }
 
 impl generic::Movable<WideAxisMove<1>> for Cube5 {

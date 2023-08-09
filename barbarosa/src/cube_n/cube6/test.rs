@@ -15,7 +15,7 @@ use super::*;
 
 #[test]
 fn six_sexies() {
-    let mut cube = Cube6::new_solved();
+    let mut cube = Cube6::SOLVED;
     let alg = perms::SEXY_MOVE.clone().widen::<2>(0).unwrap();
 
     for _ in 0..6 {
@@ -27,7 +27,7 @@ fn six_sexies() {
 
 #[test]
 fn two_t_perms_of_varying_depths() {
-    let mut cube = Cube6::new_solved();
+    let mut cube = Cube6::SOLVED;
     let alg = |i| pll::T.clone().widen::<2>(i).unwrap();
 
     for i in 0..=2 {
@@ -46,7 +46,7 @@ fn four_of_each() {
     for mov in &AxisMove::all() {
         for depth in 0..=2 {
             let mov = mov.clone().widen::<2>(depth).unwrap();
-            let mut cube = Cube6::new_solved();
+            let mut cube = Cube6::SOLVED;
 
             for _ in 0..4 {
                 cube.apply(&mov);
@@ -59,12 +59,12 @@ fn four_of_each() {
 
 #[test]
 fn center_wings_normal_directions() {
-    let ru = &Cube6::solved().center_wings.pieces()[0];
+    let ru = &Cube6::SOLVED.center_wings.pieces()[0];
 
     assert_eq!(ru.normal_axis(), Axis::Z);
     assert_eq!(ru.normal_direction(), Direction::Positive);
 
-    let uf = &Cube6::solved().center_wings.pieces()[1];
+    let uf = &Cube6::SOLVED.center_wings.pieces()[1];
 
     assert_eq!(uf.normal_axis(), Axis::X);
     assert_eq!(uf.normal_direction(), Direction::Negative);

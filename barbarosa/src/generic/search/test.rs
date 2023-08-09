@@ -11,7 +11,7 @@ use crate::{
 macro_rules! assert_solves_ida {
     ($cube:ty, $heuristic:expr, $alg:expr) => {
         let alg: Alg<AxisMove> = Alg::parse($alg).unwrap();
-        let cube = <$cube>::new_solved().moved(&alg);
+        let cube = <$cube>::SOLVED.moved(&alg);
         let solution = cube
             .solve_with_heuristic($heuristic)
             .expect("Cube should be solvable");
@@ -37,7 +37,7 @@ fn solves_lengths() {
 
     for move_amount in 0..=12 {
         let alg = Alg::random_with_rng(move_amount, &mut rng);
-        let cube = Cube3::new_solved().moved(&alg);
+        let cube = Cube3::SOLVED.moved(&alg);
 
         let solution = cube
             .solve_with_heuristic(heuristics::mus)

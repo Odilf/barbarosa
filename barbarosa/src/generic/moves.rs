@@ -58,7 +58,7 @@ impl<M: Move> AsMove for M {
 /// use barbarosa::generic::*;
 /// use barbarosa::cube_n::{moves::AxisMove, Cube3};
 ///
-/// let cube = Cube3::solved();
+/// let cube = Cube3::SOLVED;
 /// let mov = AxisMove::parse("B'").unwrap();
 /// let moved = cube.clone().moved(&mov);
 ///

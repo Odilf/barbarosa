@@ -37,21 +37,21 @@ fn rotates_orientation() {
 
 #[test]
 fn moves_rotated_simple() {
-    let mut cube = Cube3::new_solved().orientable();
+    let mut cube = Cube3::SOLVED.orientable();
 
     cube.orientation
         .rotate(&AxisRotation::new(Axis::X, Amount::Double));
 
     cube.apply(&AxisMove::new(Face::U, Amount::Single));
 
-    let expected = Cube3::new_solved().moved(&AxisMove::new(Face::D, Amount::Single));
+    let expected = Cube3::SOLVED.moved(&AxisMove::new(Face::D, Amount::Single));
 
     assert_eq!(cube.base_cube, expected)
 }
 
 #[test]
 fn moves_rotated() {
-    let mut cube = Cube3::new_solved().orientable();
+    let mut cube = Cube3::SOLVED.orientable();
 
     cube.orientation
         .rotate(&AxisRotation::new(Axis::X, Amount::Double));
@@ -60,7 +60,7 @@ fn moves_rotated() {
 
     cube.apply(&SEXY_MOVE);
 
-    let expected = Cube3::new_solved().moved(&Alg::<AxisMove>::parse("B D B' D'").unwrap());
+    let expected = Cube3::SOLVED.moved(&Alg::<AxisMove>::parse("B D B' D'").unwrap());
 
     assert_eq!(cube.base_cube, expected)
 }

@@ -188,7 +188,7 @@ pub struct CubeIndices {
 ///
 /// # Warning
 ///
-/// This depends on the structure of `Cube::solved()`.
+/// This depends on the structure of `Cube::SOLVED`.
 fn adjust_second_edges_for_indexing(edges: &HalfEdgesMUS) -> HalfEdgesMUS {
     let mut output = edges.clone();
 

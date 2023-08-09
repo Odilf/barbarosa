@@ -14,7 +14,7 @@ use super::*;
 
 #[test]
 fn solved_cube_has_pieces_in_all_coordinates() {
-    let solved_cube = Cube3::new_solved();
+    let solved_cube = Cube3::SOLVED;
 
     let mut positions: HashSet<_> = solved_cube
         .edges
@@ -58,7 +58,7 @@ fn random_cube() {
 
 #[test]
 fn test_f() {
-    let mut cube = Cube3::new_solved();
+    let mut cube = Cube3::SOLVED;
 
     let target = Edge::oriented(Axis::Y, vector![Direction::Positive, Direction::Positive]);
     let target_index = cube

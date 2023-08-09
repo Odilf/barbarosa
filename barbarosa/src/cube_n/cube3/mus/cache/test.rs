@@ -15,7 +15,7 @@ fn correct_cache() {
     for move_amount in 0..=20 {
         for _ in 0..100 {
             let alg = Alg::random_with_rng(move_amount, &mut rng);
-            let cube = Cube3::new_solved().moved(&alg);
+            let cube = Cube3::SOLVED.moved(&alg);
 
             assert!(mus(&cube) <= alg.moves.len() as f32);
         }
