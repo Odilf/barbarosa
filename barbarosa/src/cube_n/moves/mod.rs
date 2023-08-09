@@ -17,10 +17,12 @@ pub mod rotation;
 pub mod wide;
 
 mod amount;
+mod extended;
 mod quarter;
 mod test;
 
 pub use amount::Amount;
+pub use extended::ExtendedAxisMove;
 pub use non_redundant::NonRedundantAxisMove;
 pub use quarter::QuarterAxisMove;
 pub use wide::WideAxisMove;
