@@ -15,6 +15,8 @@ use thiserror::Error;
 /// Any type that implements [FromStr] implements this trait automatically. The only
 /// reason not to use [FromStr] directly is because it doesn't allow implementing in
 /// foreign types, which is something that might be needed.
+/// 
+/// [FromStr]: std::str::FromStr
 pub trait Parsable: Sized {
     /// The type of the pest rule used to parse this type.
     type Rule: RuleType;

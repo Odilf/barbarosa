@@ -54,7 +54,7 @@ pub trait Cube:
         Self::SOLVED.clone()
     }
 
-    /// Checks whether a cube is solved by comparing it to [Cube::solved]   
+    /// Checks whether a cube is solved by comparing it to [Cube::SOLVED]   
     fn is_solved(&self) -> bool
     where
         Self: 'static,

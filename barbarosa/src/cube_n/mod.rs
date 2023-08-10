@@ -10,7 +10,7 @@
 //! the color of, for example, a corner just by the information in the [Corner] struct.
 //!
 //! Rather, the cube is responsible for keeping track for which piece is which. Simply,
-//! the "color" of a piece is determined by that position in [Cube::solved](crate::generic::Cube::solved).
+//! the "color" of a piece is determined by that position in [Cube::SOLVED](crate::generic::Cube::SOLVED).
 //!
 //! You can use the functions [utils::item_at](crate::generic::utils::item_at) and
 //! [utils::position_of_item](crate::generic::utils::position_of_item) to find where
