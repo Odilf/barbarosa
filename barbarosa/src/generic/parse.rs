@@ -24,7 +24,7 @@ pub trait Parsable: Sized {
 }
 
 /// A trait for types that can be parsed from a [`pest::iterators::Pair`].
-/// 
+///
 /// If this trait is implemented, [`Parsable::parse`] is automatically implemented
 pub trait FromPest {
     /// The type of the pest rule used to parse this type.
@@ -44,17 +44,22 @@ impl<T: FromPest> Parsable for T {
     type Rule = T::Rule;
 
     fn parse(s: &str) -> Result<Self> {
-        let pair = T::Parser::parse(T::rule(), s)?.next().unwrap();
+        let mut pairs = T::Parser::parse(T::rule(), s)?;
+        let pair = pairs.next().unwrap();
 
         // Check if the entire string was parsed
         if pair.as_span().end() != s.len() {
-            return Err(pest::error::Error::new_from_span(
+            let err = pest::error::Error::new_from_span(
                 pest::error::ErrorVariant::CustomError {
                     message: "Expected end of input".to_string(),
                 },
                 pair.as_span(),
-            ));
+            );
+
+            return Err(ParseError::Pest(Box::new(err)));
         }
+
+        debug_assert!(pairs.next().is_none());
 
         Ok(T::from_pest(pair))
     }
@@ -62,10 +67,19 @@ impl<T: FromPest> Parsable for T {
 
 /// An error that can occur while parsing.
 #[derive(Debug, Error)]
-pub enum ParseError<T: Parsable> where T::Rule: 'static {
+pub enum ParseError<T: Parsable>
+where
+    T::Rule: 'static,
+{
     #[allow(missing_docs)]
-    Pest(#[from] pest::error::Error<T::Rule>),
+    Pest(Box<pest::error::Error<T::Rule>>),
+}
+
+impl<T: Parsable> From<pest::error::Error<T::Rule>> for ParseError<T> {
+    fn from(value: pest::error::Error<T::Rule>) -> Self {
+        Self::Pest(Box::new(value))
+    }
 }
 
 /// Type alias for a `pest` result, just much more concise.
-pub type Result<T> = std::result::Result<T, pest::error::Error<<T as Parsable>::Rule>>;
+pub type Result<T> = std::result::Result<T, ParseError<T>>;

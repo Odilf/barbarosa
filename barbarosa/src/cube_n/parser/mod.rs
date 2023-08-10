@@ -5,7 +5,11 @@ use pest_derive::Parser;
 
 use crate::generic::parse::{FromPest, Parsable};
 
-use super::{moves::Amount, space::Face, AxisMove, WideAxisMove};
+use super::{
+    moves::{rotation::AxisRotation, Amount, ExtendedAxisMove},
+    space::{Axis, Direction, Face},
+    AxisMove, WideAxisMove,
+};
 
 #[derive(Parser)]
 #[grammar = "grammar/cube_n.pest"]
@@ -32,13 +36,11 @@ impl_with_current_rule! {
     Amount;
     Rule::amount;
 
-    |pair| {
-        match pair.as_str() {
-            "" => Amount::Single,
-            "2" => Amount::Double,
-            "'" => Amount::Inverse,
-            _ => unreachable!(),
-        }
+    |pair| match pair.as_str() {
+        "" => Amount::Single,
+        "2" => Amount::Double,
+        "'" => Amount::Inverse,
+        _ => unreachable!(),
     }
 }
 
@@ -122,5 +124,83 @@ impl<const N: u32> FromPest for WideAxisMove<N> {
         let amount = Amount::from_pest(inner.next().unwrap());
 
         WideAxisMove::new(face, amount, depth).unwrap()
+    }
+}
+
+impl_with_current_rule! {
+    Axis;
+    Rule::axis;
+
+    |pair| match pair.as_str() {
+        "x" => Axis::X,
+        "y" => Axis::Y,
+        "z" => Axis::Z,
+        _ => unreachable!(),
+    }
+}
+
+impl_with_current_rule! {
+    AxisRotation;
+    Rule::rotation;
+
+    |pair| {
+        let mut parent = pair.into_inner();
+        let axis = Axis::from_pest(parent.next().unwrap());
+        let amount = Amount::from_pest(parent.next().unwrap());
+
+        AxisRotation::new(axis, amount)
+    }
+}
+
+fn parse_slice(pair: Pair<Rule>) -> (Axis, bool) {
+    match pair.as_str() {
+        "M" => (Axis::X, false),
+        "m" => (Axis::X, true),
+        "E" => (Axis::Y, false),
+        "e" => (Axis::Y, true),
+        "S" => (Axis::Z, false),
+        "s" => (Axis::Z, true),
+        _ => unreachable!(),
+    }
+}
+
+fn parse_slice_move(pair: Pair<Rule>) -> (AxisRotation, bool) {
+    let mut inner = pair.into_inner();
+
+    let (axis, wide) = parse_slice(inner.next().unwrap());
+    let mut amount = Amount::from_pest(inner.next().unwrap());
+
+    // because E and M slices are inverted :eyeroll:
+    if axis != Axis::Z {
+        amount = amount * Direction::Negative;
+    }
+
+    (AxisRotation::new(axis, amount), wide)
+}
+
+impl_with_current_rule! {
+    ExtendedAxisMove;
+    Rule::extended_move;
+
+    |pair| {
+        dbg!(&pair);
+        let pair = pair.into_inner().next().unwrap();
+            match pair.as_rule() {
+            Rule::axis_move => ExtendedAxisMove::Regular(AxisMove::from_pest(pair)),
+            Rule::wide_move => {
+                // If it's a depth 0 wide move, just make it an axis move
+                let mov = WideAxisMove::from_pest(pair);
+                match mov.depth() {
+                    0 => ExtendedAxisMove::Regular(mov.axis_move),
+                    _ => ExtendedAxisMove::Wide(mov),
+                }
+            },
+            Rule::rotation => ExtendedAxisMove::Rotation(AxisRotation::from_pest(pair)),
+            Rule::slice_move => {
+                let (rot, wide) = parse_slice_move(pair);
+                ExtendedAxisMove::Slice { rot, wide }
+            },
+            _ => unreachable!(),
+        }
     }
 }

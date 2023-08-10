@@ -1,14 +1,24 @@
-face = @{ "R" | "U" | "F" | "L" | "D" | "B" }
+face = { "R" | "U" | "F" | "L" | "D" | "B" }
 face_small = { "r" | "u" | "f" | "l" | "d" | "b" }
 
-amount = @{ "2" | "'" | "" }
+amount = { "2" | "'" | "" }
 axis_move = ${ face ~ amount }
 
 wide_face = ${ (face ~ "w") | face_small }
 depth = { NUMBER? }
 wide_move = ${ ((depth ~ wide_face) | face) ~ amount }
 
-// Comments
+axis = { "x" | "y" | "z" }
+rotation = ${ axis ~ amount }
+
+slice = { "M" | "E" | "S" }
+slice_small = { "m" | "e" | "s" }
+
+slice_move = ${ (slice | slice_small) ~ amount }
+
+extended_move = ${ wide_move | axis_move | rotation | slice_move }
+
+// Comments and whitespace
 line_comment = { "//" ~ ANY ~ NEWLINE }
 block_comment = { "/*" ~ ANY ~ "*/" }
 COMMENT = _{ line_comment | block_comment }

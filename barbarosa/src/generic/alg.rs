@@ -8,7 +8,11 @@ use rand::{distributions::Standard, prelude::Distribution, Rng};
 use strum::IntoEnumIterator;
 use thiserror::Error;
 
-use super::{moves::AsMove, parse, Movable, Move, Parsable};
+use super::{
+    moves::AsMove,
+    parse::{self, ParseError},
+    Movable, Move, Parsable,
+};
 use crate::generic;
 
 /// An alg. A sequence of moves.
@@ -45,11 +49,15 @@ where
     type Rule = <T::Move as Parsable>::Rule;
 
     fn parse(s: &str) -> parse::Result<Self> {
-        type Err<R> = pest::error::Error<R>;
-
-        let moves: Result<Vec<_>, Err<Self::Rule>> =
+        let moves: Result<Vec<_>, ParseError<T::Move>> =
             s.split_whitespace().map(T::Move::parse).collect();
-        Ok(Self::new(moves?))
+
+        // TODO: Make sure this actually works and is safe
+        let moves = moves.map_err(|e| unsafe {
+            std::mem::transmute::<ParseError<T::Move>, ParseError<Self>>(e)
+        })?;
+
+        Ok(Self::new(moves))
     }
 }
 
@@ -120,9 +128,9 @@ pub enum TryFromStatesError<M: Move, T: Movable<M> + Eq + Clone> {
 // Parsing using `TryFrom`
 impl<T: AsMove> TryFrom<&str> for Alg<T>
 where
-    T::Move: Parsable,
+    T::Move: Parsable + 'static,
 {
-    type Error = pest::error::Error<<Self as Parsable>::Rule>;
+    type Error = ParseError<Self>;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         Self::parse(value)

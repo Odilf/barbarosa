@@ -1,5 +1,3 @@
-use std::mem;
-
 use crate::{
     cube3::Cube3,
     cube_n::{
@@ -71,8 +69,7 @@ macro_rules! impl_movable_extended {
                             opposite(&m, depth_oppossite)
                         };
 
-                        // Safe because we're changing between wide axis moves which have the same exact structure
-                        let m = unsafe { mem::transmute::<_, WideAxisMove<{ <$cube>::N / 2 - 1 }>>(m) };
+                        let m = m.set_max_depth::<{ <$cube>::N / 2 - 1 }>().expect("TODO");
                         self.base_cube.apply(&m);
                     },
                     ExtendedAxisMove::Slice { rot, wide: _wide } => {
@@ -92,3 +89,30 @@ macro_rules! impl_movable_extended {
 }
 
 impl_movable_extended!([Cube2, Cube3, Cube4, Cube5, Cube6, Cube7]);
+
+impl From<AxisMove> for ExtendedAxisMove {
+    fn from(m: AxisMove) -> Self {
+        Self::Regular(m)
+    }
+}
+
+impl<const N: u32> From<WideAxisMove<N>> for ExtendedAxisMove {
+    fn from(value: WideAxisMove<N>) -> Self {
+        let widest = value
+            .set_max_depth::<{ u32::MAX }>()
+            .expect("`u32::MAX` is bigger or equal to than any N");
+        Self::Wide(widest)
+    }
+}
+
+impl From<AxisRotation> for ExtendedAxisMove {
+    fn from(value: AxisRotation) -> Self {
+        Self::Rotation(value)
+    }
+}
+
+impl From<(AxisRotation, bool)> for ExtendedAxisMove {
+    fn from((rot, wide): (AxisRotation, bool)) -> Self {
+        Self::Slice { rot, wide }
+    }
+}

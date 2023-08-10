@@ -1,7 +1,10 @@
 #![cfg(test)]
 
+use pest::Parser;
+
 use crate::cube_n::{
-    moves::{wide::Parsable, Amount},
+    moves::{rotation::AxisRotation, wide::Parsable, Amount, ExtendedAxisMove},
+    parser::{parse_slice_move, CubeNParser, Rule},
     space::Face,
     AxisMove, WideAxisMove,
 };
@@ -70,5 +73,45 @@ fn wide_moves() {
 
     assert!(WideAxisMove::<2>::parse("Rw3").is_err());
     assert!(WideAxisMove::<2>::parse("rw").is_err());
+    // TODO: Proper error handling
     // assert!(WideAxisMove::<2>::parse("3Rw").is_err());
+}
+
+#[test]
+fn extended_moves() {
+    macro_rules! assert_move {
+        ($testing:literal, "slice") => {
+            assert_eq!(
+                ExtendedAxisMove::parse($testing).unwrap(),
+                parse_slice_move(
+                    CubeNParser::parse(Rule::slice_move, "E")
+                        .unwrap()
+                        .next()
+                        .unwrap()
+                )
+                .into()
+            );
+        };
+        ($testing:literal, $type:ty) => {
+            assert_eq!(
+                ExtendedAxisMove::parse($testing).unwrap(),
+                <$type>::parse($testing).unwrap().into()
+            );
+        };
+    }
+
+    assert_move!("R", AxisMove);
+    assert_move!("R2", AxisMove);
+    assert_move!("Rw", WideAxisMove<2>);
+
+    assert_move!("x", AxisRotation);
+    assert_move!("x2", AxisRotation);
+    assert_move!("z'", AxisRotation);
+    assert_move!("y", AxisRotation);
+
+    assert_move!("E", "slice");
+    assert_move!("E2", "slice");
+    assert_move!("e'", "slice");
+    assert_move!("S", "slice");
+    assert_move!("M'", "slice");
 }
