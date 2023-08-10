@@ -8,7 +8,7 @@ use crate::generic::parse::{FromPest, IntoParseErr, Parsable, ParseError};
 type Result<T> = std::result::Result<T, ParseError<Rule>>;
 
 use super::{
-    moves::{rotation::AxisRotation, Amount, ExtendedAxisMove},
+    moves::{rotation::AxisRotation, Amount, ExtendedAxisMove, wide::WideMoveCreationError},
     space::{Axis, Direction, Face},
     AxisMove, WideAxisMove,
 };
@@ -120,7 +120,7 @@ impl<const N: u32> FromPest for WideAxisMove<N> {
         };
 
         if depth > N {
-            panic!("Depth {} is greater than N {}", depth, N);
+            return Err(ParseError::uknown(WideMoveCreationError::ExcededDepth(depth, N)));
         }
 
         let amount = Amount::from_pest(inner.next().into_err()?)?;
