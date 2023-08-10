@@ -1,6 +1,6 @@
 //! Moves for 4x4x4 and up
 
-use std::ops::Deref;
+use std::{mem, ops::Deref};
 
 use rand::prelude::Distribution;
 use thiserror::Error;
@@ -80,6 +80,18 @@ impl<const N: u32> WideAxisMove<N> {
         self.depth = new_depth;
 
         Ok(())
+    }
+
+    /// Returns a new [`WideAxisMove<N>`] with the max depth set to `M`.
+    pub fn set_max_depth<const M: u32>(self) -> Result<WideAxisMove<M>, WideMoveCreationError> {
+        if self.depth > M {
+            return Err(WideMoveCreationError::ExcededDepth(self.depth, M));
+        }
+
+        // Safe because we're changing between wide axis moves which have the same exact structure
+        let output = unsafe { mem::transmute::<WideAxisMove<N>, WideAxisMove<M>>(self) };
+
+        Ok(output)
     }
 }
 
