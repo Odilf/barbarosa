@@ -73,8 +73,7 @@ fn wide_moves() {
 
     assert!(WideAxisMove::<2>::parse("Rw3").is_err());
     assert!(WideAxisMove::<2>::parse("rw").is_err());
-    // TODO: Proper error handling
-    // assert!(WideAxisMove::<2>::parse("3Rw").is_err());
+    assert!(WideAxisMove::<2>::parse("3Rw").is_err());
 }
 
 #[test]
@@ -89,6 +88,7 @@ fn extended_moves() {
                         .next()
                         .unwrap()
                 )
+                .unwrap()
                 .into()
             );
         };

@@ -49,15 +49,10 @@ where
     type Rule = <T::Move as Parsable>::Rule;
 
     fn parse(s: &str) -> parse::Result<Self> {
-        let moves: Result<Vec<_>, ParseError<T::Move>> =
+        let moves: Result<Vec<_>, ParseError<Self::Rule>> =
             s.split_whitespace().map(T::Move::parse).collect();
 
-        // TODO: Make sure this actually works and is safe
-        let moves = moves.map_err(|e| unsafe {
-            std::mem::transmute::<ParseError<T::Move>, ParseError<Self>>(e)
-        })?;
-
-        Ok(Self::new(moves))
+        Ok(Self::new(moves?))
     }
 }
 
@@ -130,7 +125,7 @@ impl<T: AsMove> TryFrom<&str> for Alg<T>
 where
     T::Move: Parsable + 'static,
 {
-    type Error = ParseError<Self>;
+    type Error = ParseError<<T::Move as Parsable>::Rule>;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         Self::parse(value)
