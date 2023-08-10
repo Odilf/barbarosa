@@ -77,7 +77,7 @@ impl_with_current_rule! {
     Rule::depth;
 
     |pair| {
-        if pair.as_str().len() == 0 { 0 } else { pair.as_str().parse().unwrap() }
+        if pair.as_str().is_empty() { 0 } else { pair.as_str().parse().unwrap() }
     }
 }
 
