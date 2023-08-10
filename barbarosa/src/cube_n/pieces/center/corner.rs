@@ -1,7 +1,7 @@
 //! Center corner piece. See [CenterCorner] for more info.
 
 use cartesian_array_product::cartesian_array_map;
-use nalgebra::{vector, Vector3};
+use nalgebra::vector;
 
 use crate::{
     cube_n::{
@@ -10,7 +10,7 @@ use crate::{
             wide::{DepthPiece, DepthPieceSet},
         },
         space::{Axis, Direction},
-        WideAxisMove,
+        Vec3, WideAxisMove,
     },
     generic,
 };
@@ -18,7 +18,7 @@ use crate::{
 /// A center corner piece of the cube. There are 4 of these in each face of a cube.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct CenterCorner {
-    position: Vector3<Direction>,
+    position: Vec3,
     axis: Axis,
 }
 
@@ -87,7 +87,7 @@ impl DepthPiece<24> for CenterCorner {
 }
 
 impl CenterCorner {
-    const fn new(position: Vector3<Direction>, axis: Axis) -> Self {
+    const fn new(position: Vec3, axis: Axis) -> Self {
         Self { position, axis }
     }
 

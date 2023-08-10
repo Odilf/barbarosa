@@ -32,6 +32,7 @@ pub mod search;
 pub mod space;
 
 pub use moves::{AxisMove, WideAxisMove};
+use nalgebra::{Vector2, Vector3};
 pub use orientable::{Orientable, Orientation};
 pub use pieces::{center, Corner, Edge, Wing};
 
@@ -43,6 +44,11 @@ pub use cube6::Cube6;
 pub use cube7::Cube7;
 
 use crate::generic;
+
+use self::space::Direction;
+
+type Vec2 = Vector2<Direction>;
+type Vec3 = Vector3<Direction>;
 
 /// An NxNxN cube.
 ///

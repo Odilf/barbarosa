@@ -2,10 +2,13 @@
 //!
 //! This is mainly used because, for example, L and R' are the same rotation and
 /// the only difference is the pieces selected in the rotation.
-use nalgebra::{vector, Vector2, Vector3};
+use nalgebra::vector;
 
 use crate::{
-    cube_n::space::{Axis, Direction, Face},
+    cube_n::{
+        space::{Axis, Direction, Face},
+        Vec2, Vec3,
+    },
     generic::Alg,
 };
 
@@ -71,7 +74,7 @@ impl Rotatable for Face {
     }
 }
 
-impl Rotatable for Vector3<Direction> {
+impl Rotatable for Vec3 {
     fn rotate(&mut self, rotation: &AxisRotation) {
         *self = rotation.axis.map_on_slice(*self, |[x, y]| {
             rotate_vec2(&rotation.amount, &vector![*x, *y])
@@ -99,7 +102,7 @@ impl From<&AxisMove> for AxisRotation {
 }
 
 /// Rotates a [Vector2] clockwise
-pub fn rotate_vec2(amount: &Amount, vec: &Vector2<Direction>) -> Vector2<Direction> {
+pub fn rotate_vec2(amount: &Amount, vec: &Vec2) -> Vec2 {
     match amount {
         Amount::Single => vector![vec.y, -vec.x],
         Amount::Double => vector![-vec.x, -vec.y],

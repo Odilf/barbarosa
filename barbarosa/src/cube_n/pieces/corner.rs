@@ -9,7 +9,7 @@ use crate::{
     cube_n::{
         moves::rotation::{AxisRotation, Rotatable},
         space::{Axis, Direction, Face},
-        AxisMove,
+        AxisMove, Vec3,
     },
     generic::{self, moves::impl_movable_array, utils::map_array_const, PieceSet},
 };
@@ -18,7 +18,7 @@ use crate::{
 #[derive(PartialEq, Eq, Clone, Hash)]
 pub struct Corner {
     /// The position of the corner piece, relative to the center of the cube.
-    pub position: Vector3<Direction>,
+    pub position: Vec3,
 
     /// The orientation of the corner piece, determined by the axis of the
     /// sticker that is originally on the X (R-L) axis (usually red-orange)
@@ -26,7 +26,7 @@ pub struct Corner {
 }
 
 impl generic::Piece<8> for Corner {
-    type Position = Vector3<Direction>;
+    type Position = Vec3;
 
     const REFERENCE_POSITIONS: [Self::Position; 8] = {
         use Direction::*;
@@ -68,7 +68,7 @@ impl_movable_array!(Corner, AxisMove);
 
 impl Corner {
     /// Creates a new [`Corner`] with the given position and orientation axis.
-    pub const fn new(position: Vector3<Direction>, orientation_axis: Axis) -> Self {
+    pub const fn new(position: Vec3, orientation_axis: Axis) -> Self {
         Self {
             position,
             orientation_axis,
@@ -76,7 +76,7 @@ impl Corner {
     }
 
     /// Creates a new [Corner] with the given position and correct orientation.
-    pub const fn oriented(position: Vector3<Direction>) -> Self {
+    pub const fn oriented(position: Vec3) -> Self {
         Self {
             position,
             orientation_axis: Axis::X,
@@ -92,7 +92,7 @@ impl Corner {
         ]
     }
 
-    fn is_even_position_parity(position: &Vector3<Direction>) -> bool {
+    fn is_even_position_parity(position: &Vec3) -> bool {
         position
             .iter()
             .filter(|dir| dir == &&Direction::Negative)
@@ -116,7 +116,7 @@ impl Corner {
 
     /// Gets the axis that is a counterclockwise rotation from the current axis
     /// around the given position. So the thing used for twisting corners
-    pub fn next_axis(position: &Vector3<Direction>, axis: &Axis) -> Axis {
+    pub fn next_axis(position: &Vec3, axis: &Axis) -> Axis {
         if Self::is_even_position_parity(position) {
             axis.next()
         } else {
@@ -134,7 +134,7 @@ impl Corner {
     }
 
     /// Gets the physical standard coordinates of the corner
-    pub fn coordinates(position: &Vector3<Direction>) -> Vector3<f32> {
+    pub fn coordinates(position: &Vec3) -> Vector3<f32> {
         position.map(|dir| dir.scalar() as f32)
     }
 

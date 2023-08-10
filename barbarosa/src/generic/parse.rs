@@ -105,7 +105,7 @@ impl<R: RuleType> From<pest::error::Error<R>> for ParseError<R> {
 }
 
 /// A trait for types that can be converted into a [ParseError].
-/// 
+///
 /// Basically used for convience if you want to do `pair.next().unwrap()` but with proper
 /// error handling (which would now be `pair.next().into_err()?`).
 pub trait IntoParseErr<T, R: RuleType> {

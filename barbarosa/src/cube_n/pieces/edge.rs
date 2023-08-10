@@ -1,7 +1,7 @@
 //! Edge piece of the cube.
 
 use arr_macro::arr;
-use nalgebra::{vector, Vector2, Vector3};
+use nalgebra::{vector, Vector3};
 use static_assertions::const_assert_eq;
 use thiserror::Error;
 
@@ -9,7 +9,7 @@ use crate::{
     cube_n::{
         moves::rotation::{rotate_vec2, AxisRotation, Rotatable},
         space::{Axis, Direction, Face},
-        AxisMove,
+        AxisMove, Vec2,
     },
     generic::{self, moves::impl_movable_array, utils::map_array_const, Piece, PieceSet},
 };
@@ -24,7 +24,7 @@ pub struct Edge {
 
     /// The position of the edge on the slice. It uses as basis the positive diriection of the other two axes from the normal,
     /// in contiguous order (e.g.: if normal is Y, then basis is Z, X).
-    pub slice_position: Vector2<Direction>,
+    pub slice_position: Vec2,
 
     /// Whether the edge is oriented or not.
     ///
@@ -45,10 +45,10 @@ pub struct Edge {
 }
 
 impl generic::Piece<12> for Edge {
-    type Position = (Axis, Vector2<Direction>);
+    type Position = (Axis, Vec2);
 
     // TODO: Try to use cartesian product to make this nicer
-    const REFERENCE_POSITIONS: [(Axis, Vector2<Direction>); 12] = {
+    const REFERENCE_POSITIONS: [(Axis, Vec2); 12] = {
         use Axis::*;
         use Direction::*;
 
@@ -77,7 +77,7 @@ impl generic::Piece<12> for Edge {
     ///
     /// See [crate::cube_n::cube3::mus] for more information.
     const SOLVED: [Edge; 12] = {
-        const fn from_tuple((axis, pos): (Axis, Vector2<Direction>)) -> Edge {
+        const fn from_tuple((axis, pos): (Axis, Vec2)) -> Edge {
             Edge::oriented(axis, pos)
         }
 
@@ -129,11 +129,7 @@ impl_movable_array!(Edge, AxisMove);
 
 impl Edge {
     /// Creates a new [`Edge`]
-    pub const fn new(
-        normal_axis: Axis,
-        slice_position: Vector2<Direction>,
-        oriented: bool,
-    ) -> Self {
+    pub const fn new(normal_axis: Axis, slice_position: Vec2, oriented: bool) -> Self {
         Self {
             normal_axis,
             slice_position,
@@ -142,7 +138,7 @@ impl Edge {
     }
 
     /// Creates a new oriented edge
-    pub const fn oriented(normal_axis: Axis, slice_position: Vector2<Direction>) -> Self {
+    pub const fn oriented(normal_axis: Axis, slice_position: Vec2) -> Self {
         Self::new(normal_axis, slice_position, true)
     }
 
@@ -175,9 +171,7 @@ impl Edge {
     /// Calculates the position information of an edge placed in between the given faces.
     ///
     /// Errors if the faces are not perpendicular
-    pub fn position_from_faces(
-        [a, b]: [Face; 2],
-    ) -> Result<(Axis, Vector2<Direction>), ParallelAxesError> {
+    pub fn position_from_faces([a, b]: [Face; 2]) -> Result<(Axis, Vec2), ParallelAxesError> {
         let normal_axis =
             Axis::other(&a.axis, &b.axis).ok_or(ParallelAxesError::SameAxis(a.axis))?;
 

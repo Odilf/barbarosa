@@ -3,7 +3,7 @@
 mod test;
 
 use cartesian_array_product::cartesian_array_map;
-use nalgebra::{vector, Vector2};
+use nalgebra::vector;
 
 use crate::{
     cube_n::{
@@ -12,7 +12,7 @@ use crate::{
             wide::{DepthPiece, DepthPieceSet},
         },
         space::{Axis, Direction, Face},
-        WideAxisMove,
+        Vec2, WideAxisMove,
     },
     generic,
 };
@@ -79,7 +79,7 @@ impl Wing {
     }
 
     /// The position of the slice of the wing.
-    pub fn slice_position(&self) -> Vector2<Direction> {
+    pub fn slice_position(&self) -> Vec2 {
         self.corresponding_edge.slice_position
     }
 
@@ -106,7 +106,7 @@ impl Wing {
 /// Look into the implementation for details.
 pub fn wing_normal_direction(
     normal_axis: Axis,
-    slice_position: Vector2<Direction>,
+    slice_position: Vec2,
     pseudo_oriented: bool,
 ) -> Direction {
     let is_x_axis = normal_axis == Axis::X;
@@ -122,11 +122,7 @@ pub fn wing_normal_direction(
 
 impl Wing {
     /// Creates a new [`Wing`]
-    pub fn new(
-        normal_axis: Axis,
-        slice_position: Vector2<Direction>,
-        normal_direction: Direction,
-    ) -> Self {
+    pub fn new(normal_axis: Axis, slice_position: Vec2, normal_direction: Direction) -> Self {
         let orientation =
             wing_normal_direction(normal_axis, slice_position, true) == normal_direction;
 
@@ -135,11 +131,7 @@ impl Wing {
         }
     }
 
-    const fn new_with_orientation(
-        normal_axis: Axis,
-        slice_position: Vector2<Direction>,
-        oriented: bool,
-    ) -> Self {
+    const fn new_with_orientation(normal_axis: Axis, slice_position: Vec2, oriented: bool) -> Self {
         Self {
             corresponding_edge: Edge::new(normal_axis, slice_position, oriented),
         }

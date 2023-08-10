@@ -4,7 +4,7 @@ use std::fmt::Display;
 use nalgebra::Vector3;
 use rand_derive2::RandGen;
 
-use crate::cube_n::Edge;
+use crate::cube_n::{Edge, Vec3};
 
 use super::{Axis, Direction};
 
@@ -160,7 +160,7 @@ impl Face {
     }
 
     /// Wether a face contains a vector
-    pub fn contains_vector(&self, vec: &Vector3<Direction>) -> bool {
+    pub fn contains_vector(&self, vec: &Vec3) -> bool {
         vec[self.axis] == self.direction
     }
 

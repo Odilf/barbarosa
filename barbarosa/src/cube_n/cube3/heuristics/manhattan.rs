@@ -26,3 +26,5 @@ pub fn manhattan(cube: &Cube3) -> f32 {
 
     (edge_distance + corner_distance) / (8.0 * 2.0)
 }
+
+// pub fn manhattan_filtered()
