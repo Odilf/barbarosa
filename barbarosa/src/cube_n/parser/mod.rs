@@ -116,7 +116,7 @@ impl<const N: u32> FromPest for WideAxisMove<N> {
                 parse_face_wide(inner.next().into_err()?)?,
                 u32::from_pest(first)?.max(1),
             ),
-            _ => unreachable!(),
+            _ => return Err(ParseError::Unreachable(first.as_str().to_string())),
         };
 
         if depth > N {
@@ -201,7 +201,7 @@ impl_with_current_rule! {
                 let (rot, wide) = parse_slice_move(pair)?;
                 ExtendedAxisMove::Slice { rot, wide }
             },
-            _ => unreachable!(),
+            _ => return Err(ParseError::Unreachable(pair.as_str().to_string())),
         };
 
         Ok(mov)
