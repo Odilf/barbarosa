@@ -13,11 +13,27 @@ use super::{
     AxisMove, WideAxisMove,
 };
 
+/// Fancier moves that only work on [`Orientable`] cubes. 
+/// 
+/// In regular NxN cubes, you can only do [`AxisMove`]s and [`WideAxisMove`]s. However, with orientable
+/// cubes you can use [`ExtendedAxisMove`]s which are basically any move you can imagine on an NxN.
+/// 
+/// Look at the variants of the enum for specifics. 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ExtendedAxisMove {
+    /// A good ol' regular [`AxisMove`].
     Regular(AxisMove),
+
+    /// A rotation of the cube ("x", "y" or "z").
     Rotation(AxisRotation),
+
+    /// A [`WideAxisMove`]. However, it works for any combination of depth and cubes. 
+    /// 
+    /// A move with more depth than the side length of the cube is equivalent to a rotation (e.g.: 4Rw in a 3x3 is just X).
     Wide(WideAxisMove<{ u32::MAX }>),
+
+    /// A slice move.
+    #[allow(missing_docs)]
     Slice { rot: AxisRotation, wide: bool },
 }
 
