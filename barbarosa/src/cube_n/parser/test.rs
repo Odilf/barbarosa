@@ -84,7 +84,7 @@ fn extended_moves() {
             assert_eq!(
                 ExtendedAxisMove::parse($testing).unwrap(),
                 parse_slice_move(
-                    CubeNParser::parse(Rule::slice_move, "E")
+                    CubeNParser::parse(Rule::slice_move, $testing)
                         .unwrap()
                         .next()
                         .unwrap()
