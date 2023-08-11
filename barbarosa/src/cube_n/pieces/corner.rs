@@ -71,6 +71,12 @@ impl generic::Movable<AxisMove> for Corner {
 
 impl_movable_array!(Corner, AxisMove);
 
+impl generic::piece::Coordinates for Corner {
+    fn coordinates_pos(position: Self::Position) -> Vector3<f32> {
+        position.map(|dir| dir.scalar() as f32)
+    }
+}
+
 impl Corner {
     /// Creates a new [`Corner`] with the given position and orientation axis.
     pub const fn new(position: Vec3, orientation_axis: Axis) -> Self {
@@ -136,11 +142,6 @@ impl Corner {
         } else {
             self.orientation_axis.prev()
         };
-    }
-
-    /// Gets the physical standard coordinates of the corner
-    pub fn coordinates(position: &Vec3) -> Vector3<f32> {
-        position.map(|dir| dir.scalar() as f32)
     }
 
     /// Whether the corner is oriented. This is true if the orientation axis is

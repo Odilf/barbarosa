@@ -132,6 +132,14 @@ impl generic::Movable<AxisMove> for Edge {
 
 impl_movable_array!(Edge, AxisMove);
 
+impl generic::piece::Coordinates for Edge {
+    fn coordinates_pos((normal_axis, slice_position): Self::Position) -> Vector3<f32> {
+        normal_axis.map_on_slice(Vector3::zeros(), |_| {
+            slice_position.map(|dir| dir.scalar() as f32)
+        })
+    }
+}
+
 impl Edge {
     /// Creates a new [`Edge`]
     pub const fn new(normal_axis: Axis, slice_position: Vec2, oriented: bool) -> Self {
@@ -192,15 +200,6 @@ impl Edge {
         };
 
         Ok((normal_axis, position))
-    }
-
-    /// Returns the standard coordinates of the edge
-    pub fn coordinates(
-        (normal_axis, slice_position): &<Edge as Piece>::Position,
-    ) -> nalgebra::Vector3<f32> {
-        normal_axis.map_on_slice(Vector3::zeros(), |_| {
-            slice_position.map(|dir| dir.scalar() as f32)
-        })
     }
 }
 

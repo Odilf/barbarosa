@@ -7,7 +7,7 @@ use nalgebra::{vector, Vector3};
 
 use crate::{
     cube_n::space::Direction,
-    generic::{Cube, Movable, Parsable, Piece},
+    generic::{piece::Coordinates, Cube, Movable, Parsable, Piece},
 };
 
 use super::*;
@@ -20,7 +20,7 @@ fn solved_cube_has_pieces_in_all_coordinates() {
         .edges
         .pieces()
         .into_iter()
-        .map(|piece| Edge::coordinates(&piece.position()).map(|i| i as i32))
+        .map(|piece| piece.coordinates().map(|i| i as i32))
         .collect();
 
     positions.extend(
@@ -28,7 +28,7 @@ fn solved_cube_has_pieces_in_all_coordinates() {
             .corners
             .pieces()
             .into_iter()
-            .map(|piece| Corner::coordinates(&piece.position()).map(|i| i as i32)),
+            .map(|piece| piece.coordinates().map(|i| i as i32)),
     );
 
     assert!(

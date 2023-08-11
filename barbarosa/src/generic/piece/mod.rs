@@ -1,10 +1,12 @@
 //! Traits and structs for pieces on the cube.
 
 mod set;
+mod traits;
 
 use std::fmt::Debug;
 
 pub use set::{PieceSet, PieceSetDescriptor};
+pub use traits::*;
 
 /// A piece on the cube.
 ///
