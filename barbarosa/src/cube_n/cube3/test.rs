@@ -7,7 +7,7 @@ use nalgebra::{vector, Vector3};
 
 use crate::{
     cube_n::space::Direction,
-    generic::{piece::Coordinates, Cube, Movable, Parsable, Piece},
+    generic::{piece::Coordinates, Cube, Movable, Parsable},
 };
 
 use super::*;

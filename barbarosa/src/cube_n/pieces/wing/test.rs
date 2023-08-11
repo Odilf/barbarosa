@@ -31,9 +31,9 @@ fn has_correct_direction() {
     let wing2 = wing_at(Face::F, Face::R, true);
     let wing3 = wing_at(Face::F, Face::U, true);
 
-    assert_eq!(wing1.normal_direction(), Positive);
+    assert_eq!(wing1.normal_direction(), Negative);
     assert_eq!(wing2.normal_direction(), Positive);
-    assert_eq!(wing3.normal_direction(), Negative);
+    assert_eq!(wing3.normal_direction(), Positive);
 }
 
 #[test]
@@ -80,7 +80,7 @@ fn turning_on_r_face() {
     wing_inside.rotate(&AxisRotation::new(X, Single));
 
     assert_eq!(wing.normal_axis(), Y);
-    assert_eq!(wing.normal_direction(), Positive);
+    assert_eq!(wing.normal_direction(), Negative);
 
     assert_eq!(wing_inside.slice_position(), vector![Positive, Negative]);
 
@@ -88,7 +88,7 @@ fn turning_on_r_face() {
     wing_inside.rotate(&AxisRotation::new(X, Single));
 
     assert_eq!(wing.normal_axis(), Z);
-    assert_eq!(wing.normal_direction(), Negative);
+    assert_eq!(wing.normal_direction(), Positive);
 
     assert_eq!(wing_inside.slice_position(), vector![Negative, Negative]);
 
@@ -96,7 +96,7 @@ fn turning_on_r_face() {
     wing_inside.rotate(&AxisRotation::new(X, Single));
 
     assert_eq!(wing.normal_axis(), Y);
-    assert_eq!(wing.normal_direction(), Negative);
+    assert_eq!(wing.normal_direction(), Positive);
 
     assert_eq!(wing_inside.slice_position(), vector![Negative, Positive]);
 }
@@ -127,5 +127,5 @@ fn turning_on_f_face_inside_wings() {
 
     wing.rotate(&AxisRotation::new(Z, Single));
 
-    assert_eq!(wing, wing_at(Face::U, Face::R, true))
+    assert_eq!(wing, wing_at(Face::U, Face::R, false))
 }

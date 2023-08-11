@@ -62,10 +62,10 @@ fn center_wings_normal_directions() {
     let ru = &Cube6::SOLVED.center_wings.pieces()[0];
 
     assert_eq!(ru.normal_axis(), Axis::Z);
-    assert_eq!(ru.normal_direction(), Direction::Positive);
+    assert_eq!(ru.normal_direction(), Direction::Negative);
 
     let uf = &Cube6::SOLVED.center_wings.pieces()[1];
 
     assert_eq!(uf.normal_axis(), Axis::X);
-    assert_eq!(uf.normal_direction(), Direction::Negative);
+    assert_eq!(uf.normal_direction(), Direction::Positive);
 }

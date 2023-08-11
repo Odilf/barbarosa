@@ -65,16 +65,16 @@ fn rotates_edges() {
 
     let expectations = [
         (
-            AxisRotation::new(Axis::X, Amount::Single),
-            Edge::try_from([Face::R, Face::U]).unwrap().flipped(),
+            AxisRotation::new(Axis::Z, Amount::Single),
+            Edge::try_from([Face::D, Face::F]).unwrap().flipped(),
         ),
         (
-            AxisRotation::new(Axis::X, Amount::Inverse),
-            Edge::try_from([Face::R, Face::D]).unwrap().flipped(),
+            AxisRotation::new(Axis::Z, Amount::Inverse),
+            Edge::try_from([Face::U, Face::F]).unwrap().flipped(),
         ),
         (
-            AxisRotation::new(Axis::X, Amount::Double),
-            Edge::try_from([Face::R, Face::B]).unwrap(),
+            AxisRotation::new(Axis::Z, Amount::Double),
+            Edge::try_from([Face::L, Face::F]).unwrap(),
         ),
     ];
 

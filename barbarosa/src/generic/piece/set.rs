@@ -193,5 +193,4 @@ impl<P: PieceSetDescriptor<N>, const N: usize> IntoIterator for PieceSet<P, N> {
     fn into_iter(self) -> Self::IntoIter {
         self.pieces.into_iter()
     }
-
 }

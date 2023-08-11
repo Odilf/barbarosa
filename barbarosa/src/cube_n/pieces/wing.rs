@@ -110,11 +110,11 @@ pub fn wing_normal_direction(
     slice_position: Vec2,
     pseudo_oriented: bool,
 ) -> Direction {
-    let is_x_axis = normal_axis == Axis::X;
+    let is_z_axis = normal_axis == Axis::Z;
 
     let is_even_position_parity = slice_position.x == slice_position.y;
 
-    if is_x_axis ^ is_even_position_parity ^ pseudo_oriented {
+    if is_z_axis ^ is_even_position_parity ^ pseudo_oriented {
         Direction::Negative
     } else {
         Direction::Positive

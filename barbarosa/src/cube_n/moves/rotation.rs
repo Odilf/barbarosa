@@ -34,7 +34,7 @@ impl AxisRotation {
     ///
     /// todo!()
     pub fn flips_edge_orientation(&self, normal_axis: Axis) -> bool {
-        self.amount != Amount::Double && (self.axis == Axis::X || self.axis == normal_axis)
+        self.amount != Amount::Double && (self.axis == Axis::Z || self.axis == normal_axis)
     }
 
     /// Retruns the inverse rotation, such that if both get applied the result is no rotation.

@@ -33,17 +33,18 @@ pub struct Edge {
     ///
     /// An edge need to be oriented to be solved.
     ///
-    /// The orientation of the edges only changes when doing a non double move on the X axis. In other words: R, R', L, L'.
+    /// The orientation of the edges only changes when doing a non double move on the Z axis. In other words: F, F', B, B'.
     ///
     /// The geometric interpretation is a bit more involved:
     ///
-    /// Each edge has two stickers. One of this stickers is the "orientation sticker". For edges on the B and F faces it's the sticker on
-    /// the B and F face, for the other ones it's the sticker on the R or L face (whichever is applicable). Then, an edge is oriented if
+    /// Each edge has two stickers. One of this stickers is the "orientation sticker". For edges on the U and D faces it's the sticker on
+    /// the U and D face, for the other ones it's the sticker on the F or B face (whichever is applicable). Then, an edge is oriented if
     /// it has the orientation sticker in the place where the original piece would have it's orientation sticker.
     ///
     /// Even though this definition seems convoluted, it is very useful for two reasons:
     /// 1. The sum of the orientations of the edges in a cube has to always be even.
     /// 2. It is very easy and cheap to implement.
+    /// 3. It is standard in the cubing community.
     pub oriented: bool,
 }
 
