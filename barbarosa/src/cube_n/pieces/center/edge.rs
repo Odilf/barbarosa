@@ -14,7 +14,7 @@ use crate::{
         space::{faces, Axis, Direction, Face},
         WideAxisMove,
     },
-    generic,
+    generic::{self, piece::PieceSetDescriptor},
 };
 
 /// A center edge piece of the cube. There are 4 of these in each face of a cube.
@@ -34,9 +34,19 @@ pub struct CenterEdge {
     pub side_direction: Direction,
 }
 
-impl generic::Piece<24> for CenterEdge {
+impl generic::Piece for CenterEdge {
     type Position = Self;
 
+    fn position(&self) -> Self::Position {
+        self.clone()
+    }
+
+    fn is_solved(&self, original_pos: &Self::Position) -> bool {
+        self.main_face == original_pos.main_face
+    }
+}
+
+impl PieceSetDescriptor<24> for CenterEdge {
     const REFERENCE_POSITIONS: [Self::Position; 24] = {
         use faces::*;
         use Direction::*;
@@ -50,14 +60,6 @@ impl generic::Piece<24> for CenterEdge {
     };
 
     const SOLVED: [Self; 24] = Self::REFERENCE_POSITIONS;
-
-    fn position(&self) -> Self::Position {
-        self.clone()
-    }
-
-    fn is_solved(&self, original_pos: &Self::Position) -> bool {
-        self.main_face == original_pos.main_face
-    }
 }
 
 impl Rotatable for CenterEdge {
@@ -120,7 +122,7 @@ impl CenterEdge {
     }
 }
 
-impl DepthPiece<24> for CenterEdge {
+impl DepthPiece for CenterEdge {
     fn is_in_wide_move<const M: u32>(
         &self,
         normal_depth: u32,

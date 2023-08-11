@@ -13,7 +13,7 @@ use crate::{
         space::{faces, Axis, Direction, Face},
         WideAxisMove,
     },
-    generic,
+    generic::{self, piece::PieceSetDescriptor},
 };
 
 use super::edge::CenterEdge;
@@ -28,9 +28,19 @@ pub struct CenterWing {
     pseudo_oriented: bool,
 }
 
-impl generic::Piece<48> for CenterWing {
+impl generic::Piece for CenterWing {
     type Position = Self;
 
+    fn position(&self) -> Self::Position {
+        self.clone()
+    }
+
+    fn is_solved(&self, original_pos: &Self::Position) -> bool {
+        self.main_face() == original_pos.main_face()
+    }
+}
+
+impl PieceSetDescriptor<48> for CenterWing {
     const REFERENCE_POSITIONS: [Self::Position; 48] = {
         use faces::*;
         use Direction::*;
@@ -45,14 +55,6 @@ impl generic::Piece<48> for CenterWing {
     };
 
     const SOLVED: [Self; 48] = Self::REFERENCE_POSITIONS;
-
-    fn position(&self) -> Self::Position {
-        self.clone()
-    }
-
-    fn is_solved(&self, original_pos: &Self::Position) -> bool {
-        self.main_face() == original_pos.main_face()
-    }
 }
 
 impl Rotatable for CenterWing {
@@ -139,7 +141,7 @@ impl std::fmt::Debug for CenterWing {
     }
 }
 
-impl DepthPiece<48> for CenterWing {
+impl DepthPiece for CenterWing {
     fn is_in_wide_move<const M: u32>(
         &self,
         normal_depth: u32,

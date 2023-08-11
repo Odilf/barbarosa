@@ -12,10 +12,10 @@ pub use self::{
 pub mod alg;
 pub mod moves;
 pub mod parse;
+pub mod piece;
 pub mod search;
 pub mod utils;
 
-mod piece;
 mod scramble;
 
 /// A generic cube (or twisty puzzle)

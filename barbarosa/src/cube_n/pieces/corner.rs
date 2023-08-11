@@ -11,7 +11,10 @@ use crate::{
         space::{Axis, Direction, Face},
         AxisMove, Vec3,
     },
-    generic::{self, moves::impl_movable_array, utils::map_array_const, PieceSet},
+    generic::{
+        self, moves::impl_movable_array, piece::PieceSetDescriptor, utils::map_array_const,
+        PieceSet,
+    },
 };
 
 /// A corner piece of the cube.
@@ -25,9 +28,19 @@ pub struct Corner {
     pub orientation_axis: Axis,
 }
 
-impl generic::Piece<8> for Corner {
+impl generic::Piece for Corner {
     type Position = Vec3;
 
+    fn position(&self) -> Self::Position {
+        self.position
+    }
+
+    fn is_solved(&self, original_pos: &Self::Position) -> bool {
+        self.position() == *original_pos && self.is_oriented()
+    }
+}
+
+impl PieceSetDescriptor<8> for Corner {
     const REFERENCE_POSITIONS: [Self::Position; 8] = {
         use Direction::*;
 
@@ -38,14 +51,6 @@ impl generic::Piece<8> for Corner {
     };
 
     const SOLVED: [Self; 8] = map_array_const!(Corner::REFERENCE_POSITIONS, 8, Corner::oriented);
-
-    fn position(&self) -> Self::Position {
-        self.position
-    }
-
-    fn is_solved(&self, original_pos: &Self::Position) -> bool {
-        self.position() == *original_pos && self.is_oriented()
-    }
 }
 
 impl Rotatable for Corner {

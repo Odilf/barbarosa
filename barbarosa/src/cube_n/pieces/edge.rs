@@ -11,7 +11,10 @@ use crate::{
         space::{Axis, Direction, Face},
         AxisMove, Vec2,
     },
-    generic::{self, moves::impl_movable_array, utils::map_array_const, Piece, PieceSet},
+    generic::{
+        self, moves::impl_movable_array, piece::PieceSetDescriptor, utils::map_array_const, Piece,
+        PieceSet,
+    },
 };
 
 // use super::{ContainedInMove, Corner};
@@ -44,9 +47,19 @@ pub struct Edge {
     pub oriented: bool,
 }
 
-impl generic::Piece<12> for Edge {
+impl generic::Piece for Edge {
     type Position = (Axis, Vec2);
 
+    fn position(&self) -> Self::Position {
+        (self.normal_axis, self.slice_position)
+    }
+
+    fn is_solved(&self, original_pos: &Self::Position) -> bool {
+        self.position() == *original_pos && self.oriented
+    }
+}
+
+impl PieceSetDescriptor<12> for Edge {
     // TODO: Try to use cartesian product to make this nicer
     const REFERENCE_POSITIONS: [(Axis, Vec2); 12] = {
         use Axis::*;
@@ -77,20 +90,12 @@ impl generic::Piece<12> for Edge {
     ///
     /// See [crate::cube_n::cube3::mus] for more information.
     const SOLVED: [Edge; 12] = {
-        const fn from_tuple((axis, pos): (Axis, Vec2)) -> Edge {
+        const fn from_tuple((axis, pos): <Edge as Piece>::Position) -> Edge {
             Edge::oriented(axis, pos)
         }
 
         map_array_const!(Edge::REFERENCE_POSITIONS, 12, from_tuple)
     };
-
-    fn position(&self) -> Self::Position {
-        (self.normal_axis, self.slice_position)
-    }
-
-    fn is_solved(&self, original_pos: &Self::Position) -> bool {
-        self.position() == *original_pos && self.oriented
-    }
 }
 
 impl Rotatable for Edge {
@@ -191,7 +196,7 @@ impl Edge {
 
     /// Returns the standard coordinates of the edge
     pub fn coordinates(
-        (normal_axis, slice_position): &<Edge as Piece<12>>::Position,
+        (normal_axis, slice_position): &<Edge as Piece>::Position,
     ) -> nalgebra::Vector3<f32> {
         normal_axis.map_on_slice(Vector3::zeros(), |_| {
             slice_position.map(|dir| dir.scalar() as f32)

@@ -11,7 +11,7 @@ pub use crate::generic::{
     parse::{self, Parsable},
 };
 
-use self::generic::{Alg, Cube, Movable, Piece, PieceSet};
+use self::generic::{piece::PieceSetDescriptor, Alg, Cube, Movable, Piece, PieceSet};
 
 use super::{
     rotation::{AxisRotation, Rotatable},
@@ -183,13 +183,13 @@ impl Alg<AxisMove> {
 }
 
 /// A piece that can be moved by a wide move
-pub trait DepthPiece<const N: usize>: Piece<N> {
+pub trait DepthPiece: Piece {
     /// Whether the piece is in the wide move if it has the given normal and tangent depth.
-    fn is_in_wide_move<const M: u32>(
+    fn is_in_wide_move<const N: u32>(
         &self,
         normal_depth: u32,
         tangent_depth: u32,
-        m: &WideAxisMove<M>,
+        m: &WideAxisMove<N>,
     ) -> bool;
 }
 
@@ -199,7 +199,7 @@ pub trait DepthPiece<const N: usize>: Piece<N> {
 /// implements [`Movable`] for [`WideAxisMove`]s.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct DepthPieceSet<
-    P: DepthPiece<N>,
+    P: DepthPiece + PieceSetDescriptor<N>,
     const N: usize,
     const NORMAL_DEPTH: u32,
     const TANGENT_DEPTH: u32 = 0,
@@ -208,15 +208,22 @@ pub struct DepthPieceSet<
     pub set: PieceSet<P, N>,
 }
 
-impl<P: DepthPiece<N>, const N: usize, const ND: u32, const TD: u32> DepthPieceSet<P, N, ND, TD> {
+impl<P: DepthPiece + PieceSetDescriptor<N>, const N: usize, const ND: u32, const TD: u32>
+    DepthPieceSet<P, N, ND, TD>
+{
     /// Alias to [`Piece::SOLVED`]
     pub const SOLVED: Self = Self {
         set: PieceSet::SOLVED,
     };
 }
 
-impl<P: DepthPiece<N> + Rotatable, const M: u32, const N: usize, const ND: u32, const TD: u32>
-    Movable<WideAxisMove<M>> for DepthPieceSet<P, N, ND, TD>
+impl<
+        P: DepthPiece + Rotatable + PieceSetDescriptor<N>,
+        const M: u32,
+        const N: usize,
+        const ND: u32,
+        const TD: u32,
+    > Movable<WideAxisMove<M>> for DepthPieceSet<P, N, ND, TD>
 {
     fn apply(&mut self, m: &WideAxisMove<M>) {
         self.set
@@ -226,7 +233,7 @@ impl<P: DepthPiece<N> + Rotatable, const M: u32, const N: usize, const ND: u32, 
     }
 }
 
-impl<P: DepthPiece<N>, const N: usize, const ND: u32, const TD: u32> Deref
+impl<P: DepthPiece + PieceSetDescriptor<N>, const N: usize, const ND: u32, const TD: u32> Deref
     for DepthPieceSet<P, N, ND, TD>
 {
     type Target = PieceSet<P, N>;

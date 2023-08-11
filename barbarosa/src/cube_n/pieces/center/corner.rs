@@ -12,7 +12,7 @@ use crate::{
         space::{Axis, Direction},
         Vec3, WideAxisMove,
     },
-    generic,
+    generic::{self, piece::PieceSetDescriptor},
 };
 
 /// A center corner piece of the cube. There are 4 of these in each face of a cube.
@@ -22,9 +22,19 @@ pub struct CenterCorner {
     axis: Axis,
 }
 
-impl generic::Piece<24> for CenterCorner {
+impl generic::Piece for CenterCorner {
     type Position = Self;
 
+    fn position(&self) -> Self::Position {
+        self.clone()
+    }
+
+    fn is_solved(&self, original_pos: &Self::Position) -> bool {
+        self.position[self.axis] == original_pos.position[original_pos.axis]
+    }
+}
+
+impl PieceSetDescriptor<24> for CenterCorner {
     const SOLVED: [Self; 24] = {
         use Direction::*;
 
@@ -47,14 +57,6 @@ impl generic::Piece<24> for CenterCorner {
     };
 
     const REFERENCE_POSITIONS: [Self::Position; 24] = Self::SOLVED;
-
-    fn position(&self) -> Self::Position {
-        self.clone()
-    }
-
-    fn is_solved(&self, original_pos: &Self::Position) -> bool {
-        self.position[self.axis] == original_pos.position[original_pos.axis]
-    }
 }
 
 impl Rotatable for CenterCorner {
@@ -64,7 +66,7 @@ impl Rotatable for CenterCorner {
     }
 }
 
-impl DepthPiece<24> for CenterCorner {
+impl DepthPiece for CenterCorner {
     fn is_in_wide_move<const M: u32>(
         &self,
         normal_depth: u32,

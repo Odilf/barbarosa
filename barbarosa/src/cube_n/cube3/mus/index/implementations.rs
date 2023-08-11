@@ -3,7 +3,7 @@ use crate::{
         mus::{CornersMUS, HalfEdgesMUS},
         Corner, Edge,
     },
-    generic::Piece,
+    generic::{piece::PieceSetDescriptor, Piece},
 };
 
 use super::{

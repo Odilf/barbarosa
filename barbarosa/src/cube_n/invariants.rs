@@ -32,7 +32,7 @@ use std::fmt::Debug;
 
 use crate::{
     cube_n::{cube3::mus::index::PositionIndexable, Cube3, Edge},
-    generic::Piece,
+    generic::piece::PieceSetDescriptor,
 };
 
 use super::pieces::{corner::CornerSet, edge::EdgeSet};

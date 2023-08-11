@@ -14,7 +14,7 @@ use crate::{
         space::{Axis, Direction, Face},
         Vec2, WideAxisMove,
     },
-    generic,
+    generic::{self, piece::PieceSetDescriptor},
 };
 
 use super::{edge::ParallelAxesError, Edge};
@@ -29,10 +29,19 @@ pub struct Wing {
     corresponding_edge: Edge,
 }
 
-impl generic::Piece<24> for Wing {
+impl generic::Piece for Wing {
     type Position = Self;
 
-    /// The solved set of [`Wing`]s.
+    fn position(&self) -> Self::Position {
+        self.clone()
+    }
+
+    fn is_solved(&self, original_pos: &Self::Position) -> bool {
+        self == original_pos
+    }
+}
+
+impl PieceSetDescriptor<24> for Wing {
     const SOLVED: [Wing; 24] = {
         use Axis::*;
         use Direction::*;
@@ -56,14 +65,6 @@ impl generic::Piece<24> for Wing {
     };
 
     const REFERENCE_POSITIONS: [Self::Position; 24] = Self::SOLVED;
-
-    fn position(&self) -> Self::Position {
-        self.clone()
-    }
-
-    fn is_solved(&self, original_pos: &Self::Position) -> bool {
-        self == original_pos
-    }
 }
 
 impl Rotatable for Wing {
@@ -147,7 +148,7 @@ impl Wing {
     }
 }
 
-impl DepthPiece<24> for Wing {
+impl DepthPiece for Wing {
     fn is_in_wide_move<const M: u32>(
         &self,
         normal_depth: u32,

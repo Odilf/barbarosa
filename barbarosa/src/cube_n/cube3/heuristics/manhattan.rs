@@ -3,14 +3,14 @@ use nalgebra::Vector3;
 use crate::{
     cube3::Cube3,
     cube_n::{Corner, Edge},
-    generic::{Piece, PieceSet},
+    generic::{piece::PieceSetDescriptor, PieceSet},
 };
 
 fn vec_manhattan(a: &Vector3<f32>, b: &Vector3<f32>) -> f32 {
     a.iter().zip(b.iter()).map(|(a, b)| (a - b).abs()).sum()
 }
 
-fn piece_set_manhattan<P: Piece<N>, const N: usize>(
+fn piece_set_manhattan<P: PieceSetDescriptor<N>, const N: usize>(
     set: &PieceSet<P, N>,
     coords: impl Fn(&P::Position) -> Vector3<f32>,
 ) -> f32 {

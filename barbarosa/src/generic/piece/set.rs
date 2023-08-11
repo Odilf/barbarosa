@@ -8,6 +8,27 @@ use crate::generic::{Movable, Move};
 
 use super::Piece;
 
+/// A trait to be able to use [`PieceSet`] with different types of pieces.
+///
+/// This trait is generic over a const `SET_SIZE` which is the number of
+/// distinct positions that the piece can be in.
+///
+/// This trait is not part of the [`Piece`] trait since that would entail adding
+/// a generic const on every use of the [`Piece`] trait, which is very cumebrsome.
+/// The ideal situation would be to have an associated const, but you can not use
+/// them in any meaningful way in current stable rust :(.
+pub trait PieceSetDescriptor<const SET_SIZE: usize>: Piece {
+    /// The solved set of pieces.
+    const SOLVED: [Self; SET_SIZE];
+
+    /// The reference positions of the piece. This is used to define that, in an array of pieces, the piece at
+    /// index `i` was originally at position `REFERENCE_POSITIONS[i]`.
+    ///
+    /// Ideally, it should enumarate every possible distinct value of [`Piece::Position`] (but you could technically
+    /// not do that).
+    const REFERENCE_POSITIONS: [Self::Position; SET_SIZE];
+}
+
 /// A set of `N` pieces.
 ///
 /// This struct provides methods in order to ensure that each piece is unique and that each position
@@ -16,17 +37,17 @@ use super::Piece;
 /// [`PieceSet`] is not responsible for enforcing the specific invariants of the different piece types.
 /// For example, [`EdgeSet`](crate::cube_n::pieces::edge::EdgeSet) does not check that the parity of the edges is correct.
 #[derive(Debug, PartialEq, Eq, Clone, Hash)]
-pub struct PieceSet<P: Piece<N>, const N: usize> {
+pub struct PieceSet<P: PieceSetDescriptor<N>, const N: usize> {
     pieces: [P; N],
 }
 
-impl<P: Piece<N>, const N: usize> PieceSet<P, N> {
+impl<P: PieceSetDescriptor<N>, const N: usize> PieceSet<P, N> {
     /// Alias to [`Piece::SOLVED`]
     pub const SOLVED: Self = Self { pieces: P::SOLVED };
 
     /// Creates a new [`PieceSet`] from an array of pieces. Fails if one of the invariants is
     /// not upheld.
-    pub fn new(pieces: [P; N]) -> Result<Self, ValidationError<P, N>> {
+    pub fn new(pieces: [P; N]) -> Result<Self, ValidationError<P>> {
         let output = Self { pieces };
 
         match output.validate() {
@@ -36,7 +57,7 @@ impl<P: Piece<N>, const N: usize> PieceSet<P, N> {
     }
 
     /// Checks whether there is a duplicate piece or position in the set.
-    pub fn validate(&self) -> Option<ValidationError<P, N>> {
+    pub fn validate(&self) -> Option<ValidationError<P>> {
         if let Some(dup) = find_duplicates(self.pieces.iter().map(P::position)) {
             return Some(ValidationError::DuplicatePosition(dup));
         }
@@ -144,7 +165,7 @@ fn find_duplicates<T: PartialEq>(iter: impl IntoIterator<Item = T>) -> Option<T>
 }
 
 #[derive(Debug, Error)]
-pub enum ValidationError<P: Piece<N>, const N: usize> {
+pub enum ValidationError<P: Piece> {
     #[error("Duplicate position ({0:?})")]
     DuplicatePosition(P::Position),
 
@@ -155,7 +176,7 @@ pub enum ValidationError<P: Piece<N>, const N: usize> {
 impl<M, P, const N: usize> Movable<M> for PieceSet<P, N>
 where
     M: Move,
-    P: Piece<N> + Movable<M>,
+    P: PieceSetDescriptor<N> + Movable<M>,
 {
     fn apply(&mut self, m: &M) {
         for piece in &mut self.pieces {
