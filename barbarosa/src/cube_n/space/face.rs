@@ -81,6 +81,8 @@ impl Face {
     pub const B: Face = Face::new(Axis::Z, Direction::Negative);
 
     /// Iterates over all 6 faces
+    ///
+    /// The order is R, U, F, L, D, B. In other words, positive X, Y, Z, then negative X, Y, Z
     pub fn iter() -> impl Iterator<Item = Face> {
         use faces::*;
         use std::iter::once;
@@ -189,5 +191,26 @@ impl Face {
         };
 
         Some(Face::new(axis, direction))
+    }
+
+    /// The (normalized) coordinates of the face
+    pub fn coords(&self) -> Vector3<i8> {
+        let mut coords = Vector3::zeros();
+
+        coords[self.axis as usize] = self.direction.scalar();
+
+        coords
+    }
+
+    /// The index of the face
+    pub fn index(&self) -> usize {
+        match *self {
+            Face::R => 0,
+            Face::U => 1,
+            Face::F => 2,
+            Face::L => 3,
+            Face::D => 4,
+            Face::B => 5,
+        }
     }
 }
