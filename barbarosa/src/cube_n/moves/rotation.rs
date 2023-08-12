@@ -96,7 +96,7 @@ impl From<&AxisMove> for AxisRotation {
     fn from(mov: &AxisMove) -> Self {
         AxisRotation {
             axis: mov.face.axis,
-            amount: mov.amount,
+            amount: mov.amount * mov.face.direction,
         }
     }
 }
