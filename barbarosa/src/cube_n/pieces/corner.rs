@@ -86,11 +86,14 @@ impl Corner {
         }
     }
 
+    /// The axis that is considered to be the correct orientation axis for corners
+    pub const ORIENTED_AXIS: Axis = Axis::Y;
+
     /// Creates a new [Corner] with the given position and correct orientation.
     pub const fn oriented(position: Vec3) -> Self {
         Self {
             position,
-            orientation_axis: Axis::X,
+            orientation_axis: Self::ORIENTED_AXIS,
         }
     }
 
@@ -117,12 +120,12 @@ impl Corner {
     // TODO: Check the "i think" part
     pub fn orientation_index(&self) -> usize {
         let even_parity = Self::is_even_position_parity(&self.position);
-        let axis_index = self.orientation_axis as usize;
+        let axis_index = self.orientation_axis as i32;
 
         if even_parity {
-            axis_index
+            (axis_index - 1).rem_euclid(3) as usize
         } else {
-            (3 - axis_index).rem_euclid(3)
+            (1 - axis_index).rem_euclid(3) as usize
         }
     }
 
@@ -150,7 +153,7 @@ impl Corner {
     ///
     /// This method might be ever so slightly faster then doing `corner.orientation_index() == 0`.
     pub fn is_oriented(&self) -> bool {
-        self.orientation_axis == Axis::X
+        self.orientation_axis == Self::ORIENTED_AXIS
     }
 }
 

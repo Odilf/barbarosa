@@ -193,7 +193,6 @@ fn adjust_second_edges_for_indexing(edges: &HalfEdgesMUS) -> HalfEdgesMUS {
     let mut output = edges.clone();
 
     for edge in output.iter_mut() {
-        // edge.slice_position = -edge.slice_position;
         edge.rotate(&AxisRotation::new(Axis::X, Amount::Double))
     }
 

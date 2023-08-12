@@ -9,10 +9,7 @@ use crate::{cube3::Cube3, generic::Piece};
 
 use self::unfolded::Unfolded;
 
-use super::{
-    space::{Axis, Face},
-    Corner, Edge,
-};
+use super::{space::Face, Corner, Edge};
 
 mod test;
 pub mod unfolded;
@@ -87,7 +84,7 @@ impl fmt::Debug for Color {
 impl Colored for Corner {
     fn colors(&self, original_pos: Self::Position) -> Vec<(Face, Color)> {
         let mut current_axis = self.orientation_axis;
-        let mut original_axis = Axis::X;
+        let mut original_axis = Corner::ORIENTED_AXIS;
 
         let mut output = Vec::with_capacity(3);
 
