@@ -220,6 +220,29 @@ impl Edge {
             Axis::Z => Face::new(Axis::X, slice_pos[0]),
         }
     }
+
+    /// Gets the direction of the edge position on the given axis.
+    ///
+    /// Returns `None` if the axis is the normal axis of the edge.
+    pub fn direction_on_axis(
+        &(normal, slice_pos): &<Edge as Piece>::Position,
+        axis: Axis,
+    ) -> Option<Direction> {
+        if axis == normal {
+            return None;
+        }
+
+        let x = normal.next();
+        let y = x.next();
+
+        if axis == x {
+            Some(slice_pos[0])
+        } else if axis == y {
+            Some(slice_pos[1])
+        } else {
+            unreachable!()
+        }
+    }
 }
 
 impl std::fmt::Debug for Edge {
