@@ -45,6 +45,9 @@ impl<P: PieceSetDescriptor<N>, const N: usize> PieceSet<P, N> {
     /// Alias to [`PieceSetDescriptor::SOLVED`]
     pub const SOLVED: Self = Self { pieces: P::SOLVED };
 
+    /// Alias to [`PieceSetDescriptor::REFERENCE_POSITIONS`]
+    pub const REFERENCE_POSITIONS: [P::Position; N] = P::REFERENCE_POSITIONS;
+
     /// Creates a new [`PieceSet`] from an array of pieces. Fails if one of the invariants is
     /// not upheld.
     pub fn new(pieces: [P; N]) -> Result<Self, ValidationError<P>> {
