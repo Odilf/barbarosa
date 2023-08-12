@@ -199,7 +199,11 @@ impl<const N: usize> Unfolded<N> {
         colorscheme: &Colorscheme<Srgb>,
         f: &mut fmt::Formatter<'_>,
     ) -> fmt::Result {
-        self[&Face::U].write(colorscheme, N, f)?;
+        let padding = N + 1;
+
+        self[&Face::U].write(colorscheme, padding, f)?;
+
+        writeln!(f)?;
 
         for ((l_row, f_row), r_row) in self[&Face::L]
             .data
@@ -211,9 +215,13 @@ impl<const N: usize> Unfolded<N> {
                 color.write(colorscheme, f)?;
             }
 
+            write!(f, "  ")?;
+
             for color in f_row {
                 color.write(colorscheme, f)?;
             }
+
+            write!(f, "  ")?;
 
             for color in r_row {
                 color.write(colorscheme, f)?;
@@ -222,8 +230,15 @@ impl<const N: usize> Unfolded<N> {
             writeln!(f)?;
         }
 
-        self[&Face::D].write(colorscheme, N, f)?;
-        self[&Face::B].write(colorscheme, N, f)?;
+        writeln!(f)?;
+
+        self[&Face::D].write(colorscheme, padding, f)?;
+
+        writeln!(f)?;
+
+        self[&Face::B].write(colorscheme, padding, f)?;
+
+        writeln!(f)?;
 
         Ok(())
     }
