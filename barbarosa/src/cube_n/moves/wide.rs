@@ -211,7 +211,7 @@ pub struct DepthPieceSet<
 impl<P: DepthPiece + PieceSetDescriptor<N>, const N: usize, const ND: u32, const TD: u32>
     DepthPieceSet<P, N, ND, TD>
 {
-    /// Alias to [`Piece::SOLVED`]
+    /// Alias to [`PieceSetDescriptor::SOLVED`]
     pub const SOLVED: Self = Self {
         set: PieceSet::SOLVED,
     };

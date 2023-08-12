@@ -38,7 +38,7 @@ impl<T: AsMove> Alg<T> {
 
     /// Reverses the alg
     pub fn reversed(&self) -> Self {
-        Self::new(self.moves.iter().rev().map(|m| m.inverse()).collect())
+        Self::new(self.moves.iter().rev().map(Move::inverse).collect())
     }
 }
 
@@ -66,12 +66,12 @@ where
     /// This means that it might contain moves that cancel each other out.
     ///
     /// More often you want a random algorith with no redundancies. For that purpose,
-    /// check if [Alg::random()] is implemented for the type in question.
+    /// check if [`Alg::random()`] is implemented for the type in question.
     pub fn random_unnormalized(length: usize) -> Self {
         Self::random_unnormalized_with_rng(length, &mut rand::thread_rng())
     }
 
-    /// Same as [Self::random_unnormalized()], but specifying RNG
+    /// Same as [`Self::random_unnormalized()`], but specifying RNG
     pub fn random_unnormalized_with_rng(length: usize, rng: &mut impl Rng) -> Self {
         Self::new((0..length).map(|_| rng.gen()).collect())
     }

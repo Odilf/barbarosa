@@ -30,6 +30,7 @@ mod parser;
 pub mod pieces;
 pub mod search;
 pub mod space;
+pub mod visualization;
 
 pub use moves::{AxisMove, WideAxisMove};
 use nalgebra::{Vector2, Vector3};

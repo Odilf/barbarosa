@@ -17,6 +17,7 @@ pub mod search;
 pub mod utils;
 
 mod scramble;
+mod visualization;
 
 /// A generic cube (or twisty puzzle)
 ///
@@ -54,7 +55,7 @@ pub trait Cube:
         Self::SOLVED.clone()
     }
 
-    /// Checks whether a cube is solved by comparing it to [Cube::SOLVED]   
+    /// Checks whether a cube is solved by comparing it to [`Cube::SOLVED`]
     fn is_solved(&self) -> bool
     where
         Self: 'static,

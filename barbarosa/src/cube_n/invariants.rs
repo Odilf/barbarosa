@@ -46,7 +46,7 @@ pub fn fix_swap_parity(cube: &mut Cube3) {
 
     if edge_swap_parity != corner_swap_parity {
         cube.edges
-            .swap(Edge::REFERENCE_POSITIONS[0], Edge::REFERENCE_POSITIONS[1])
+            .swap(&Edge::REFERENCE_POSITIONS[0], &Edge::REFERENCE_POSITIONS[1])
     }
 }
 

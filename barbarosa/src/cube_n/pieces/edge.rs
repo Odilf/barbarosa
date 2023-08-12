@@ -202,6 +202,24 @@ impl Edge {
 
         Ok((normal_axis, position))
     }
+
+    /// Returns the face that has the orientation sticker. That is, the U/F face for edges on the U/D faces, and the F/B face for the other ones.
+    pub fn orientation_face((normal, slice_pos): <Edge as Piece>::Position) -> Face {
+        match normal {
+            Axis::X => Face::new(Axis::Y, slice_pos[0]),
+            Axis::Y => Face::new(Axis::Z, slice_pos[0]),
+            Axis::Z => Face::new(Axis::Y, slice_pos[1]),
+        }
+    }
+
+    /// Returns the face that is not the [`orientation_face`](Self::orientation_face)
+    pub fn non_orientation_face((normal, slice_pos): <Edge as Piece>::Position) -> Face {
+        match normal {
+            Axis::X => Face::new(Axis::Z, slice_pos[1]),
+            Axis::Y => Face::new(Axis::X, slice_pos[1]),
+            Axis::Z => Face::new(Axis::X, slice_pos[0]),
+        }
+    }
 }
 
 impl std::fmt::Debug for Edge {

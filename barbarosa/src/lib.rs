@@ -1,4 +1,5 @@
 #![warn(missing_docs)]
+#![warn(clippy::doc_markdown)]
 #![doc = include_str!("../README.md")]
 
 pub mod cube_n;

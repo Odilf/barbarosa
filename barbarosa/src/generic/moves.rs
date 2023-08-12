@@ -17,7 +17,7 @@ pub trait AsMove {
 /// Something that can be moved.
 ///
 /// A single type can be moved by multiple different types of moves. For example, a 4x4 can be moved
-/// by a single [crate::cube_n::AxisMove], but also by [crate::cube_n::WideAxisMove].
+/// by a single [`crate::cube_n::AxisMove`], but also by [`crate::cube_n::WideAxisMove`].
 ///
 /// [Movable] is auto-implemented for arrays of movables.
 // Note: M is `?Sized` to work with slices and vecs.

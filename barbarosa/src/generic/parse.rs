@@ -14,8 +14,8 @@ use thiserror::Error;
 ///
 /// Mainly used to parse moves and algorithms.
 ///
-/// Any type that implements [FromStr] implements this trait automatically. The only
-/// reason not to use [FromStr] directly is because it doesn't allow implementing in
+/// Any type that implements [`FromStr`] implements this trait automatically. The only
+/// reason not to use [`FromStr`] directly is because it doesn't allow implementing in
 /// foreign types, which is something that might be needed.
 ///
 /// [FromStr]: std::str::FromStr
@@ -44,6 +44,8 @@ where
     fn rule() -> Self::Rule;
 
     /// Parses the given [`pest::iterators::Pair`] into the type.
+    /// 
+    /// Error is the pair is malformed
     fn from_pest(pair: pest::iterators::Pair<Self::Rule>) -> Result<Self>;
 }
 
@@ -104,7 +106,7 @@ impl<R: RuleType> From<pest::error::Error<R>> for ParseError<R> {
     }
 }
 
-/// A trait for types that can be converted into a [ParseError].
+/// A trait for types that can be converted into a [`ParseError`].
 ///
 /// Basically used for convience if you want to do `pair.next().unwrap()` but with proper
 /// error handling (which would now be `pair.next().into_err()?`).
@@ -123,7 +125,7 @@ impl<'i, R: RuleType> IntoParseErr<Pair<'i, R>, R> for Option<Pair<'i, R>> {
 }
 
 impl<T: RuleType> ParseError<T> {
-    /// Convinience function for creating a [ParseError::Uknown] variant.
+    /// Convinience function for creating a [`ParseError::Uknown`] variant.
     pub fn uknown<Err: std::error::Error + Send + Sync + 'static>(err: Err) -> Self {
         Self::Uknown(Box::new(err))
     }

@@ -101,7 +101,7 @@ impl From<&AxisMove> for AxisRotation {
     }
 }
 
-/// Rotates a [Vector2] clockwise
+/// Rotates a [Vec2](nalgebra::Vector2) clockwise
 pub fn rotate_vec2(amount: &Amount, vec: &Vec2) -> Vec2 {
     match amount {
         Amount::Single => vector![vec.y, -vec.x],

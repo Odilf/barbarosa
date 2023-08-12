@@ -44,7 +44,7 @@ where
         path: &mut Vec<C>,
         is_target: &impl Fn(&C) -> bool,
         current_cost: f32,
-        bound: &f32,
+        bound: f32,
         min_exceeded: &mut f32,
     ) -> Option<Alg<M>> {
         let cube = path
@@ -52,7 +52,7 @@ where
             .expect("Path should be populated before calling this function");
         let new_cost = current_cost + (self.heuristic)(cube);
 
-        if new_cost > *bound {
+        if new_cost > bound {
             if new_cost < *min_exceeded {
                 *min_exceeded = new_cost;
             }
@@ -104,7 +104,7 @@ where
 
             path.push(cube.clone());
 
-            let t = self.search_impl(&mut path, &is_target, 0.0, &bound, &mut min_exceeded);
+            let t = self.search_impl(&mut path, &is_target, 0.0, bound, &mut min_exceeded);
 
             match t {
                 Some(mut solution) => {

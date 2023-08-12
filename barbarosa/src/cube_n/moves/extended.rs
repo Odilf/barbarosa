@@ -85,18 +85,23 @@ macro_rules! impl_movable_extended {
                             opposite(&m, depth_oppossite)
                         };
 
-                        let m = m.set_max_depth::<{ <$cube>::N / 2 - 1 }>().expect("TODO");
+                        let m = m.set_max_depth::<{ <$cube>::N / 2 - 1 }>()
+                            .expect("the depth from both sides can't be larger than N/2");
                         self.base_cube.apply(&m);
                     },
-                    ExtendedAxisMove::Slice { rot, wide: _wide } => {
+                    ExtendedAxisMove::Slice { rot, wide } => {
                         for dir in [Direction::Positive, Direction::Negative] {
-                            let m = AxisMove::new(Face::new(rot.axis, dir), rot.amount * Direction::Negative);
-                            self.apply(&m);
+                            let depth = match wide {
+                                false => 0,
+                                true => <$cube>::N / 2 - 1,
+                            };
+
+                            let m = WideAxisMove::<{ <$cube>::N / 2 - 1 }>::new(Face::new(rot.axis, dir), rot.amount * Direction::Negative, depth).unwrap();
+
+                            self.base_cube.apply(&m);
                         }
 
                         self.orientation.rotate(rot);
-
-                        todo!("Implement wideness of slice moves");
                     },
                 }
             }

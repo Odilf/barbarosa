@@ -42,7 +42,7 @@ pub struct PieceSet<P: PieceSetDescriptor<N>, const N: usize> {
 }
 
 impl<P: PieceSetDescriptor<N>, const N: usize> PieceSet<P, N> {
-    /// Alias to [`Piece::SOLVED`]
+    /// Alias to [`PieceSetDescriptor::SOLVED`]
     pub const SOLVED: Self = Self { pieces: P::SOLVED };
 
     /// Creates a new [`PieceSet`] from an array of pieces. Fails if one of the invariants is
@@ -112,8 +112,6 @@ impl<P: PieceSetDescriptor<N>, const N: usize> PieceSet<P, N> {
     }
 
     /// Returns the original position of the piece that is currently at `target_pos`.
-    ///
-    /// Returns [`None`] if there is no piece at `target_pos`.
     pub fn original_position_of_piece_at(&self, target_pos: &P::Position) -> P::Position {
         self.iter_with_pos()
             .find(|(_, piece)| piece.position() == *target_pos)
@@ -121,7 +119,7 @@ impl<P: PieceSetDescriptor<N>, const N: usize> PieceSet<P, N> {
             .expect("There should be a piece at each position")
     }
 
-    /// Returns the piece that is at `index`
+    /// Returns the piece that is at the given index
     pub fn at_index(&self, index: usize) -> Option<&P> {
         self.pieces.get(index)
     }
@@ -134,16 +132,16 @@ impl<P: PieceSetDescriptor<N>, const N: usize> PieceSet<P, N> {
     /// Swaps the pieces with original positions `a` and `b`
     // TODO: Check this. I don't think I can just unwrap the indices. Also there might be a nicer way to do this
     // TODO: Maybe it's easier to just swap the pieces with current positions `a` and `b`?
-    pub fn swap(&mut self, a: P::Position, b: P::Position) {
+    pub fn swap(&mut self, a: &P::Position, b: &P::Position) {
         let index_a = P::REFERENCE_POSITIONS
             .iter()
-            .position(|pos| pos == &a)
-            .unwrap();
+            .position(|pos| pos == a)
+            .expect("There should be a piece at each position");
 
         let index_b = P::REFERENCE_POSITIONS
             .iter()
-            .position(|pos| pos == &b)
-            .unwrap();
+            .position(|pos| pos == b)
+            .expect("There should be a piece at each position");
 
         (self.pieces[index_a], self.pieces[index_b]) =
             (self.pieces[index_b].clone(), self.pieces[index_a].clone());
@@ -153,7 +151,7 @@ impl<P: PieceSetDescriptor<N>, const N: usize> PieceSet<P, N> {
 fn find_duplicates<T: PartialEq>(iter: impl IntoIterator<Item = T>) -> Option<T> {
     let mut visited = Vec::new();
 
-    for elem in iter.into_iter() {
+    for elem in iter {
         if visited.contains(&elem) {
             return Some(elem);
         }

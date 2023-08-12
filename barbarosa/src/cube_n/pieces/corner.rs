@@ -114,6 +114,7 @@ impl Corner {
 
     /// Amount of counter-clockwise rotations needed for an oriented corner to get
     /// to the current orientation. i think
+    // TODO: Check the "i think" part
     pub fn orientation_index(&self) -> usize {
         let even_parity = Self::is_even_position_parity(&self.position);
         let axis_index = self.orientation_axis as usize;
