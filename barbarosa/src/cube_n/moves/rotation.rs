@@ -1,4 +1,4 @@
-//! Rotations of NxNxN cubes.
+//! Rotations of `NxNxN` cubes.
 //!
 //! This is mainly used because, for example, L and R' are the same rotation and
 /// the only difference is the pieces selected in the rotation.
@@ -14,7 +14,7 @@ use crate::{
 
 use super::{Amount, AxisMove};
 
-/// A rotation around an axis. This is similar to an [AxisMove](super::AxisMove), but it doesn't
+/// A rotation around an axis. This is similar to an [`AxisMove`](super::AxisMove), but it doesn't
 /// specify the face.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AxisRotation {
@@ -25,7 +25,7 @@ pub struct AxisRotation {
 }
 
 impl AxisRotation {
-    /// Creates a new [AxisRotation]
+    /// Creates a new [`AxisRotation`]
     pub fn new(axis: Axis, amount: Amount) -> Self {
         Self { axis, amount }
     }
@@ -48,12 +48,12 @@ impl AxisRotation {
 
 /// Things that can be rotated.
 pub trait Rotatable: Sized {
-    /// Rotates a piece according to an [AxisRotation]
+    /// Rotates a piece according to an [`AxisRotation`]
     fn rotate(&mut self, rotation: &AxisRotation);
 
     /// Returns a rotated copy of the piece
     ///
-    /// See also [Self::rotate]
+    /// See also [`Self::rotate`]
     fn rotated(mut self, rotation: &AxisRotation) -> Self {
         self.rotate(rotation);
         self

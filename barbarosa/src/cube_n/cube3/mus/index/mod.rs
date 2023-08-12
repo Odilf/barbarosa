@@ -50,9 +50,9 @@ pub trait OrientationIndexable {
 
 /// Trait for indexing. Every unique instance of a type that implements this trait has to return a
 /// unique index, and all indices have to be contiguous (starting from 0). In other words, you can index
-/// into an array of size [Self::TOTAL_SET_SIZE] with the index returned by [Self::index()].
+/// into an array of size [`Self::TOTAL_SET_SIZE`] with the index returned by [`Self::index`()].
 ///
-/// This type requires and is auto-implemented with [PositionIndexable] and [OrientationIndexable]
+/// This type requires and is auto-implemented with [`PositionIndexable`] and [`OrientationIndexable`]
 // TODO: Write about the implementation
 pub trait Indexable: PositionIndexable + OrientationIndexable {
     /// Returns the index of the instance. See [Indexable] for more info.

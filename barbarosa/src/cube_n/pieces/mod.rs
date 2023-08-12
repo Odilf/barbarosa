@@ -1,4 +1,4 @@
-//! Pieces of an NxNxN cube.
+//! Pieces of an `NxNxN` cube.
 
 pub mod center;
 pub mod corner;

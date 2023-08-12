@@ -1,4 +1,4 @@
-//! Ways to visualize NxN cubes. 
+//! Ways to visualize `NxN` cubes.
 
 use core::fmt;
 
@@ -17,7 +17,7 @@ use super::{
 mod test;
 pub mod unfolded;
 
-/// An NxN sticker color. Newtype around face, since faces and colors biject. Mostly for clarity in type signatures. 
+/// An `NxN` sticker color. Newtype around face, since faces and colors biject. Mostly for clarity in type signatures.
 #[derive(Clone, PartialEq, Eq)]
 pub struct Color {
     /// The face that the color belongs to
@@ -62,7 +62,7 @@ impl Color {
     }
 }
 
-/// Pieces on NxNs where you can extract color information
+/// Pieces on `NxNs` where you can extract color information
 pub trait Colored: Piece {
     /// Returns a vec that maps faces to colors.
     // TODO: This should be an `impl Iterator`
@@ -128,7 +128,7 @@ impl Colored for Edge {
     }
 }
 
-/// A colorscheme for an NxN cube
+/// A colorscheme for an `NxN` cube
 pub struct Colorscheme<C: IntoColor<Srgb>> {
     data: [C; 6],
 }

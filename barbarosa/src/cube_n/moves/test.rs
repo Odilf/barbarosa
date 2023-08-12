@@ -28,7 +28,7 @@ fn assert_rotations<T: Rotatable + Clone + Eq + Debug>(
     expectations: &[(AxisRotation, T)],
 ) {
     for (rotation, expected_face) in expectations {
-        let rotated = initial.clone().rotated(&rotation);
+        let rotated = initial.clone().rotated(rotation);
         assert_eq!(&rotated, expected_face, "Rotation: {:?}", rotation);
     }
 }

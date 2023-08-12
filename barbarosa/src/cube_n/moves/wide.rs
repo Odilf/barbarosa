@@ -42,7 +42,7 @@ impl<const N: u32> generic::Move for WideAxisMove<N> {
 impl<const N: u32> WideAxisMove<N> {
     /// Creates a new [`WideAxisMove<N>`].
     ///
-    /// Returns [WideMoveCreationError] if the depth is greater than `N`.
+    /// Returns [`WideMoveCreationError`] if the depth is greater than `N`.
     pub fn new(face: Face, amount: Amount, depth: u32) -> Result<Self, WideMoveCreationError> {
         if depth > N {
             return Err(WideMoveCreationError::ExcededDepth(depth, N));
@@ -71,7 +71,7 @@ impl<const N: u32> WideAxisMove<N> {
 
     /// Tries to set the depth of the move in-place.
     ///
-    /// Fails and returns [WideMoveCreationError] if the depth is greater than `N`.
+    /// Fails and returns [`WideMoveCreationError`] if the depth is greater than `N`.
     pub fn set_depth(&mut self, new_depth: u32) -> Result<(), WideMoveCreationError> {
         if new_depth > N {
             return Err(WideMoveCreationError::ExcededDepth(new_depth, N));
@@ -168,7 +168,7 @@ impl<const N: u32> Distribution<WideAxisMove<N>> for rand::distributions::Standa
 }
 
 impl Alg<AxisMove> {
-    /// Widens an axis move into a [WideAxisMove].
+    /// Widens an axis move into a [`WideAxisMove`].
     ///
     /// Fails if the depth is greater than `N`.
     pub fn widen<const N: u32>(

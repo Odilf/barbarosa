@@ -86,10 +86,10 @@ impl PieceSetDescriptor<12> for Edge {
     ///
     /// Edges are set up this way so that an X2 rotation increases the index by 6.
     /// That is, `SOLVED[n]` and `SOLVED[n + 6]` differ by an X2 rotation. This is
-    /// useful for indexing into the HalfEdges permutation table with the second half
+    /// useful for indexing into the `HalfEdges` permutation table with the second half
     /// of the edges.
     ///
-    /// See [crate::cube_n::cube3::mus] for more information.
+    /// See [`crate::cube_n::cube3::mus`] for more information.
     const SOLVED: [Edge; 12] = {
         const fn from_tuple((axis, pos): <Edge as Piece>::Position) -> Edge {
             Edge::oriented(axis, pos)
@@ -169,7 +169,7 @@ impl Edge {
 
     /// Returns the edge with the opposite orientation.
     ///
-    /// See also [Edge::flip()] for mutating instead of owning.
+    /// See also [`Edge::flip`()] for mutating instead of owning.
     pub const fn flipped(mut self) -> Self {
         self.oriented = !self.oriented;
         self
@@ -177,7 +177,7 @@ impl Edge {
 
     /// Flips the orientation of the edge.
     ///
-    /// See also [Edge::flipped()] for owning instead of mutating.
+    /// See also [`Edge::flipped`()] for owning instead of mutating.
     pub fn flip(&mut self) {
         self.oriented = !self.oriented;
     }

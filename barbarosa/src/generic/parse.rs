@@ -44,7 +44,7 @@ where
     fn rule() -> Self::Rule;
 
     /// Parses the given [`pest::iterators::Pair`] into the type.
-    /// 
+    ///
     /// Error is the pair is malformed
     fn from_pest(pair: pest::iterators::Pair<Self::Rule>) -> Result<Self>;
 }

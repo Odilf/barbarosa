@@ -27,7 +27,7 @@ fn playground_3x3() {
     use std::io::{BufRead, Write};
 
     use barbarosa::{
-        cube_n::{Cube3, moves::ExtendedAxisMove, Orientable},
+        cube_n::{moves::ExtendedAxisMove, Cube3, Orientable},
         generic::{Alg, Cube, Movable, Parsable},
     };
 

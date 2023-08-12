@@ -12,7 +12,7 @@ pub fn mus_with_fallback(fallback: impl Fn(&Cube3) -> f32) -> impl Fn(&Cube3) ->
 /// Returns the maximum of the number of moves it takes to
 /// solve the corners and the two sets of 6 edges.
 ///
-/// See also [crate::cube3::mus].
+/// See also [`crate::cube3::mus`].
 pub fn mus(cube: &Cube3) -> f32 {
     mus::cache::get_or_init(cube) as f32
 }

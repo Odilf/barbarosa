@@ -1,8 +1,8 @@
 //! Collection of functions to assert if cube invariants are upheld and to fix them.
 //!
-//! TODO: This docs are written for a 3x3x3 cube, but they should be valid for any NxNxN cube.
+//! TODO: This docs are written for a 3x3x3 cube, but they should be valid for any `NxNxN` cube.
 //!
-//! Mainly used for [Cube::random()](rand::random::<Cube3>())
+//! Mainly used for [`Cube::random`()](rand::random::<Cube3>())
 //!
 //! There are thre invariants we need to uphold in a 3x3x3 Rubik's cube. We can deduce them by analizing what
 //! a single move does in terms of swaps and changes of orientation.
@@ -26,7 +26,7 @@
 //! - Twisting `cube.corners[7]` such that the sum of corner orientation indices is divisble by 3.
 //!
 //! PS: The reason to change the orientation of the last piece is because it makes implementing
-//! [mus::index::OrientationIndexable](super::cube3::mus::index::OrientationIndexable) nicer for corners.
+//! [`mus::index::OrientationIndexable`](super::cube3::mus::index::OrientationIndexable) nicer for corners.
 
 use std::fmt::Debug;
 

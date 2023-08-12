@@ -19,7 +19,7 @@ fn solved_cube_has_pieces_in_all_coordinates() {
     let mut positions: HashSet<_> = solved_cube
         .edges
         .pieces()
-        .into_iter()
+        .iter()
         .map(|piece| piece.coordinates().map(|i| i as i32))
         .collect();
 
@@ -27,7 +27,7 @@ fn solved_cube_has_pieces_in_all_coordinates() {
         solved_cube
             .corners
             .pieces()
-            .into_iter()
+            .iter()
             .map(|piece| piece.coordinates().map(|i| i as i32)),
     );
 

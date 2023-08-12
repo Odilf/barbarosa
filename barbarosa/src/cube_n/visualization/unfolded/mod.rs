@@ -1,6 +1,6 @@
 //! Cube unfolding.
-//! 
-//! See [`Unfolded`] for more info. 
+//!
+//! See [`Unfolded`] for more info.
 
 mod test;
 
@@ -27,7 +27,7 @@ use crate::{
 
 use super::{Colored, Colorscheme};
 
-/// An NxN array of colors, used to represent a face of an NxN cube in [`Unfolded`]
+/// An `NxN` array of colors, used to represent a face of an `NxN` cube in [`Unfolded`]
 pub struct Square<const N: usize> {
     /// The actual arrays of colors
     pub data: [[Color; N]; N],
@@ -74,8 +74,8 @@ impl<const N: usize> Square<N> {
     }
 
     /// The color at the given coordinates. The vector is projected to the given face and then the color is retrieved.
-    /// 
-    /// Note: Since the coordinates are `f32` trying to match exact values is a bad idea (because of floating point 
+    ///
+    /// Note: Since the coordinates are `f32` trying to match exact values is a bad idea (because of floating point
     /// inaccuracies). Instead, we return the face that is closest to the coordinates. If the vector is too far outside
     /// the bounds of the square, `None` is returned. The meaning of "too far" is kind of messy and shoudn't be relied upon,
     /// but it gets smaller the bigger the `N`.
@@ -86,7 +86,7 @@ impl<const N: usize> Square<N> {
     }
 
     /// Mutable reference to the color at the given coordinates.
-    /// 
+    ///
     /// See also the note from [`Square::at`]
     pub fn at_mut(&mut self, point: &Vector3<f32>, face: &Face) -> Option<&mut Color> {
         let [x, y] = Self::indices(point, face)?;
@@ -129,21 +129,21 @@ impl<const N: usize> Square<N> {
     }
 }
 
-/// An unfolded representation of a cube of size `N`. 
-/// 
+/// An unfolded representation of a cube of size `N`.
+///
 /// The unfolded structure is the following:
-/// 
+///
 /// ```text
 ///   U
 /// R F L
 ///   D
 ///   B
 /// ```
-/// 
+///
 /// Note that the way the unfolding works is like if it were a piece of paper. This means that the B face is not obtained by doing a y2 rotation,
-/// but instead by doing an x2, which might make it look like it's "upside down". 
-/// 
-/// Mainly used for visualization. 
+/// but instead by doing an x2, which might make it look like it's "upside down".
+///
+/// Mainly used for visualization.
 pub struct Unfolded<const N: usize> {
     faces: [Square<N>; 6],
 }
@@ -170,17 +170,17 @@ impl<const N: usize> Unfolded<N> {
         Face::iter().zip(self.faces.iter())
     }
 
-    /// Mutable reference of the pice at the given coordinates. 
-    /// 
+    /// Mutable reference of the pice at the given coordinates.
+    ///
     /// See note from [`Square::at`]
     pub fn at_mut(&mut self, coords: &Vector3<f32>, face: &Face) -> Option<&mut Color> {
         self[face].at_mut(coords, face)
     }
 
-    /// Populates the unfolded cube with the pieces of the piece set. 
-    /// 
+    /// Populates the unfolded cube with the pieces of the piece set.
+    ///
     /// # Panics
-    /// 
+    ///
     /// If there is a piece on the set that has coordinates too far outside the range [-1, 1]
     pub fn populate_with<P: Colored + Coordinates + PieceSetDescriptor<M>, const M: usize>(
         &mut self,

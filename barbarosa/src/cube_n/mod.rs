@@ -1,6 +1,6 @@
-//! NxNxNs cube implementation.
+//! `NxNxNs` cube implementation.
 //!
-//! See [crate::generic] for more aspects that are generic across all cubes, such as moves and pieces.
+//! See [`crate::generic`] for more aspects that are generic across all cubes, such as moves and pieces.
 //!
 //! # Piece position
 //!
@@ -10,10 +10,10 @@
 //! the color of, for example, a corner just by the information in the [Corner] struct.
 //!
 //! Rather, the cube is responsible for keeping track for which piece is which. Simply,
-//! the "color" of a piece is determined by that position in [Cube::SOLVED](crate::generic::Cube::SOLVED).
+//! the "color" of a piece is determined by that position in [`Cube::SOLVED`](crate::generic::Cube::SOLVED).
 //!
-//! You can use the functions [utils::item_at](crate::generic::utils::item_at) and
-//! [utils::position_of_item](crate::generic::utils::position_of_item) to find where
+//! You can use the functions [`utils::item_at`](crate::generic::utils::item_at) and
+//! [`utils::position_of_item`](crate::generic::utils::position_of_item) to find where
 //! pieces are.
 
 mod cube2;
@@ -51,7 +51,7 @@ use self::space::Direction;
 type Vec2 = Vector2<Direction>;
 type Vec3 = Vector3<Direction>;
 
-/// An NxNxN cube.
+/// An `NxNxN` cube.
 ///
 /// Currently just a marker trait.
 pub trait CubeN: generic::Cube {

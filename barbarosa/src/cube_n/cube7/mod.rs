@@ -9,9 +9,9 @@ use super::{
     CubeN, WideAxisMove,
 };
 
-/// The 7x7x7 cube. The biggest [WCA](https://www.worldcubeassociation.org/) NxN.
+/// The 7x7x7 cube. The biggest [WCA](https://www.worldcubeassociation.org/) `NxN`.
 ///
-/// See [crate::cube_n] for more info.
+/// See [`crate::cube_n`] for more info.
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Cube7 {
     corners: CornerSet,

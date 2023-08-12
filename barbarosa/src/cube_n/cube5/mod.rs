@@ -14,7 +14,7 @@ use super::{
 
 /// The 5x5x5 cube.
 ///
-/// See [crate::cube_n] for more info.
+/// See [`crate::cube_n`] for more info.
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Cube5 {
     corners: CornerSet,

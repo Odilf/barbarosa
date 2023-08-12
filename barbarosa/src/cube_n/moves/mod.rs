@@ -1,4 +1,4 @@
-//! Moves for NxNxN cubes
+//! Moves for `NxNxN` cubes
 
 use std::mem::{self, MaybeUninit};
 
@@ -32,9 +32,9 @@ pub use wide::WideAxisMove;
 /// It can be either single, double or inverse.
 ///
 /// Variants of axis moves are:
-/// - [WideAxisMove] for big cubes (4x4 and up)
-/// - [QuarterAxisMove]
-/// - [NonRedundantAxisMove]
+/// - [`WideAxisMove`] for big cubes (4x4 and up)
+/// - [`QuarterAxisMove`]
+/// - [`NonRedundantAxisMove`]
 #[derive(Debug, PartialEq, Eq, Clone, RandGen)]
 pub struct AxisMove {
     /// The face that is being rotated

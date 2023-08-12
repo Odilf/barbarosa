@@ -80,9 +80,8 @@ fn four_wide_fs() {
     for i in 0..4 {
         cube.apply(&mov);
 
-        match i {
-            0 => expect_wing(&cube, ([R, F], Positive), ([U, F], Negative)),
-            _ => (),
+        if i == 0 {
+            expect_wing(&cube, ([R, F], Positive), ([U, F], Negative));
         }
     }
 

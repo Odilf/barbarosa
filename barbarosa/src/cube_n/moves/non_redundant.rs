@@ -1,6 +1,6 @@
 //! Moves that reduce redundancies.
 //!
-//! See [NonRedundantAxisMove] for more info.
+//! See [`NonRedundantAxisMove`] for more info.
 
 use std::iter;
 
@@ -15,20 +15,20 @@ use crate::{
 
 use super::{Amount, AxisMove};
 
-/// A type of move used to prevent redundancies in [AxisMove]s.
+/// A type of move used to prevent redundancies in [`AxisMove`]s.
 ///
 /// This redundancy arises
 /// because you can have something like `R R` or `R L R' L` which can clearly be simplified.
-/// [NonRedundantAxisMove] implements this by encoding all possible types of move in one axis.
+/// [`NonRedundantAxisMove`] implements this by encoding all possible types of move in one axis.
 /// This way you can check the axis of the previous move and select only moves from another axis
-/// on the next one (see [Self::of_axis] and [Self::given_last_axis] for more info).
+/// on the next one (see [`Self::of_axis`] and [`Self::given_last_axis`] for more info).
 ///
 /// # Note
 ///
 /// Technically, this doesn't prevent all redundancies. For example, you could make six sexy moves or
 /// two T perms at any point and that's cleary simplifiable. Actually, every sequence of more than 20
 /// moves is always going to have some redundancy. However, finding this redundancies basically as
-/// hard as solving the cube, so it misses the point. [NonRedundantAxisMove] is just meant to reduce
+/// hard as solving the cube, so it misses the point. [`NonRedundantAxisMove`] is just meant to reduce
 /// the very obvious and very common redundancies.
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum NonRedundantAxisMove {
@@ -125,12 +125,12 @@ impl NonRedundantAxisMove {
     }
 }
 
-/// Tries to absorve an [AxisMove] into a [NonRedundantAxisMove].
+/// Tries to absorve an [`AxisMove`] into a [`NonRedundantAxisMove`].
 ///
-/// In this context, "absorve" means modifying the original [NonRedundantAxisMove] in such
+/// In this context, "absorve" means modifying the original [`NonRedundantAxisMove`] in such
 /// a way that the result is the same as doing both moves sequentially.
 ///
-/// This function modifies `self` in-place. It returns an [AbsorveResult] specifying
+/// This function modifies `self` in-place. It returns an [`AbsorveResult`] specifying
 /// what happened with the input move.
 ///
 /// # Example

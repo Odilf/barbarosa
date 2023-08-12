@@ -1,4 +1,4 @@
-//! Center corner piece. See [CenterCorner] for more info.
+//! Center corner piece. See [`CenterCorner`] for more info.
 
 use cartesian_array_product::cartesian_array_map;
 use nalgebra::vector;

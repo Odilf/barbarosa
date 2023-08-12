@@ -15,8 +15,8 @@ use super::{
 
 /// Fancier moves that only work on [`Orientable`] cubes.
 ///
-/// In regular NxN cubes, you can only do [`AxisMove`]s and [`WideAxisMove`]s. However, with orientable
-/// cubes you can use [`ExtendedAxisMove`]s which are basically any move you can imagine on an NxN.
+/// In regular `NxN` cubes, you can only do [`AxisMove`]s and [`WideAxisMove`]s. However, with orientable
+/// cubes you can use [`ExtendedAxisMove`]s which are basically any move you can imagine on an `NxN`.
 ///
 /// Look at the variants of the enum for specifics.
 #[derive(Debug, Clone, PartialEq, Eq)]

@@ -1,6 +1,6 @@
 //! The 3x3x3 Rubik's cube.
 //!
-//! See [Cube3] and [cube_n](crate::cube_n) for more information.
+//! See [Cube3] and [`cube_n`](crate::cube_n) for more information.
 
 pub mod heuristics;
 pub mod mus;
