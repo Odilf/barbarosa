@@ -17,8 +17,6 @@ use crate::{
     },
 };
 
-// use super::{ContainedInMove, Corner};
-
 /// An edge piece of the cube.
 #[derive(PartialEq, Eq, Hash, Clone)]
 pub struct Edge {
