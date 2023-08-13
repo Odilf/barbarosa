@@ -1,4 +1,4 @@
-//!
+//! Corner piece of the cube.
 
 use arr_macro::arr;
 use cartesian_array_product::cartesian_array_map;
@@ -24,7 +24,7 @@ pub struct Corner {
     pub position: Vec3,
 
     /// The orientation of the corner piece, determined by the axis of the
-    /// sticker that is originally on the X (R-L) axis (usually red-orange)
+    /// sticker that is originally on the Y (U-D) axis (usually white-yellow)
     pub orientation_axis: Axis,
 }
 
