@@ -3,6 +3,7 @@
 use arr_macro::arr;
 use nalgebra::{vector, Vector3};
 use static_assertions::const_assert_eq;
+use strum::IntoEnumIterator;
 use thiserror::Error;
 
 use crate::{
@@ -276,3 +277,38 @@ pub enum ParallelAxesError {
 
 /// The piece set of 12 [`Edge`]s
 pub type EdgeSet = PieceSet<Edge, 12>;
+
+/// Determines the minimum amount of moves it would take to solve the given edge, if you ignored everything else.
+/// This will be a number between 0 and 3.
+///
+/// Useful as an admissable heuristic
+pub fn min_moves_to_solve(original_pos: &<Edge as Piece>::Position, edge: &Edge) -> i32 {
+    if edge.is_solved(&original_pos) {
+        return 0;
+    }
+
+    let (normal, _) = &original_pos;
+
+    let shared_axis = Axis::iter().find(|axis| {
+        let d1 = Edge::direction_on_axis(&edge.position(), *axis);
+        let d2 = Edge::direction_on_axis(&original_pos, *axis);
+
+        d1.is_some() && d1 == d2
+    });
+
+    // Ugly ass match statement that actually works. I feel there should be a way to extract the logic out
+    // but I couldn't find anything better than just going through each case manually.
+    match (edge.oriented, *normal == edge.normal_axis, shared_axis) {
+        (true, true, Some(_)) => 1,
+        (true, false, Some(Axis::X | Axis::Y)) => 1,
+        (false, false, Some(Axis::Z)) => 1,
+
+        (true, _, None) => 2,
+        (true, false, Some(Axis::Z)) => 2,
+        (false, false, Some(Axis::X | Axis::Y)) => 2,
+        (false, false, None) => 2,
+
+        (false, true, None) => 3,
+        (false, true, Some(_)) => 3,
+    }
+}

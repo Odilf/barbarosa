@@ -5,6 +5,8 @@ pub mod corner;
 pub mod edge;
 pub mod wing;
 
+mod test;
+
 pub use center::corner::CenterCorner;
 pub use corner::Corner;
 pub use edge::Edge;
