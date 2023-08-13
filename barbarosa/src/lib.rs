@@ -4,5 +4,6 @@
 
 pub mod cube_n;
 pub mod generic;
+pub mod prelude;
 
 pub use cube_n::cube3;
