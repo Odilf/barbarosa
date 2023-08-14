@@ -1,4 +1,4 @@
-use std::ops::Index;
+use std::ops::{Index, IndexMut};
 
 use nalgebra::{Vector2, Vector3};
 use rand_derive2::RandGen;
@@ -33,6 +33,12 @@ impl<T> Index<Axis> for Vector3<T> {
 
     fn index(&self, index: Axis) -> &Self::Output {
         &self[index as usize]
+    }
+}
+
+impl<T> IndexMut<Axis> for Vector3<T> {
+    fn index_mut(&mut self, index: Axis) -> &mut Self::Output {
+        &mut self[index as usize]
     }
 }
 
