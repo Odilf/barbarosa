@@ -78,3 +78,12 @@ where
 {
     type Move = ExtendedAxisMove;
 }
+
+impl<C: CubeN + 'static> From<C> for Orientable<C>
+where
+    Orientable<C>: Movable<ExtendedAxisMove>,
+{
+    fn from(value: C) -> Self {
+        Self::new(value)
+    }
+}
