@@ -86,8 +86,8 @@ fn solve_cross_directly(
 pub fn good_cross_heuristic(cube: &Cube3, bottom_face: &Face) -> f32 {
     cube.edges
         .iter_with_pos()
-        .filter(|(original, _)| is_cross_edge(&original, bottom_face))
-        .map(|(original, edge)| min_moves_to_solve(&original, &edge))
+        .filter(|(original, _)| is_cross_edge(original, bottom_face))
+        .map(|(original, edge)| min_moves_to_solve(&original, edge))
         .sum::<i32>() as f32
         / 2.0 // Constant is kinda arbitrary to improve performance
 }
@@ -98,8 +98,8 @@ pub fn good_cross_heuristic(cube: &Cube3, bottom_face: &Face) -> f32 {
 pub fn worse_but_admissable_cross_heuristic(cube: &Cube3, bottom_face: &Face) -> f32 {
     cube.edges
         .iter_with_pos()
-        .filter(|(original, _)| is_cross_edge(&original, &bottom_face))
-        .map(|(original, edge)| min_moves_to_solve(&original, &edge))
+        .filter(|(original, _)| is_cross_edge(original, bottom_face))
+        .map(|(original, edge)| min_moves_to_solve(&original, edge))
         .max()
         .expect("Edges have 12 items, which is greater 0") as f32
 }

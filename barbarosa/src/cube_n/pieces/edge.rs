@@ -282,7 +282,7 @@ pub type EdgeSet = PieceSet<Edge, 12>;
 ///
 /// Useful as an admissable heuristic
 pub fn min_moves_to_solve(original_pos: &<Edge as Piece>::Position, edge: &Edge) -> i32 {
-    if edge.is_solved(&original_pos) {
+    if edge.is_solved(original_pos) {
         return 0;
     }
 
@@ -290,7 +290,7 @@ pub fn min_moves_to_solve(original_pos: &<Edge as Piece>::Position, edge: &Edge)
 
     let shared_axis = Axis::iter().find(|axis| {
         let d1 = Edge::direction_on_axis(&edge.position(), *axis);
-        let d2 = Edge::direction_on_axis(&original_pos, *axis);
+        let d2 = Edge::direction_on_axis(original_pos, *axis);
 
         d1.is_some() && d1 == d2
     });
