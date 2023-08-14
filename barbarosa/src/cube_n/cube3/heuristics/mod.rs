@@ -5,7 +5,7 @@ pub use mus::{mus, mus_with_fallback};
 
 use crate::generic::Cube;
 
-mod manhattan;
+pub mod manhattan;
 mod mus;
 
 /// A heuristic that just always returns 0. It can be used to basically fall back to BFS.
