@@ -2,6 +2,7 @@
 //!
 //! See [Cube3] and [`cube_n`](crate::cube_n) for more information.
 
+pub mod cfop;
 pub mod heuristics;
 pub mod mus;
 
