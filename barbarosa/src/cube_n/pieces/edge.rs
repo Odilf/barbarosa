@@ -231,12 +231,11 @@ impl Edge {
             return None;
         }
 
-        let x = normal.next();
-        let y = x.next();
+        let [b1, b2] = Axis::basis(&normal);
 
-        if axis == x {
+        if axis == b1 {
             Some(slice_pos[0])
-        } else if axis == y {
+        } else if axis == b2 {
             Some(slice_pos[1])
         } else {
             unreachable!()

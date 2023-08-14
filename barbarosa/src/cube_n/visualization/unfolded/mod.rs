@@ -5,13 +5,12 @@
 mod test;
 
 use core::fmt;
+use nalgebra::Vector3;
+use palette::Srgb;
 use std::{
     array,
     ops::{Index, IndexMut},
 };
-
-use nalgebra::Vector3;
-use palette::Srgb;
 
 use crate::{
     cube3::Cube3,
