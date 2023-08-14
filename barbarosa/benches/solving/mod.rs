@@ -24,17 +24,15 @@ macro_rules! bench_heuristic {
         let alg = Alg::<AxisMove>::random_with_rng($amount, &mut rng);
         let cube = Cube3::SOLVED.moved(&alg);
 
-        println!("Benching solving alg {alg}");
-
-        let solution = cube.solve_with_heuristic(&$heuristic).expect("Cube should be solvable");
-        assert!(cube.clone().moved(&solution).is_solved());
-        assert!(solution.moves.len() <= alg.moves.len(), "Solution: {solution}, alg: {alg}");
-
         if $amount >= 13 {
             $group.sample_size(10);
         }
 
-        $group.bench_function(format!("{}/{}", stringify!($heuristic), $amount), |b| {
+        $group.bench_function(format!("{}/{} (scramble {alg})", stringify!($heuristic), $amount), |b| {
+            let solution = cube.solve_with_heuristic(&$heuristic).expect("Cube should be solvable");
+            assert!(cube.clone().moved(&solution).is_solved());
+            assert!(solution.moves.len() <= alg.moves.len(), "Solution: {solution}, alg: {alg}");
+
             b.iter(|| -> Alg<AxisMove> { cube.solve_with_heuristic(&$heuristic).unwrap() })
         });
     };

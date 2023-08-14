@@ -95,7 +95,7 @@ where
     Successors: Fn(&C) -> Iter,
     Iter: IntoIterator<Item = (C, M)>,
 {
-    fn search(&self, cube: &C, is_target: impl Fn(&C) -> bool) -> Option<Alg<M>> {
+    fn search(&self, cube: &C, is_target: impl Fn(&C) -> bool) -> Option<(Alg<M>, C)> {
         let mut bound = (self.heuristic)(cube);
 
         for _ in 0..=self.max_depth {
@@ -109,7 +109,7 @@ where
             match t {
                 Some(mut solution) => {
                     solution.moves.reverse();
-                    return Some(solution);
+                    return Some((solution, path.into_iter().last()?));
                 }
                 None => bound = min_exceeded,
             }

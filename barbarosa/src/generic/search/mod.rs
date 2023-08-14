@@ -18,12 +18,16 @@ pub trait Solver<C: Cube + Movable<M>, M: Move> {
 /// [`Searcher`]s implement automatically [`Solver`
 pub trait Searcher<C: Cube + Movable<M>, M: Move> {
     /// Tries to find a state of `C` such that `is_target` evaluates to `true`.
-    fn search(&self, cube: &C, is_target: impl Fn(&C) -> bool) -> Option<Alg<M>>;
+    fn search(&self, cube: &C, is_target: impl Fn(&C) -> bool) -> Option<(Alg<M>, C)>;
 }
 
 // All searchers implement solver
 impl<C: Cube + Movable<M> + 'static, M: Move, S: Searcher<C, M>> Solver<C, M> for S {
     fn solve(&self, cube: &C) -> Option<Alg<M>> {
-        self.search(cube, C::is_solved)
+        let (solution, _solved) = self.search(cube, C::is_solved)?;
+
+        debug_assert!(_solved.is_solved());
+
+        Some(solution)
     }
 }

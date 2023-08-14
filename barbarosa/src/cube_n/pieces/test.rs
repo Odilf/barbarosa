@@ -22,7 +22,7 @@ fn edge_min_to_solve() {
         let min = edge::min_moves_to_solve(&target, cube.edges.piece_originally_at(&target));
         let searcher = IDASearcher::new(|_| 0.0, Cube3::successors, 20);
 
-        let solution = searcher
+        let (solution, _) = searcher
             .search(&cube, |cube| {
                 cube.edges
                     .iter_with_pos()
